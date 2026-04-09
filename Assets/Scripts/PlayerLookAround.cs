@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class PlayerLookAround : MonoBehaviour
 {
+
+    //Keep the camera perspective in 3rd person
+
     public Camera cam;
 
     public float xRotation = 0f;

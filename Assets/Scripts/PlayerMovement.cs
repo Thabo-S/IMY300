@@ -56,11 +56,24 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(playerVelocity * Time.deltaTime);  
     }
 
+    // THE PLAYER CAN ONLY JUMP IF THEY ARE ONLY GROUNDED
+    // THIS BASICALLY PREVENTS DOUBLE JUMPING
     public void PlayerJump()
     {
         if (isGrounded)
         {
             playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -3.0f);
+        }
+    }
+
+    // THE PLAYER CAN ALSO ONLY SPRINT IF THEY ARE GROUNDED
+    // THIS PREVENTS THE CASE WHERE THE PLAYER IS IN MID AIR
+    // AND PRESSES THE SPRINT BUTTON, PREVENTS THEM FROM TURINING INTO SUPERMAN
+    public void PlayerSprint(float speedInput)
+    {
+        if (isGrounded)
+        {
+            speed = speedInput;
         }
     }
 }

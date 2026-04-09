@@ -1216,17 +1216,45 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4792397098877828362, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
+      propertyPath: field of view
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 4792397098877828362, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.4745098
+      objectReference: {fileID: 0}
+    - target: {fileID: 4792397098877828362, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.36484727
+      objectReference: {fileID: 0}
+    - target: {fileID: 4792397098877828362, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.19215688
+      objectReference: {fileID: 0}
+    - target: {fileID: 7632874689529833869, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7632874689529833869, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.655
+      objectReference: {fileID: 0}
+    - target: {fileID: 7632874689529833869, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.013
+      objectReference: {fileID: 0}
     - target: {fileID: 9007150745859211872, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -30.13
       objectReference: {fileID: 0}
     - target: {fileID: 9007150745859211872, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.06
+      value: 3.063
       objectReference: {fileID: 0}
     - target: {fileID: 9007150745859211872, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5.6
+      value: 5.259
       objectReference: {fileID: 0}
     - target: {fileID: 9007150745859211872, guid: ca88842dcebb03c449d5c7d7a94942f4, type: 3}
       propertyPath: m_LocalRotation.w

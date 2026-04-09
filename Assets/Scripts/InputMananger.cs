@@ -25,6 +25,14 @@ public class InputMananger : MonoBehaviour
 
         walking.Jump.performed += ctx => movement.PlayerJump();
 
+        // MODIFIED THE SPRINT FUNTION TO HAVE A PARAMETER
+        // THAT DETERMINES THE SPEED OF THE PLAYER BUT CHANGES 
+        // BACK ON EVENT CANCELLED
+        walking.Sprint.performed += ctx => movement.PlayerSprint(16f);
+
+        walking.Sprint.canceled += ctx => movement.PlayerSprint(6f);
+
+
     }
 
     // Update is called once per frame
