@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.Scripts.NPCscripts; // Import the namespace for NPC scripts
 
-public class NPCmovementScript : NPCComponent 
+// NameSpace for the NPC scripts, which can be used to organize related classes and avoid naming conflicts
+namespace Assets.Scripts.NPCscripts
 {
-    private void Update()
+    public class NPCmovementScript : NPCComponent
     {
-        NPC.animator.SetFloat("Speed", NPC.CurrentSpeed());// Update the "Speed" parameter in the Animator based on the current speed of the NavMeshAgent
+        private void Update()
+        {
+            NPC.animator.SetFloat("Speed", NPC.CurrentSpeed());// Update the "Speed" parameter in the Animator based on the current speed of the NavMeshAgent
+        }
     }
 }
