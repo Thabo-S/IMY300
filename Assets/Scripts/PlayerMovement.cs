@@ -11,7 +11,6 @@ public class PlayerMovement : MonoBehaviour
     public float speed = 6f;
     public float jumpHeight = 2f;
 
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
