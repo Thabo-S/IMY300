@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine.AI; // AI library for pathfinding and navigation
 using UnityEngine;
 
+//Starting postions of the NPC's intila game
+//trnasform ,x = any  z= 1.52761
+
 // NameSpace for the NPC scripts, which can be used to organize related classes and avoid naming conflicts
 namespace Assets.Scripts.NPCscripts
 {
