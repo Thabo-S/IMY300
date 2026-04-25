@@ -14,6 +14,8 @@ public class PickUpScript : MonoBehaviour
     private bool canDrop = true; //this is needed so we don't throw/drop object when rotating the object
     private int LayerNumber; //layer index
 
+    private Vector3 defaultHeldObjectScale = Vector3.zero;
+
     //Reference to script which includes mouse movement of player (looking around)
     //we want to disable the player looking around when rotating the object
     //example below 
@@ -42,7 +44,9 @@ public class PickUpScript : MonoBehaviour
                     //make sure pickup tag is attached
                     if (hit.transform.gameObject.tag == "canPickUp")
                     {
-                        //pass in object hit into the PickUpObject function
+                    //pass in object hit into the PickUpObject function
+
+                        defaultHeldObjectScale = hit.transform.localScale;
                         PickUpObject(hit.transform.gameObject);
                     }
                 }
@@ -55,7 +59,7 @@ public class PickUpScript : MonoBehaviour
                     DropObject();
                 }
             }
-       
+
     }
 
 
@@ -80,11 +84,13 @@ public class PickUpScript : MonoBehaviour
             heldObj = pickUpObj; //assign heldObj to the object that was hit by the raycast (no longer == null)
             heldObjRb = pickUpObj.GetComponent<Rigidbody>(); //assign Rigidbody
             heldObjRb.isKinematic = true;
+            heldObj.transform.localScale = defaultHeldObjectScale;
             heldObjRb.transform.parent = holdPosition.transform; //parent object to holdposition
             heldObj.layer = LayerNumber; //change the object layer to the holdLayer
             //make sure object doesnt collide with player, it can cause weird bugs
             Physics.IgnoreCollision(heldObj.GetComponent<Collider>(), player.GetComponent<Collider>(), true);
         }
+
     }
     void DropObject()
     {
