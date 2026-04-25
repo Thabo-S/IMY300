@@ -376,7 +376,7 @@ GameObject:
   - component: {fileID: 124253852}
   - component: {fileID: 124253856}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: pickuptest
   m_TagString: canPickUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

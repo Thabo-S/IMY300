@@ -20,6 +20,8 @@ public class InputMananger : MonoBehaviour
 
     private float sneakValue = 6f;
 
+    private Vector3 couchValue = new Vector3(1, 0.5f, 1);
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -41,6 +43,10 @@ public class InputMananger : MonoBehaviour
         walking.Sprint.performed += ctx => movement.PlayerSprint(sprintValue);
 
         walking.Sprint.canceled += ctx => movement.PlayerSprint(sneakValue);
+
+        walking.Crouch.performed += ctx => movement.playerCrouch(couchValue, true);
+
+        walking.Crouch.canceled += ctx => movement.playerCrouch(new Vector3(1 , 1 , 1), false);
 
         pickUp.PickUpObject.performed += ctx => pickUpScript.runPickUpObject();
 

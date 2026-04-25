@@ -6,6 +6,8 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController characterController;
     private Vector3 playerVelocity;
     private bool isGrounded;
+    private bool isCrouching = false;
+    private Transform scaleTransform;
 
     public float gravity = -9.8f;
     public float speed = 6f;
@@ -17,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+
+        scaleTransform = GetComponent<Transform>();
 
     }
 
@@ -72,9 +76,21 @@ public class PlayerMovement : MonoBehaviour
     // AND PRESSES THE SPRINT BUTTON, PREVENTS THEM FROM TURINING INTO SUPERMAN
     public void PlayerSprint(float speedInput)
     {
-        if (isGrounded)
+        if (isGrounded && !isCrouching)
         {
             speed = speedInput;
         }
+    }
+
+
+    public void playerCrouch(Vector3 crouchValue, bool crouchingFlag)
+    {
+
+        isCrouching = crouchingFlag;
+
+        scaleTransform.localScale = crouchValue;
+        //Debug.Log();
+
+
     }
 }
