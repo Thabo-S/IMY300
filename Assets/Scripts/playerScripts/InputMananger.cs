@@ -1,16 +1,26 @@
+using Unity.AppUI.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputMananger : MonoBehaviour
 {
+    private PlayerInput.WalkingActions walking;
+
+    private PlayerInput.PickUpActions pickUp;
 
     private PlayerInput playerInput;
-
-    private PlayerInput.WalkingActions walking;
 
     private PlayerMovement movement;
 
     private PlayerLookAround playerLookAround;
+
+    public PickUpScript pickUpScript;
+
+    private float sprintValue = 16f;
+
+    private float sneakValue = 6f;
+
+    private Vector3 couchValue = new Vector3(1, 0.5f, 1);
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -18,6 +28,8 @@ public class InputMananger : MonoBehaviour
         playerInput = new PlayerInput();
 
         walking = playerInput.Walking;
+
+        pickUp = playerInput.PickUp;
 
         movement =  GetComponent<PlayerMovement>();
 
@@ -28,10 +40,17 @@ public class InputMananger : MonoBehaviour
         // MODIFIED THE SPRINT FUNTION TO HAVE A PARAMETER
         // THAT DETERMINES THE SPEED OF THE PLAYER BUT CHANGES 
         // BACK ON EVENT CANCELLED
-        walking.Sprint.performed += ctx => movement.PlayerSprint(16f);
+        walking.Sprint.performed += ctx => movement.PlayerSprint(sprintValue);
 
-        walking.Sprint.canceled += ctx => movement.PlayerSprint(6f);
+        walking.Sprint.canceled += ctx => movement.PlayerSprint(sneakValue);
 
+        walking.Crouch.performed += ctx => movement.playerCrouch(couchValue, true);
+
+        walking.Crouch.canceled += ctx => movement.playerCrouch(new Vector3(1 , 1 , 1), false);
+
+        pickUp.PickUpObject.performed += ctx => pickUpScript.runPickUpObject();
+
+        pickUp.ThrowObject.performed += ctx => pickUpScript.runThrowObject();
 
     }
 
@@ -57,11 +76,13 @@ public class InputMananger : MonoBehaviour
     private void OnEnable()
     {
         walking.Enable();
+        pickUp.Enable();
     }
 
     // And this turns the walking controls OFF when the player dies/leaves
     private void OnDisable()
     {
-        walking.Disable(); 
+        walking.Disable();
+        pickUp.Disable();
     }
 }
