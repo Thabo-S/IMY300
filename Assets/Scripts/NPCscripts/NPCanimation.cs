@@ -12,5 +12,6 @@ namespace Assets.Scripts.NPCscripts
         {
             NPC.animator.SetFloat("Speed", NPC.CurrentSpeed());// Update the "Speed" parameter in the Animator based on the current speed of the NavMeshAgent
         }
+
     }
 }

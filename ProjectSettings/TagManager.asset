@@ -6,11 +6,12 @@ TagManager:
   tags:
   - canPickUp
   - laser
+  - Walls
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - obstacle
   - Water
   - UI
   - holdLayer

@@ -1,39 +1,53 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// NameSpace for the NPC scripts, which can be used to organize related classes and avoid naming conflicts
 namespace Assets.Scripts.NPCscripts
 {
     public class PatrolArea : MonoBehaviour
     {
         public float width = 10f;
         public float height = 10f;
+        [SerializeField] private float Radius = 10f;
+        [SerializeField] private int waypointCount = 3;
 
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.yellow;
             Vector3 center = transform.position;
-            Vector3 size = new Vector3(width, 0.1f, height);
-            Gizmos.DrawWireCube(center, size); //draw a Wire Cube to visualize the patrol area in the editor
+            Vector3 size = new Vector3(width, 5f, height);
+            Gizmos.DrawWireCube(center, size);
         }
 
-        [SerializeField] private float Radius = 10f; //radius of the patrol area
+        public Vector3[] GetWaypoints()
+        {
+            Vector3[] points = new Vector3[waypointCount];
+            for (int i = 0; i < waypointCount; i++)
+            {
+                points[i] = GetRandomPoint();
+            }
+            return points;
+        }
+
         public Vector3 GetRandomPoint()
         {
-            Vector3 randomDirection = Random.insideUnitSphere * Radius;
-            randomDirection.y = 0; //keep the point on the same plane as the NPC
-
-            Vector3 randomPoint = transform.position + randomDirection; //offset the random point from the NPC's current position
-
-            NavMeshHit hit;
-            Vector3 finalPos = transform.position;
-
-            if (NavMesh.SamplePosition(randomPoint, out hit, Radius, NavMesh.AllAreas))
+            // Try up to 10 times to find a valid NavMesh point
+            for (int i = 0; i < 10; i++)
             {
-                finalPos = hit.position;
+                Vector3 randomDirection = Random.insideUnitSphere * Radius;
+                randomDirection.y = 0;
+                Vector3 randomPoint = transform.position + randomDirection;
+
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(randomPoint, out hit, Radius, NavMesh.AllAreas))
+                {
+                    return hit.position; // ✅ Valid point found
+                }
             }
 
-            return finalPos;
+            Debug.LogWarning("Could not find valid NavMesh point — check PatrolArea position and Radius");
+            return transform.position; // Fallback to PatrolArea center, not NPC position
         }
     }
 }
+
+
