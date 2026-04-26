@@ -22,6 +22,12 @@ public class PickUpScript : MonoBehaviour
     //MouseLookScript mouseLookScript;
     void Start()
     {
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = new Color(0f, 0f, 1f, 0.5f);
+        }
+
         LayerNumber = LayerMask.NameToLayer("holdLayer"); //if your holdLayer is named differently make sure to change this ""
 
         //mouseLookScript = player.GetComponent<MouseLookScript>();
