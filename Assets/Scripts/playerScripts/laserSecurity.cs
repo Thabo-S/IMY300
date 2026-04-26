@@ -1,9 +1,15 @@
 using UnityEngine;
-
+using UnityEngine.Audio;
 public class LaserSecurity : MonoBehaviour
 {
+
+    private AudioSource audioSource;
     void Start()
     {
+
+        audioSource = GetComponent<AudioSource>();
+
+
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
         {
@@ -22,5 +28,7 @@ public class LaserSecurity : MonoBehaviour
     void TriggerAlarm()
     {
         Debug.Log("ALARM! Laser tripped by the player!");
+
+        audioSource.Play();
     }
 }
