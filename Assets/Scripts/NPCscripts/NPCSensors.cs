@@ -8,7 +8,7 @@ namespace Assets.Scripts.NPCscripts
         [Header("Vision Settings")]
         [SerializeField] private Transform player;
         [SerializeField] private Transform eyePoint;
-        [SerializeField] private float visionRange = 30f;
+        [SerializeField] private float visionRange = 15f;
         [SerializeField] private float visionAngle = 60f;
         [SerializeField] private LayerMask obstacleMask;
 
@@ -133,13 +133,15 @@ namespace Assets.Scripts.NPCscripts
         private void GameOver()
         {
             Debug.Log("GAME OVER: Player was seen for 5 seconds.");
-            
+            seenCountText.text = "Game Over(player seen for 5 seconds: " + timesPlayerSeen;
+
         }
 
         private void UpdateSeenUI()
         {
             if (seenCountText != null)
-                seenCountText.text = "Caught: " + timesPlayerSeen;
+                seenCountText.text = "Seen: " + timesPlayerSeen;
+
         }
 
         private void OnDrawGizmosSelected()
