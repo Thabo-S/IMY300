@@ -7,8 +7,18 @@ public class LaserSecurity : MonoBehaviour
     void Start()
     {
 
+
+
         audioSource = GetComponent<AudioSource>();
 
+        if (audioSource == null)
+        {
+            Debug.LogError("There is no AudioSource on " + gameObject.name);
+        }
+        else
+        {
+            Debug.Log("AudioSource found on " + gameObject.name);
+        }
 
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
@@ -29,6 +39,9 @@ public class LaserSecurity : MonoBehaviour
     {
         Debug.Log("ALARM! Laser tripped by the player!");
 
-        audioSource.Play();
+        if (audioSource != null && !audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
     }
 }
