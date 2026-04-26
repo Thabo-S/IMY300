@@ -33,7 +33,7 @@ public class PickUpScript : MonoBehaviour
 
     public void runPickUpObject()
     {
-        Debug.Log("running pick up method");
+        //Debug.Log("running pick up method");
 
             if (heldObj == null) //if currently not holding anything
             {

@@ -1,4 +1,5 @@
 using System;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -82,15 +83,23 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private Vector3 crouchValue = new Vector3(1, 0.5f, 1);
 
-    public void playerCrouch(Vector3 crouchValue, bool crouchingFlag)
+    public void playerCrouch()
     {
 
-        isCrouching = crouchingFlag;
-
-        scaleTransform.localScale = crouchValue;
-        //Debug.Log();
-
+        if (!isCrouching) 
+        {
+            scaleTransform.localScale = crouchValue;
+            isCrouching = !isCrouching;
+            Debug.Log("currently crouching");
+        }
+        else
+        {
+            scaleTransform.localScale = new Vector3(1, 1, 1);
+            isCrouching = !isCrouching;
+            Debug.Log("standing");
+        }
 
     }
 }
