@@ -5,15 +5,17 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private CharacterController characterController;
+    private Animator animator;
     private Vector3 playerVelocity;
     private bool isGrounded;
     private bool isCrouching = false;
     private Transform scaleTransform;
 
-    public float gravity = -9.8f;
-    public float speed = 6f;
-    public float sprintValue = 16f;
-    public float jumpHeight = 2f;
+    public float gravity = -50f;
+    public float speed = 20f;
+    public float walkSpeed = 20f;
+    public float sprintSpeed = 30f;
+    public float jumpHeight = 5f;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -23,43 +25,63 @@ public class PlayerMovement : MonoBehaviour
 
         scaleTransform = GetComponent<Transform>();
 
+        animator = GetComponentInChildren<Animator>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
         isGrounded = characterController.isGrounded;
+
+    
     }
+
+    //public void UpdateAnimations()
+    //{
+    //    Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0, characterController.velocity.z);
+    //    bool isMoving = horizontalVelocity.magnitude > 0f;
+
+    //    if (animator != null)
+    //    {
+    //        Debug.Log($"isWalking: {isMoving}, velocity magnitude: {horizontalVelocity.magnitude}");
+    //        animator.SetBool("isWalking", isMoving);
+    //    }
+    //}
+
+    private Vector3 currentVelocity = Vector3.zero;
 
     // SO THIS FUNCTION BASCIALLY GETS THE INPUTS FROM THE INPUT MANAGER 
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
     public void CalculatePlayerMovement(Vector2 movementInput)
     {
-        Vector3 playerMovementDirection = Vector3.zero;
 
-        playerMovementDirection.x = movementInput.x;
+        Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
+        move = transform.TransformDirection(move);
+        characterController.Move(move * speed * Time.deltaTime);
 
-        // since it's a 3D sort of game this might be confusing but
-        // basically what i am doing here is taking the up/vertical movement
-        // from the input (when you press W on WASD) and transforming it 
-        // to foward movement
-        playerMovementDirection.z = movementInput.y;
+        currentVelocity = move * speed;
 
-        // So without TransformDirection, the player would basically move
-        // foward towards the Worlds North and not relative to the player's rotation
-        characterController.Move(transform.TransformDirection(playerMovementDirection) * speed * Time.deltaTime);
-
-
-        //this applied a downward motion to the player
-        playerVelocity.y += gravity * Time.deltaTime;
-
-
+        // 2. Gravity Logic
         if (isGrounded && playerVelocity.y < 0)
         {
-            playerVelocity.y = -2f;
+            playerVelocity.y = -2f; // Keeps player glued to slopes
         }
 
-        characterController.Move(playerVelocity * Time.deltaTime);  
+        playerVelocity.y += gravity * Time.deltaTime;
+        characterController.Move(playerVelocity * Time.deltaTime);
+
+        UpdateAnimations();
+    }
+    public void UpdateAnimations()
+    {
+        bool isMoving = currentVelocity.magnitude > 0.1f;
+
+        if (animator != null)
+        {
+            Debug.Log($"isWalking: {isMoving}, velocity magnitude: {currentVelocity.magnitude}");
+            animator.SetBool("isWalking", isMoving);
+        }
     }
 
     // THE PLAYER CAN ONLY JUMP IF THEY ARE ONLY GROUNDED
@@ -68,18 +90,18 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isGrounded)
         {
-            playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -3.0f);
+            playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
         }
     }
 
     // THE PLAYER CAN ALSO ONLY SPRINT IF THEY ARE GROUNDED
     // THIS PREVENTS THE CASE WHERE THE PLAYER IS IN MID AIR
     // AND PRESSES THE SPRINT BUTTON, PREVENTS THEM FROM TURINING INTO SUPERMAN
-    public void PlayerSprint(float speedInput)
+    public void PlayerSprint(bool isSprinting)
     {
         if (isGrounded && !isCrouching)
         {
-            speed = speedInput;
+            speed = isSprinting ? sprintSpeed : walkSpeed;
         }
     }
 
