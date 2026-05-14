@@ -25,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
     private float crouchHeight = 9.46f;
     private Vector3 crouchCenter = new Vector3(0f, 4.67f, -0.37f);
 
+    private CameraPosition cameraScript;
 
     public static class AnimationParams
     {
@@ -46,6 +47,8 @@ public class PlayerMovement : MonoBehaviour
         // To fix the squashing bug
         standingHeight = characterController.height;
         standingCenter = characterController.center;
+
+        cameraScript = GetComponentInChildren<CameraPosition>();
 
     }
 
@@ -134,6 +137,8 @@ public class PlayerMovement : MonoBehaviour
             if (animator != null) animator.SetBool(AnimationParams.IsSprinting, false);
         }
     }
+
+
     public void playerCrouch()
     {
         isCrouching = !isCrouching;
@@ -143,12 +148,26 @@ public class PlayerMovement : MonoBehaviour
             characterController.height = crouchHeight;
             characterController.center = crouchCenter;
             speed = sneakSpeed;
+
+            if (cameraScript != null)
+            {
+                // Raycast origin still drops to avoid ceiling clipping
+                cameraScript.headPosition = 5.0f;
+                // This now only lowers the Top-Down coordinates
+                cameraScript.ToggleCrouchView(true);
+            }
         }
         else
         {
             characterController.height = standingHeight;
             characterController.center = standingCenter;
             speed = walkSpeed;
+
+            if (cameraScript != null)
+            {
+                cameraScript.headPosition = 11.5f;
+                cameraScript.ToggleCrouchView(false);
+            }
         }
 
         if (animator != null)
