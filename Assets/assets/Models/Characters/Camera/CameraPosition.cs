@@ -2,26 +2,37 @@ using UnityEngine;
 
 public class CameraPosition : MonoBehaviour
 {
-    // Standing Coordinates (Standard 3rd Person)
     private Vector3 thirdPersonPos = new Vector3(4.11f, 12.59f, -16.21f);
     private Vector3 thirdPersonRot = new Vector3(15f, 0f, 0f);
 
-    // Standing Coordinates (Standard Top-Down)
-    private Vector3 topDownPos = new Vector3(0f, 11.57f, 0f);
+    private Vector3 topDownPos = new Vector3(0f, 11.57f, 1.8f);
     private Vector3 topDownRot = new Vector3(0f, 0f, 0f);
 
-    private Vector3 crouchTopDownPos = new Vector3(0f, 8.22f, 1.26f);
+    private Vector3 crouchTopDownPos = new Vector3(0f, 8.22f, 1f);
     private Vector3 crouchTopDownRot = new Vector3(20f, 0f, 0f);
 
     private bool isTopDown = true;
-    private bool isCrouching = false; // Keep track of crouch state here too
+    private bool isCrouching = false;
     private Transform player;
     public float headPosition = 11.5f;
 
+    private SkinnedMeshRenderer playerMeshRenderer;
+
     [SerializeField] private float smoothSpeed = 10f;
+
     void Start()
     {
         player = transform.parent;
+
+        // Find the player mesh by tag
+        GameObject meshObj = GameObject.FindGameObjectWithTag("PlayerMesh");
+        if (meshObj != null)
+        {
+            playerMeshRenderer = meshObj.GetComponent<SkinnedMeshRenderer>();
+        }
+
+        // Set initial state
+        UpdateCameraTransform();
     }
 
     void Update()
@@ -35,18 +46,22 @@ public class CameraPosition : MonoBehaviour
         PreventCameraClipping();
     }
 
-    // This is called by PlayerMovement.cs
     public void ToggleCrouchView(bool crouchingState)
     {
         isCrouching = crouchingState;
-        UpdateCameraTransform(); // Refresh the position immediately
+        UpdateCameraTransform();
     }
 
     void UpdateCameraTransform()
     {
+
+        if (playerMeshRenderer != null)
+        {
+            playerMeshRenderer.enabled = !isTopDown;
+        }
+
         if (isTopDown)
         {
-            // If crouching in TopDown, use the specific screenshot values
             if (isCrouching)
             {
                 transform.localPosition = crouchTopDownPos;
@@ -60,7 +75,6 @@ public class CameraPosition : MonoBehaviour
         }
         else
         {
-            // 3rd Person stays at standard height as you requested
             transform.localPosition = thirdPersonPos;
             transform.localRotation = Quaternion.Euler(thirdPersonRot);
         }

@@ -1,6 +1,8 @@
-using System;
 using NUnit.Framework.Constraints;
+using System;
 using UnityEngine;
+using static PlayerMovement;
+using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -27,12 +29,15 @@ public class PlayerMovement : MonoBehaviour
 
     private CameraPosition cameraScript;
 
+    [SerializeField] private float jumpDelay = 0.71f;
+
     public static class AnimationParams
     {
         public const string IsWalking = "isWalking";
         public const string IsSprinting = "isRunning";
         public const string IsCrouching = "isCrouching";
         public const string IsSneaking = "isSneaking";
+        public const string JumpTrigger = "Jump";
     }
 
     void Start()
@@ -110,10 +115,23 @@ public class PlayerMovement : MonoBehaviour
     // THIS BASICALLY PREVENTS DOUBLE JUMPING
     public void PlayerJump()
     {
-        if (isGrounded)
+        // Check if grounded and not crouching
+        if (isGrounded && !isCrouching)
         {
-            playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
+            StartCoroutine(JumpWithDelay());
         }
+    }
+
+    private IEnumerator JumpWithDelay()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(AnimationParams.JumpTrigger);
+        }
+
+        yield return new WaitForSeconds(jumpDelay);
+
+        playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
     }
 
     // THE PLAYER CAN ALSO ONLY SPRINT IF THEY ARE GROUNDED
