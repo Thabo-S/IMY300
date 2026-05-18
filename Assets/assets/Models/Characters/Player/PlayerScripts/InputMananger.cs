@@ -16,9 +16,9 @@ public class InputMananger : MonoBehaviour
 
     public PickUpScript pickUpScript;
 
-    private float sprintValue = 16f;
+    //private float sprintValue = 16f;
 
-    private float sneakValue = 6f;
+    //private float sneakValue = 6f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -38,9 +38,9 @@ public class InputMananger : MonoBehaviour
         // MODIFIED THE SPRINT FUNTION TO HAVE A PARAMETER
         // THAT DETERMINES THE SPEED OF THE PLAYER BUT CHANGES 
         // BACK ON EVENT CANCELLED
-        walking.Sprint.performed += ctx => movement.PlayerSprint(sprintValue);
+        walking.Sprint.performed += ctx => movement.PlayerSprint(true);
 
-        walking.Sprint.canceled += ctx => movement.PlayerSprint(sneakValue);
+        walking.Sprint.canceled += ctx => movement.PlayerSprint(false);
 
         walking.Crouch.performed += ctx => movement.playerCrouch();
 
