@@ -7,8 +7,6 @@ TagManager:
   - canPickUp
   - laser
   - Walls
-  - PlayerMesh
-  - Door
   layers:
   - Default
   - TransparentFX

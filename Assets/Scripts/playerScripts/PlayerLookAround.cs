@@ -12,8 +12,6 @@ public class PlayerLookAround : MonoBehaviour
     public float xDirectionSensitivity = 20f;
     public float yDirectionSensitivity = 20f;
 
-    [SerializeField] private float VerticalClamp = 20f;
-
     //TEMPORARY WAY MAKE THE CURSOR NOT VISIBLE
     private void Update()
     {
@@ -37,7 +35,7 @@ public class PlayerLookAround : MonoBehaviour
 
         // CALCULATE THE CAMERA ROUTAION BASED ON THE MOUSE INPUTS
         xRotation -= (mouseY * Time.deltaTime) * yDirectionSensitivity;
-        xRotation = Mathf.Clamp(xRotation, -VerticalClamp + 10 , VerticalClamp);
+        xRotation = Mathf.Clamp(xRotation, -80f, 80f);
 
         cam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
 
