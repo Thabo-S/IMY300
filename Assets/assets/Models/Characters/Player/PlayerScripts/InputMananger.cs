@@ -50,6 +50,9 @@ public class InputMananger : MonoBehaviour
 
         pickUp.ThrowObject.performed += ctx => pickUpScript.runThrowObject();
 
+        pickUp.PickUpObject.performed += ctc => pickUpScript.toggleDoorState();
+
+
     }
 
     // Update is called once per frame

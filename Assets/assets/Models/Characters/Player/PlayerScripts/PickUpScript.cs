@@ -5,9 +5,13 @@ public class PickUpScript : MonoBehaviour
     public GameObject player;
     public Transform holdPosition;
 
+    public GameObject door;
+
     //if you copy from below this point, you are legally required to like the video
     public float throwForce = 500f; //force at which the object is thrown at
     public float pickUpRange = 5f; //how far the player can pickup the object from
+    [SerializeField]
+    private float doorOpenRange = 12f; //how far away the player needs to be in order to open or close the door
     private float rotationSensitivity = 1f; //how fast/slow the object is rotated in relation to mouse movement
     private GameObject heldObj; //object which we pick up
     private Rigidbody heldObjRb; //rigidbody of object we pick up
@@ -35,6 +39,34 @@ public class PickUpScript : MonoBehaviour
     }
     void Update()
     {
+    }
+
+    public void toggleDoorState()
+    {
+        //Debug.Log("toggling...");
+        if (heldObj == null) //if currently not holding anything
+        {
+            Debug.Log("NULL PASS");
+            //perform raycast to check if player is looking at object within interaction range
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, doorOpenRange))
+            {
+                Debug.Log("RAY PASS");
+                //make sure pickup tag is attached
+                if (hit.transform.gameObject.tag == "Door")
+                {
+                    Debug.Log("DOOR FOUND!!");
+
+                    doorMovement targetDoor = hit.transform.GetComponent<doorMovement>();
+
+                    // If the script exists on that door, run its Interact method!
+                    if (targetDoor != null)
+                    {
+                        targetDoor.ToggleDoor();
+                    }
+                }
+            }
+        }
     }
 
     public void runPickUpObject()
