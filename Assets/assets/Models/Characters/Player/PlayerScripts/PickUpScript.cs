@@ -9,7 +9,7 @@ public class PickUpScript : MonoBehaviour
 
     //if you copy from below this point, you are legally required to like the video
     public float throwForce = 500f; //force at which the object is thrown at
-    public float pickUpRange = 5f; //how far the player can pickup the object from
+    public float pickUpRange = 8f; //how far the player can pickup the object from
     [SerializeField]
     private float doorOpenRange = 12f; //how far away the player needs to be in order to open or close the door
     private float rotationSensitivity = 1f; //how fast/slow the object is rotated in relation to mouse movement
@@ -35,8 +35,8 @@ public class PickUpScript : MonoBehaviour
         LayerNumber = LayerMask.NameToLayer("holdLayer"); //if your holdLayer is named differently make sure to change this ""
 
         //mouseLookScript = player.GetComponent<MouseLookScript>();
-
     }
+
     void Update()
     {
     }
@@ -73,33 +73,31 @@ public class PickUpScript : MonoBehaviour
     {
         //Debug.Log("running pick up method");
 
-            if (heldObj == null) //if currently not holding anything
+        if (heldObj == null) //if currently not holding anything
+        {
+            //perform raycast to check if player is looking at object within pickuprange
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, pickUpRange))
             {
-                //perform raycast to check if player is looking at object within pickuprange
-                RaycastHit hit;
-                if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, pickUpRange))
+                //make sure pickup tag is attached
+                if (hit.transform.gameObject.tag == "canPickUp")
                 {
-                    //make sure pickup tag is attached
-                    if (hit.transform.gameObject.tag == "canPickUp")
-                    {
                     //pass in object hit into the PickUpObject function
 
-                        defaultHeldObjectScale = hit.transform.localScale;
-                        PickUpObject(hit.transform.gameObject);
-                    }
+                    defaultHeldObjectScale = hit.transform.localScale;
+                    PickUpObject(hit.transform.gameObject);
                 }
             }
-            else
+        }
+        else
+        {
+            if (canDrop == true)
             {
-                if (canDrop == true)
-                {
-                    StopClipping(); //prevents object from clipping through walls
-                    DropObject();
-                }
+                StopClipping(); //prevents object from clipping through walls
+                DropObject();
             }
-
+        }
     }
-
 
     public void runThrowObject()
     {
@@ -112,9 +110,35 @@ public class PickUpScript : MonoBehaviour
                 StopClipping();
                 ThrowObject();
             }
-
         }
     }
+
+    // New helper method to safely handle collision bypassing for either standard Colliders OR CharacterControllers
+    private void SetIgnoreCollisionWithPlayer(GameObject target, bool ignore)
+    {
+        if (player == null || target == null) return;
+
+        Collider targetCollider = target.GetComponent<Collider>();
+        if (targetCollider == null) return;
+
+        Collider playerCollider = player.GetComponent<Collider>();
+
+        if (playerCollider == null)
+        {
+            CharacterController cc = player.GetComponent<CharacterController>();
+            if (cc != null)
+            {
+                Physics.IgnoreCollision(targetCollider, cc, ignore);
+                return;
+            }
+        }
+
+        if (playerCollider != null)
+        {
+            Physics.IgnoreCollision(targetCollider, playerCollider, ignore);
+        }
+    }
+
     void PickUpObject(GameObject pickUpObj)
     {
         if (pickUpObj.GetComponent<Rigidbody>()) //make sure the object has a RigidBody
@@ -125,25 +149,28 @@ public class PickUpScript : MonoBehaviour
             heldObj.transform.localScale = defaultHeldObjectScale;
             heldObjRb.transform.parent = holdPosition.transform; //parent object to holdposition
             heldObj.layer = LayerNumber; //change the object layer to the holdLayer
-            //make sure object doesnt collide with player, it can cause weird bugs
-            Physics.IgnoreCollision(heldObj.GetComponent<Collider>(), player.GetComponent<Collider>(), true);
-        }
 
+            //make sure object doesnt collide with player, it can cause weird bugs (Upgraded to support CharacterControllers safely)
+            SetIgnoreCollisionWithPlayer(heldObj, true);
+        }
     }
+
     void DropObject()
     {
         //re-enable collision with player
-        Physics.IgnoreCollision(heldObj.GetComponent<Collider>(), player.GetComponent<Collider>(), false);
+        SetIgnoreCollisionWithPlayer(heldObj, false);
         heldObj.layer = 0; //object assigned back to default layer
         heldObjRb.isKinematic = false;
         heldObj.transform.parent = null; //unparent object
         heldObj = null; //undefine game object
     }
+
     void MoveObject()
     {
         //keep object position the same as the holdPosition position
         heldObj.transform.position = holdPosition.transform.position;
     }
+
     void RotateObject()
     {
         if (Input.GetKey(KeyCode.R))//hold R key to rotate, change this to whatever key you want
@@ -168,16 +195,18 @@ public class PickUpScript : MonoBehaviour
             canDrop = true;
         }
     }
+
     void ThrowObject()
     {
         //same as drop function, but add force to object before undefining it
-        Physics.IgnoreCollision(heldObj.GetComponent<Collider>(), player.GetComponent<Collider>(), false);
+        SetIgnoreCollisionWithPlayer(heldObj, false);
         heldObj.layer = 0;
         heldObjRb.isKinematic = false;
         heldObj.transform.parent = null;
         heldObjRb.AddForce(transform.forward * throwForce);
         heldObj = null;
     }
+
     void StopClipping() //function only called when dropping/throwing
     {
         var clipRange = Vector3.Distance(heldObj.transform.position, transform.position); //distance from holdPos to the camera
@@ -193,7 +222,4 @@ public class PickUpScript : MonoBehaviour
             //if your player is small, change the -0.5f to a smaller number (in magnitude) ie: -0.1f
         }
     }
-
-
-
 }
