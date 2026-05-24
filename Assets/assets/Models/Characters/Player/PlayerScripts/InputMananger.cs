@@ -29,7 +29,7 @@ public class InputMananger : MonoBehaviour
 
         pickUp = playerInput.PickUp;
 
-        movement =  GetComponent<PlayerMovement>();
+        movement = GetComponent<PlayerMovement>();
 
         playerLookAround = GetComponent<PlayerLookAround>();
 
@@ -46,13 +46,10 @@ public class InputMananger : MonoBehaviour
 
         //walking.Crouch.canceled += ctx => movement.playerCrouch();
 
-        pickUp.PickUpObject.performed += ctx => pickUpScript.runPickUpObject();
-
         pickUp.ThrowObject.performed += ctx => pickUpScript.runThrowObject();
 
-        pickUp.PickUpObject.performed += ctc => pickUpScript.toggleDoorState();
-
-
+        // This unified helper method handles BOTH picking up objects and opening doors cleanly without clashing
+        pickUp.PickUpObject.performed += ctx => OnInteractionPressed();
     }
 
     // Update is called once per frame
@@ -63,14 +60,31 @@ public class InputMananger : MonoBehaviour
         movement.CalculatePlayerMovement(walking.Movement.ReadValue<Vector2>());
 
         playerLookAround.CalculatePlayerLookAround(walking.LookAround.ReadValue<Vector2>());
-
-
     }
 
     private void LateUpdate()
     {
         //playerLookAround.CalculatePlayerLookAround(walking.LookAround.ReadValue<Vector2>());
+    }
 
+    // Custom helper to decide whether to open a door or grab an item when E is pressed
+    private void OnInteractionPressed()
+    {
+        if (pickUpScript == null) return;
+
+        RaycastHit hit;
+        Vector3 forwardDirection = pickUpScript.transform.TransformDirection(Vector3.forward);
+
+        if (Physics.Raycast(pickUpScript.transform.position, forwardDirection, out hit, 12f))
+        {
+            if (hit.transform.CompareTag("Door"))
+            {
+                pickUpScript.toggleDoorState();
+                return;
+            }
+        }
+
+        pickUpScript.runPickUpObject();
     }
 
     // Basically turns ON the walking controls created before the player moves
