@@ -10,6 +10,7 @@ TagManager:
   - PlayerMesh
   - Door
   - Winner
+  - LevelComplete
   layers:
   - Default
   - TransparentFX
