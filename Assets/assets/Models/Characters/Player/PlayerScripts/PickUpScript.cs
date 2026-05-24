@@ -41,6 +41,10 @@ public class PickUpScript : MonoBehaviour
     {
     }
 
+    public bool IsHolding(string objectName)
+    {
+        return heldObj != null && heldObj.name == objectName;
+    }
     public void toggleDoorState()
     {
         //Debug.Log("toggling...");
