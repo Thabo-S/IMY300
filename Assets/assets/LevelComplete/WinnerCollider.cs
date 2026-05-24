@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WinnerCollider : MonoBehaviour
 {
@@ -12,7 +14,13 @@ public class WinnerCollider : MonoBehaviour
             {
                 levelCompleteUI.SetActive(true);
                 levelCompleteUI.GetComponent<Animator>().SetTrigger("Show");
+                StartCoroutine(ReloadScene());
             }
         }
+    }
+    private IEnumerator ReloadScene()
+    {
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

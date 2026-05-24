@@ -11,6 +11,8 @@ TagManager:
   - Door
   - Winner
   - LevelComplete
+  - Guard
+  - GameOver
   layers:
   - Default
   - TransparentFX
