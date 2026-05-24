@@ -194,13 +194,4 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // check if the player used the exit and if so, Game is over.
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Winner"))
-        {
-            Debug.Log("GAME OVER");
-        }
-    }
-
 }
