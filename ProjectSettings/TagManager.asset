@@ -9,6 +9,7 @@ TagManager:
   - Walls
   - PlayerMesh
   - Door
+  - Winner
   layers:
   - Default
   - TransparentFX
