@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class GuardScript : MonoBehaviour
 {
     private GameObject player;
-    public float sightDistance = 45f;
+    public float sightDistance = 50f;
     public float fieldOfView = 30f;
     public float eyeHeight = 12f;
     public float waitAtWaypoint = 2f;
@@ -25,6 +25,24 @@ public class GuardScript : MonoBehaviour
     private float playerSpottedTimer = 0f;
 
     public float guardSpeed = 10f;
+
+    private void OnEnable() => SoundEmissionManager.OnSoundEmitted += HandleSound;
+    private void OnDisable() => SoundEmissionManager.OnSoundEmitted -= HandleSound;
+
+    private void HandleSound(Vector3 soundPos, float volume)
+    {
+        float distance = Vector3.Distance(transform.position, soundPos);
+        //Debug.Log($"[Guard] Heard sound event. Distance: {distance}, Volume: {volume}");
+
+
+        if (distance <= volume)
+        {
+            if (volume > 60f)
+                Debug.Log("Running sound heard! Distance: " + distance);
+            else
+                Debug.Log("Walking sound heard! Distance: " + distance);
+        }
+    }
 
     void Start()
     {
@@ -139,4 +157,6 @@ public class GuardScript : MonoBehaviour
 
         return false;
     }
+
+
 }
