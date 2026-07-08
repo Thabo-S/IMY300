@@ -31,6 +31,12 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private float jumpDelay = 0.71f;
 
+    [Header("Sound Emission")]
+    public float walkVolume = 30f;
+    public float runVolume = 60f;
+    public float soundEmitInterval = 0.5f;
+    private float soundTimer = 0f;
+
     public static class AnimationParams
     {
         public const string IsWalking = "isWalking";
@@ -61,6 +67,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         isGrounded = characterController.isGrounded;
+        EmitMovementSound();
     }
 
     private Vector3 currentVelocity = Vector3.zero;
@@ -191,6 +198,23 @@ public class PlayerMovement : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool(AnimationParams.IsCrouching, isCrouching);
+        }
+    }
+
+    private void EmitMovementSound()
+    {
+        bool isMoving = currentVelocity.magnitude > 0.1f;
+
+        if (isCrouching || !isMoving) return; // sneaking or standing still = silent
+
+        soundTimer -= Time.deltaTime;
+        if (soundTimer <= 0f)
+        {
+            float volume = (speed == sprintSpeed) ? runVolume : walkVolume;
+            //Debug.Log($"[Player] Emitting sound. Volume: {volume}, Position: {transform.position}");
+
+            SoundEmissionManager.EmitSound(transform.position, volume);
+            soundTimer = soundEmitInterval;
         }
     }
 
