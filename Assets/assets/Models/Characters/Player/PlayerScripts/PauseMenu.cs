@@ -8,8 +8,8 @@ public class PauseMenu : MonoBehaviour
 
     private void Start()
     {
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
@@ -33,8 +33,8 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         isGamePause = false;
 
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         Debug.Log("Resuming game play");
     }
     public void PauseGamePlay()
@@ -43,8 +43,8 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 0f;
         isGamePause = true;
 
-        //Cursor.lockState = CursorLockMode.None;
-        //Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }
 
