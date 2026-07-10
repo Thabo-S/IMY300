@@ -13,7 +13,6 @@ TagManager:
   - LevelComplete
   - Guard
   - GameOver
-  - NoiseSource
   layers:
   - Default
   - TransparentFX
