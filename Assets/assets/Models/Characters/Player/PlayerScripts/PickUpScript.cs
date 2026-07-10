@@ -1,11 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class PickUpScript : MonoBehaviour
 {
     public GameObject player;
     public Transform holdPosition;
-
     public GameObject door;
+    public activePanel activePanelReferance;
 
     //if you copy from below this point, you are legally required to like the video
     public float throwForce = 500f; //force at which the object is thrown at
@@ -35,18 +36,17 @@ public class PickUpScript : MonoBehaviour
         LayerNumber = LayerMask.NameToLayer("holdLayer"); //if your holdLayer is named differently make sure to change this ""
 
         //mouseLookScript = player.GetComponent<MouseLookScript>();
+       
     }
 
     void Update()
     {
     }
 
-    public bool IsHolding(string objectName)
-    {
-        return heldObj != null && heldObj.name == objectName;
-    }
     public void toggleDoorState()
     {
+        if (PauseMenu.isGamePause) return;
+
         //Debug.Log("toggling...");
         if (heldObj == null) //if currently not holding anything
         {
@@ -98,13 +98,15 @@ public class PickUpScript : MonoBehaviour
             if (canDrop == true)
             {
                 StopClipping(); //prevents object from clipping through walls
-                DropObject();
+                //DropObject();
             }
         }
     }
 
     public void runThrowObject()
     {
+        if (PauseMenu.isGamePause) return;
+
         if (heldObj != null) //if player is holding object
         {
             MoveObject(); //keep object position at holdPos
@@ -143,30 +145,90 @@ public class PickUpScript : MonoBehaviour
         }
     }
 
+    public class HotbarItem
+    {
+        public GameObject heldObject; // the real pickup object
+        public Sprite icon;
+    }
+
+    public List<GameObject> hotbarSlots;
+   
+    public Sprite emptySlotSprite;
+
+    public HotbarItem[] hotbarItems = new HotbarItem[5];
+
     void PickUpObject(GameObject pickUpObj)
     {
-        if (pickUpObj.GetComponent<Rigidbody>()) //make sure the object has a RigidBody
-        {
-            heldObj = pickUpObj; //assign heldObj to the object that was hit by the raycast (no longer == null)
-            heldObjRb = pickUpObj.GetComponent<Rigidbody>(); //assign Rigidbody
-            heldObjRb.isKinematic = true;
-            heldObj.transform.localScale = defaultHeldObjectScale;
-            heldObjRb.transform.parent = holdPosition.transform; //parent object to holdposition
-            heldObj.layer = LayerNumber; //change the object layer to the holdLayer
+        if (PauseMenu.isGamePause) return;
 
-            //make sure object doesnt collide with player, it can cause weird bugs (Upgraded to support CharacterControllers safely)
-            SetIgnoreCollisionWithPlayer(heldObj, true);
+        Debug.Log("Running method and found " + pickUpObj.name);
+
+        for (int i = 0; i < hotbarSlots.Count; i++)
+        {
+            GameObject slot = hotbarSlots[i];
+            Image slotImage = slot.GetComponentInChildren<Image>(true);
+            if (slotImage == null) continue;
+
+            if (slotImage.sprite == emptySlotSprite)
+            {
+                slot.SetActive(true);
+
+                Sprite[] allSprites = Resources.LoadAll<Sprite>("Items/sprites/" + pickUpObj.name);
+                Sprite itemSprite = System.Array.Find(allSprites, s => s.name == pickUpObj.name + "_0");
+
+                if (itemSprite != null)
+                {
+                    slotImage.sprite = itemSprite;
+                    pickUpObj.SetActive(false);
+                    Debug.Log("Added " + pickUpObj.name + " to hotbar.");
+
+                    hotbarItems[i] = new HotbarItem
+                    {
+                        heldObject = pickUpObj,
+                        icon = itemSprite
+                    };
+
+                    break;
+                }
+                else
+                {
+                    Debug.LogWarning("No sprite found for: " + pickUpObj.name);
+                }
+            }
         }
     }
 
-    void DropObject()
+    public void DropSelectedSlot()
     {
-        //re-enable collision with player
-        SetIgnoreCollisionWithPlayer(heldObj, false);
-        heldObj.layer = 0; //object assigned back to default layer
-        heldObjRb.isKinematic = false;
-        heldObj.transform.parent = null; //unparent object
-        heldObj = null; //undefine game object
+        if (PauseMenu.isGamePause) return;
+
+        int index = activePanelReferance.SelectedIndex;
+        HotbarItem item = hotbarItems[index];
+
+        if (item == null || item.heldObject == null)
+        {
+            Debug.Log("Empty slot");
+            return;
+        }
+
+        DropFromHotbar(index);
+    }
+
+    public void DropFromHotbar(int index)
+    {
+        HotbarItem item = hotbarItems[index];
+        if (item == null || item.heldObject == null) return;
+
+        // Reactivate at a position in front of the player
+        item.heldObject.transform.position = holdPosition.position;
+        item.heldObject.SetActive(true);
+
+        // Clear the slot visually and in data
+        Image slotImage = hotbarSlots[index].GetComponentInChildren<Image>(true);
+        slotImage.sprite = emptySlotSprite;
+        hotbarItems[index] = null;
+
+        hotbarSlots[index].SetActive(false);
     }
 
     void MoveObject()

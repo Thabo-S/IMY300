@@ -9,27 +9,27 @@ public class WinnerCollider : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            PickUpScript pickUp = other.GetComponent<PickUpScript>();
-            bool hasCrown = pickUp != null && pickUp.IsHolding("Crown");
+        //if (other.CompareTag("Player"))
+        //{
+        //    PickUpScript pickUp = other.GetComponent<PickUpScript>();
+        //    bool hasCrown = pickUp != null && pickUp.IsHolding("Crown");
 
-            if (hasCrown)
-            {
-                if (levelCompleteUI != null)
-                {
-                    levelCompleteUI.SetActive(true);
-                    levelCompleteUI.GetComponent<Animator>().SetTrigger("Show");
-                }
-            }
-            else
-            {
-                if (gameRestartUI != null)
-                    gameRestartUI.SetActive(true);
-            }
+        //    if (hasCrown)
+        //    {
+        //        if (levelCompleteUI != null)
+        //        {
+        //            levelCompleteUI.SetActive(true);
+        //            levelCompleteUI.GetComponent<Animator>().SetTrigger("Show");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (gameRestartUI != null)
+        //            gameRestartUI.SetActive(true);
+        //    }
 
-            StartCoroutine(ReloadScene());
-        }
+        //    StartCoroutine(ReloadScene());
+        //}
     }
 
     private IEnumerator ReloadScene()

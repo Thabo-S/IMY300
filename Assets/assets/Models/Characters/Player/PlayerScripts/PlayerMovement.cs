@@ -23,7 +23,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("Crouch Dimensions")]
     private float standingHeight;
     private Vector3 standingCenter;
-
     private float crouchHeight = 9.46f;
     private Vector3 crouchCenter = new Vector3(0f, 4.67f, -0.37f);
 
@@ -76,6 +75,7 @@ public class PlayerMovement : MonoBehaviour
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
     public void CalculatePlayerMovement(Vector2 movementInput)
     {
+        if (PauseMenu.isGamePause) return;
 
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
         move = transform.TransformDirection(move);
@@ -122,6 +122,8 @@ public class PlayerMovement : MonoBehaviour
     // THIS BASICALLY PREVENTS DOUBLE JUMPING
     public void PlayerJump()
     {
+        if (PauseMenu.isGamePause) return;
+
         // Check if grounded and not crouching
         if (isGrounded && !isCrouching)
         {
@@ -146,6 +148,8 @@ public class PlayerMovement : MonoBehaviour
     // AND PRESSES THE SPRINT BUTTON, PREVENTS THEM FROM TURINING INTO SUPERMAN
     public void PlayerSprint(bool isSprinting)
     {
+        if (PauseMenu.isGamePause) return;
+
         if (isSprinting)
         {
             // Only allow STARTING a sprint if grounded and not crouching
@@ -163,9 +167,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
     public void playerCrouch()
     {
+        if (PauseMenu.isGamePause) return;
+
         isCrouching = !isCrouching;
 
         if (isCrouching)
@@ -203,6 +208,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void EmitMovementSound()
     {
+        if (PauseMenu.isGamePause) return;
+
         bool isMoving = currentVelocity.magnitude > 0.1f;
 
         if (isCrouching || !isMoving) return; // sneaking or standing still = silent
@@ -217,5 +224,4 @@ public class PlayerMovement : MonoBehaviour
             soundTimer = soundEmitInterval;
         }
     }
-
 }

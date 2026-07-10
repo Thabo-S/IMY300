@@ -17,17 +17,17 @@ public class PlayerLookAround : MonoBehaviour
     //TEMPORARY WAY MAKE THE CURSOR NOT VISIBLE
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        //if (Input.GetKeyDown(KeyCode.Escape))
+        //{
+        //    Cursor.lockState = CursorLockMode.None;
+        //    Cursor.visible = true;
+        //}
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    Cursor.lockState = CursorLockMode.Locked;
+        //    Cursor.visible = false;
+        //}
     }
 
     public void CalculatePlayerLookAround(Vector2 PlayerLookAround)

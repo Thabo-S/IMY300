@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.AppUI.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -48,8 +49,14 @@ public class InputMananger : MonoBehaviour
 
         pickUp.ThrowObject.performed += ctx => pickUpScript.runThrowObject();
 
+        pickUp.DropObject.performed += ctx => pickUpScript.DropSelectedSlot();
+
         // This unified helper method handles BOTH picking up objects and opening doors cleanly without clashing
         pickUp.PickUpObject.performed += ctx => OnInteractionPressed();
+
+        //Turn cursor off
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
     }
 
     // Update is called once per frame
