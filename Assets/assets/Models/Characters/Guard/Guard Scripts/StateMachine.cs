@@ -3,12 +3,11 @@ using UnityEngine;
 public class StateMachine : MonoBehaviour
 {
     public BaseState activeState;
-    public PatrolState patrolState;
+    //public PatrolState patrolState;
 
     public void Initialise()
     {
-        patrolState = new PatrolState();
-        ChangeState(patrolState);
+        ChangeState(new PatrolState());
     }
     void Start()
     {
@@ -41,6 +40,4 @@ public class StateMachine : MonoBehaviour
         }
  
     }
-
-
 }

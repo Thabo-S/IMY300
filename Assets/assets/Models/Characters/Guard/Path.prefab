@@ -53,6 +53,10 @@ MonoBehaviour:
   - {fileID: 8418224147411258034}
   - {fileID: 3678407060885723826}
   - {fileID: 1103131297807528707}
+  alwaysDrawPath: 1
+  drawAsLoop: 0
+  drawNumbers: 1
+  debugColour: {r: 1, g: 0.025809944, b: 0.025809944, a: 1}
 --- !u!1 &3387637344420957667
 GameObject:
   m_ObjectHideFlags: 0
