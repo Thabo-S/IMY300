@@ -19,6 +19,8 @@ public class Guard : MonoBehaviour
     public Transform PlayerTransform => player.transform;
     public Vector3 LastKnownPlayerPosition { get; private set; }
 
+    public int currentWaypointIndex = 0;
+
     [Header("Sight")]
     public float sightDistance = 50f;
     public float fieldOfView = 30f;
