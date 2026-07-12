@@ -15,6 +15,7 @@ public class Bullet : MonoBehaviour
         if (hitObject.CompareTag("Player"))
         {
             hitObject.GetComponent<Player>().TakeDamage(bulletDamage);
+            //hitObject.GetComponent<Player>().TakeDamage(Random.Range(7, 13));
         }
 
         Destroy(gameObject);

@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class PatrolState : BaseState
 {
-    public int wayPointIndex;
     public float wayPointInterval = 4f;
     private bool isWaiting = false;
 
@@ -13,7 +12,7 @@ public class PatrolState : BaseState
 
         if (guard.path != null && guard.path.waypoints.Count > 0)
         {
-            guard.Agent.SetDestination(guard.path.waypoints[wayPointIndex].position);
+            guard.Agent.SetDestination(guard.path.waypoints[guard.currentWaypointIndex].position);
         }
     }
 
@@ -56,9 +55,9 @@ public class PatrolState : BaseState
     private IEnumerator WaitAtWaypoint()
     {
         isWaiting = true;
-        wayPointIndex = (wayPointIndex + 1) % guard.path.waypoints.Count;
+        guard.currentWaypointIndex = (guard.currentWaypointIndex + 1) % guard.path.waypoints.Count;
         yield return new WaitForSeconds(wayPointInterval);
-        guard.Agent.SetDestination(guard.path.waypoints[wayPointIndex].position);
+        guard.Agent.SetDestination(guard.path.waypoints[guard.currentWaypointIndex].position);
         isWaiting = false;
     }
 }

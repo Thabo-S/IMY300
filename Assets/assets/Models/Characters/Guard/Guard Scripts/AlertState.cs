@@ -5,24 +5,20 @@ public class AlertState : BaseState
 {
     public Vector3 lastKnownPosition;
     public float alertSpeed = 16f;
-    public float waitAtLocationTime = 2f;
+    public float waitAtLocationTime = 4f;
+    public float wanderRadius = 10f;
 
     private bool hasArrived = false;
-    private bool isWaiting = false;
 
     public override void Enter()
     {
         guard.Agent.speed = alertSpeed;
         guard.Agent.SetDestination(lastKnownPosition);
         hasArrived = false;
-        isWaiting = false;
     }
 
     public override void Perform()
     {
-
-        //Debug.Log($"[ALERT] pos:{guard.Agent.transform.position} dest:{guard.Agent.destination} remainingDist:{guard.Agent.remainingDistance} hasPath:{guard.Agent.hasPath} pathPending:{guard.Agent.pathPending} pathStatus:{guard.Agent.pathStatus} hasArrived:{hasArrived}");
-
         if (guard.CanSeePlayer())
         {
             stateMachine.ChangeState(new AttackState());
@@ -45,36 +41,45 @@ public class AlertState : BaseState
             if (arrived)
             {
                 hasArrived = true;
-                stateMachine.StartCoroutine(WaitAtLocation());
+                stateMachine.StartCoroutine(SearchAtLocation());
             }
         }
 
-        bool isMoving = guard.Agent.velocity.magnitude > 0.1f && !isWaiting;
-        guard.UpdateAnimationParameters(isMoving, isWaiting);
+        bool isMoving = guard.Agent.velocity.magnitude > 0.1f;
+        guard.UpdateAnimationParameters(isMoving, !isMoving);
     }
 
-    private IEnumerator WaitAtLocation()
+    private IEnumerator SearchAtLocation()
     {
-        isWaiting = true;
-        yield return new WaitForSeconds(waitAtLocationTime);
+        float elapsed = 0f;
 
-        if (stateMachine.activeState != this)
+        while (elapsed < waitAtLocationTime)
         {
-            yield break;
+            if (stateMachine.activeState != this) yield break;
+
+            if (guard.CanSeePlayer())
+            {
+                stateMachine.ChangeState(new AttackState());
+                Debug.Log("[ALERT] Spotted player while searching, changing to ATTACK State");
+                yield break;
+            }
+
+            // Wander to a new nearby point every so often, but stay within the total search window
+            if (!guard.Agent.pathPending && guard.Agent.remainingDistance <= guard.Agent.stoppingDistance)
+            {
+                Vector3 randomOffset = Random.insideUnitSphere * wanderRadius;
+                randomOffset.y = 0f;
+                guard.Agent.SetDestination(guard.transform.position + randomOffset);
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
         }
 
-        if (guard.CanSeePlayer())
-        {
-            stateMachine.ChangeState(new AttackState());
-            Debug.Log("[ALERT] Spotted player after waiting, changing to ATTACK State");
-        }
-        else
-        {
-            stateMachine.ChangeState(new PatrolState());
-            Debug.Log("[ALERT] Didn't find player after waiting, changing back to Patrol State");
-        }
+        if (stateMachine.activeState != this) yield break;
 
-        isWaiting = false;
+        stateMachine.ChangeState(new PatrolState());
+        Debug.Log("[ALERT] Search finished, didn't find player, returning to Patrol");
     }
 
     public override void Exit() { }

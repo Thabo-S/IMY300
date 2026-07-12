@@ -1,24 +1,40 @@
 using UnityEngine;
+using UnityEngine.UI;
+using static UnityEngine.ProBuilder.AutoUnwrapSettings;
 
 public class Player : MonoBehaviour
 {
-    public float PlayerHealth = 100;
+
+    public Slider HealthBarSlider;
+
+    public float MaxHealth = 100;
+
+    public float PlayerHealth;
+
+    public Gradient gradient;
+    public Image fill;
+
+
+
+    void Start()
+    {
+        PlayerHealth = MaxHealth;
+
+        HealthBarSlider.maxValue = MaxHealth;
+
+        HealthBarSlider.value = MaxHealth;
+
+        fill.color = gradient.Evaluate(1f);
+    }
 
     public void TakeDamage(int damage)
     {
         PlayerHealth -= damage;
 
-        Debug.Log("Player took damage: " + PlayerHealth);
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+        HealthBarSlider.value = PlayerHealth;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
+
+        Debug.Log("Player took damage: " + PlayerHealth);
     }
 }

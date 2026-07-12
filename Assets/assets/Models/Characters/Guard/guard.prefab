@@ -356,6 +356,37 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &6557557520583919876
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6861666816770851377}
+  m_Layer: 0
+  m_Name: gunBarrel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6861666816770851377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6557557520583919876}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.655, y: 10.234, z: 4.499}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1748918548573582845}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8042125165835912827
 GameObject:
   m_ObjectHideFlags: 0
@@ -956,6 +987,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   currentState: 
   path: {fileID: 0}
+  player: {fileID: 0}
   sightDistance: 50
   fieldOfView: 30
   eyeHeight: 12
@@ -972,6 +1004,8 @@ MonoBehaviour:
   detectionSliderFill: {fileID: 7573340084516478441}
   eyeIcon: {fileID: 8347423157828153823}
   gun: {fileID: 1373237846862835527}
+  gunBarrel: {fileID: 6861666816770851377}
+  fireRate: 2
 --- !u!114 &3977392496578703735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1046,7 +1080,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6cad126caa25137489860211d8e99e74, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6861666816770851377}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6cad126caa25137489860211d8e99e74, type: 3}
 --- !u!1 &1373237846862835527 stripped
