@@ -1,33 +1,64 @@
+using System.Collections;
+using UnityEngine;
+
 public class PatrolState : BaseState
 {
-    public int wayPointIndex; 
+    public int wayPointIndex;
+    public float wayPointInterval = 4f;
+    private bool isWaiting = false;
+
     public override void Enter()
     {
+        guard.Agent.isStopped = false;
 
+        if (guard.path != null && guard.path.waypoints.Count > 0)
+        {
+            guard.Agent.SetDestination(guard.path.waypoints[wayPointIndex].position);
+        }
     }
+
     public override void Perform()
     {
         PatrolCycle();
-    }
-    public override void Exit()
-    {
 
+        bool isMoving = guard.Agent.velocity.magnitude > 0.1f && !isWaiting;
+        guard.UpdateAnimationParameters(isMoving, isWaiting);
+
+        if (guard.CanSeePlayer())
+        {
+            stateMachine.ChangeState(new AttackState());
+            Debug.Log("[PATROL] Spotted player, changing to ATTACK State");
+            return;
+        }
+
+        if (guard.TickDetection())
+        {
+            guard.detection = 0f;
+            AlertState alert = new AlertState();
+            alert.lastKnownPosition = guard.LastKnownPlayerPosition;
+            stateMachine.ChangeState(alert);
+            Debug.Log("[PATROL] Heard player, changing to ALERT State");
+        }
     }
+
+    public override void Exit() { }
 
     public void PatrolCycle()
     {
-        if (guard.Agent.remainingDistance < 2f)
-        {
-            if (wayPointIndex < guard.path.waypoints.Count - 1)
-            {
-                wayPointIndex++;
-            }
-            else
-            {
-                wayPointIndex = 0;
-            }
+        if (guard.path == null || guard.path.waypoints.Count == 0) return;
 
-            guard.Agent.SetDestination(guard.path.waypoints[wayPointIndex].position);
+        if (!isWaiting && guard.Agent.hasPath && guard.Agent.remainingDistance < 2f)
+        {
+            stateMachine.StartCoroutine(WaitAtWaypoint());
         }
+    }
+
+    private IEnumerator WaitAtWaypoint()
+    {
+        isWaiting = true;
+        wayPointIndex = (wayPointIndex + 1) % guard.path.waypoints.Count;
+        yield return new WaitForSeconds(wayPointInterval);
+        guard.Agent.SetDestination(guard.path.waypoints[wayPointIndex].position);
+        isWaiting = false;
     }
 }

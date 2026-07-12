@@ -34,13 +34,13 @@ namespace Assets.Scripts.NPCscripts
 
 
         [Header("Rotation Settings")]
-        [SerializeField] private float rotationSpeed = 90f;// Degrees per second
+        //[SerializeField] private float rotationSpeed = 90f;// Degrees per second
         private Quaternion targetRotation;// The rotation to turn to
 
         [Header("Debugging: NPC State")]
         [SerializeField] private State npcState = State.Wandering;
 
-        [SerializeField] private float SuspiciousDuration = 5f;
+        //[SerializeField] private float SuspiciousDuration = 5f;
         [SerializeField] private float IdleDuration = 3f;
         [SerializeField] private float maxIdleTime = 5f;
         [SerializeField] private float suspiciousTimer = 0f;
