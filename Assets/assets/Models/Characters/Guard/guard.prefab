@@ -960,7 +960,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 2040274369950383098}
   m_Enabled: 1
   m_AgentTypeID: -334000983
-  m_Radius: 0.5
+  m_Radius: 1
   m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -988,12 +988,13 @@ MonoBehaviour:
   currentState: 
   path: {fileID: 0}
   player: {fileID: 0}
-  sightDistance: 50
+  currentWaypointIndex: 0
+  sightDistance: 70
   fieldOfView: 30
   eyeHeight: 12
   catchRadius: 50
   warningSightDistance: 100
-  warningFieldOfView: 60
+  warningFieldOfView: 80
   runningFillRate: 100
   walkingFillRate: 60
   soundMemoryTime: 1
@@ -1005,6 +1006,7 @@ MonoBehaviour:
   eyeIcon: {fileID: 8347423157828153823}
   gun: {fileID: 1373237846862835527}
   gunBarrel: {fileID: 6861666816770851377}
+  bulletSpeed: 80
   fireRate: 2
 --- !u!114 &3977392496578703735
 MonoBehaviour:
