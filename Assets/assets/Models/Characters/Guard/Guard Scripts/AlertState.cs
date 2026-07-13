@@ -5,8 +5,8 @@ public class AlertState : BaseState
 {
     public Vector3 lastKnownPosition;
     public float alertSpeed = 16f;
-    public float waitAtLocationTime = 4f;
-    public float wanderRadius = 10f;
+    public float waitAtLocationTime = 8f;
+    public float wanderRadius = 15f;
 
     private bool hasArrived = false;
 

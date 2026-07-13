@@ -49,6 +49,7 @@ public class Guard : MonoBehaviour
     [Header("Weapons")]
     public GameObject gun;
     public Transform gunBarrel;
+    public float bulletSpeed = 80f;
 
     [Range(0.1f, 10f)]
     public float fireRate;
@@ -152,14 +153,14 @@ public class Guard : MonoBehaviour
         soundMemoryTimer = soundMemoryTime;
     }
 
-    private void UpdateSliderUI()
+    public void UpdateSliderUI()
     {
         if (detectionSlider != null)
             detectionSlider.value = detection / maxDetection;
 
     }
 
-    private void SetSliderColor(Color color)
+    public void SetSliderColor(Color color)
     {
         if (detectionSliderFill != null)
             detectionSliderFill.color = color;

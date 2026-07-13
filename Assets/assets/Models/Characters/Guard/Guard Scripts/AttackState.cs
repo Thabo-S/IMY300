@@ -8,7 +8,6 @@ public class AttackState : BaseState
 
     [Header("Fire Rate")]
     public float shotsPerSecond = 1.5f;
-    public float bulletSpeed = 60f;
     private float fireTimer;
 
     public override void Enter()
@@ -42,6 +41,12 @@ public class AttackState : BaseState
 
             guard.SetGunActive(true);
 
+            guard.detection = 100f;
+
+            guard.UpdateSliderUI();
+
+            guard.SetSliderColor(Color.red);
+
             if (fireTimer > guard.fireRate)
             {
                 fireTimer = 1f / shotsPerSecond;
@@ -74,6 +79,10 @@ public class AttackState : BaseState
                 }
 
                 stateMachine.ChangeState(alert);
+
+                guard.detection = 100f;
+
+                guard.SetSliderColor(Color.yellow);
 
                 guard.UpdateAnimationParameters(false, true, false);
 
@@ -119,10 +128,10 @@ public class AttackState : BaseState
     {
         Transform gunBarrel = guard.gunBarrel;
 
-        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * 10f);
+        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * 7f);
         Vector3 shootDirection = (baseTargetPoint - gunBarrel.position).normalized;
 
-        Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-7f, 7f), Vector3.up) * shootDirection;
+        Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-5f, 5f), Vector3.up) * shootDirection;
 
         GameObject bullet = GameObject.Instantiate(
             Resources.Load("Prefabs/Bullet") as GameObject,
@@ -130,7 +139,7 @@ public class AttackState : BaseState
             Quaternion.LookRotation(finalDirection)
         );
 
-        bullet.GetComponent<Rigidbody>().linearVelocity = finalDirection * 40;
+        bullet.GetComponent<Rigidbody>().linearVelocity = finalDirection * guard.bulletSpeed;
 
         Debug.Log("Shoot");
 
