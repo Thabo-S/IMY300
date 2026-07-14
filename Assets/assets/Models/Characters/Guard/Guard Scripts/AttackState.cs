@@ -25,6 +25,8 @@ public class AttackState : BaseState
         guard.UpdateAnimationParameters(false, false, false);
 
         guard.SetGunActive(false);
+
+        guard.detection = 0f;
     }
 
     public override void Perform()
@@ -80,9 +82,7 @@ public class AttackState : BaseState
 
                 stateMachine.ChangeState(alert);
 
-                guard.detection = 100f;
-
-                guard.SetSliderColor(Color.yellow);
+                //guard.SetSliderColor(Color.yellow);
 
                 guard.UpdateAnimationParameters(false, true, false);
 

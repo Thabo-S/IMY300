@@ -47,8 +47,6 @@ public class InputMananger : MonoBehaviour
 
         //walking.Crouch.canceled += ctx => movement.playerCrouch();
 
-        pickUp.ThrowObject.performed += ctx => pickUpScript.runThrowObject();
-
         pickUp.DropObject.performed += ctx => pickUpScript.DropSelectedSlot();
 
         // This unified helper method handles BOTH picking up objects and opening doors cleanly without clashing
@@ -79,19 +77,7 @@ public class InputMananger : MonoBehaviour
     {
         if (pickUpScript == null) return;
 
-        RaycastHit hit;
-        Vector3 forwardDirection = pickUpScript.transform.TransformDirection(Vector3.forward);
-
-        if (Physics.Raycast(pickUpScript.transform.position, forwardDirection, out hit, 12f))
-        {
-            if (hit.transform.CompareTag("Door"))
-            {
-                pickUpScript.toggleDoorState();
-                return;
-            }
-        }
-
-        pickUpScript.runPickUpObject();
+        pickUpScript.HandleInteraction();
     }
 
     // Basically turns ON the walking controls created before the player moves

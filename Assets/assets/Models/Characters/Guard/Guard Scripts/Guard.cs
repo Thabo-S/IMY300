@@ -25,7 +25,8 @@ public class Guard : MonoBehaviour
     public float sightDistance = 50f;
     public float fieldOfView = 30f;
     public float eyeHeight = 12f;
-    public float catchRadius = 50f;
+    public float catchRadius = 20f;
+    public float wanderRadius = 15f;
 
     [Header("Warning cone (eye icon, should be larger)")]
     public float warningSightDistance = 65f;
@@ -121,7 +122,13 @@ public class Guard : MonoBehaviour
             if (detection <= 0f) SetSliderColor(Color.green);
         }
 
-        return detection >= maxDetection;
+        if (detection >= maxDetection)
+        {
+            detection = 0f;
+            return true;
+        }
+
+        return false;
     }
 
     private bool UpdateSoundDetection()
@@ -152,6 +159,9 @@ public class Guard : MonoBehaviour
         LastKnownPlayerPosition = soundPos;
         soundMemoryTimer = soundMemoryTime;
     }
+
+    // TODO: MAKE A SEPERATE METHOD FOR OBJECTS YOU CAN THROW, 
+    // HandleSoundForObject
 
     public void UpdateSliderUI()
     {
@@ -217,4 +227,46 @@ public class Guard : MonoBehaviour
 
         return false;
     }
+
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (stateMachine == null) return;
+
+        AlertState alert = stateMachine.activeState as AlertState;
+        if (alert == null) return;
+
+        // Search radius (yellow wire circle around the search origin)
+        Gizmos.color = Color.yellow;
+        Vector3 origin = alert.HasArrived ? alert.SearchOrigin : alert.lastKnownPosition;
+        DrawWireCircle(origin, catchRadius);
+
+        // Last known / search origin point
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(alert.lastKnownPosition, 0.5f);
+
+        // Current wander target, if searching
+        if (alert.HasArrived && alert.CurrentWanderTarget != Vector3.zero)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawSphere(alert.CurrentWanderTarget, 0.4f);
+            Gizmos.DrawLine(transform.position, alert.CurrentWanderTarget);
+        }
+    }
+
+    private void DrawWireCircle(Vector3 center, float radius, int segments = 40)
+    {
+        float angleStep = 360f / segments;
+        Vector3 prevPoint = center + new Vector3(radius, 0f, 0f);
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = angleStep * i * Mathf.Deg2Rad;
+            Vector3 newPoint = center + new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
+            Gizmos.DrawLine(prevPoint, newPoint);
+            prevPoint = newPoint;
+        }
+    }
+#endif
 }

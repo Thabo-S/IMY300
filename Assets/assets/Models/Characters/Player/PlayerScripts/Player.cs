@@ -14,8 +14,6 @@ public class Player : MonoBehaviour
     public Gradient gradient;
     public Image fill;
 
-
-
     void Start()
     {
         PlayerHealth = MaxHealth;

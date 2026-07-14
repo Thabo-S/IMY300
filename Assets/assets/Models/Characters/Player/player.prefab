@@ -3959,7 +3959,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.0051917434, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5724,7 +5724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bbdb5f56fc771a74b87a22d24b831a4e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.67
+      value: 130.25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bbdb5f56fc771a74b87a22d24b831a4e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5732,7 +5732,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bbdb5f56fc771a74b87a22d24b831a4e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 70.98
+      value: 15.980015
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bbdb5f56fc771a74b87a22d24b831a4e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6128,8 +6128,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLookAround
   cam: {fileID: 8772257281698077040}
   xRotation: 0
-  xDirectionSensitivity: 10
-  yDirectionSensitivity: 10
+  xDirectionSensitivity: 3
+  yDirectionSensitivity: 3
   VerticalClamp: 70
 --- !u!114 &3885183834778949538
 MonoBehaviour:
@@ -6143,13 +6143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f50a8a71ea2fe54d9ef885bc701a001, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickUpScript
-  player: {fileID: 6911835488255642956, guid: 0d60f1e22019f2c4b8e8601521419410, type: 3}
   holdPosition: {fileID: 6782301246575935597}
-  door: {fileID: 0}
   activePanelReferance: {fileID: 113290756148625244}
-  throwForce: 500
-  pickUpRange: 8
-  doorOpenRange: 12
+  pickUpRange: 10
+  doorOpenRange: 40
   hotbarSlots:
   - {fileID: 9150602523945475691}
   - {fileID: 2089370578157393910}

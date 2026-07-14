@@ -32,7 +32,6 @@ public class PatrolState : BaseState
 
         if (guard.TickDetection())
         {
-            guard.detection = 0f;
             AlertState alert = new AlertState();
             alert.lastKnownPosition = guard.LastKnownPlayerPosition;
             stateMachine.ChangeState(alert);
