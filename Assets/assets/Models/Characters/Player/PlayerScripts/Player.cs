@@ -4,15 +4,16 @@ using static UnityEngine.ProBuilder.AutoUnwrapSettings;
 
 public class Player : MonoBehaviour
 {
-
+    [Header("Health Variables")]
     public Slider HealthBarSlider;
-
     public float MaxHealth = 100;
-
     public float PlayerHealth;
-
-    public Gradient gradient;
+        public Gradient gradient;
     public Image fill;
+
+    [Header("Footstep Audio")]
+    public AudioSource walkingFootsteps;
+    public AudioSource runningFootsteps;
 
     void Start()
     {
@@ -34,5 +35,30 @@ public class Player : MonoBehaviour
         fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
 
         Debug.Log("Player took damage: " + PlayerHealth);
+    }
+    public void PlayFootsteps(bool isSprinting)
+    {
+        if (isSprinting)
+        {
+            if (!runningFootsteps.isPlaying)
+            {
+                walkingFootsteps.Stop();
+                runningFootsteps.Play();
+            }
+        }
+        else
+        {
+            if (!walkingFootsteps.isPlaying)
+            {
+                runningFootsteps.Stop();
+                walkingFootsteps.Play();
+            }
+        }
+    }
+
+    public void StopFootsteps()
+    {
+        walkingFootsteps.Stop();
+        runningFootsteps.Stop();
     }
 }

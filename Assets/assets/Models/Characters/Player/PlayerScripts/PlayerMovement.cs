@@ -6,8 +6,13 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Reference")]
     private CharacterController characterController;
     private Animator animator;
+    private CameraPosition cameraScript;
+    public Player playerScript;
+
+
     private Vector3 playerVelocity;
     private bool isGrounded;
     private bool isCrouching = false;
@@ -26,7 +31,6 @@ public class PlayerMovement : MonoBehaviour
     private float crouchHeight = 9.46f;
     private Vector3 crouchCenter = new Vector3(0f, 4.67f, -0.37f);
 
-    private CameraPosition cameraScript;
 
     [SerializeField] private float jumpDelay = 0.71f;
 
@@ -36,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
     public float soundEmitInterval = 0.5f;
     private float soundTimer = 0f;
 
+    private Vector3 currentVelocity = Vector3.zero;
     public static class AnimationParams
     {
         public const string IsWalking = "isWalking";
@@ -49,16 +54,14 @@ public class PlayerMovement : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
 
-        //scaleTransform = GetComponent<Transform>();
-
         animator = GetComponentInChildren<Animator>();
 
-        // Saving the player's original height
-        // To fix the squashing bug
         standingHeight = characterController.height;
         standingCenter = characterController.center;
 
         cameraScript = GetComponentInChildren<CameraPosition>();
+
+        playerScript = GetComponent<Player>(); 
 
     }
 
@@ -69,7 +72,8 @@ public class PlayerMovement : MonoBehaviour
         EmitMovementSound();
     }
 
-    private Vector3 currentVelocity = Vector3.zero;
+
+
 
     // SO THIS FUNCTION BASCIALLY GETS THE INPUTS FROM THE INPUT MANAGER 
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
@@ -212,14 +216,19 @@ public class PlayerMovement : MonoBehaviour
 
         bool isMoving = currentVelocity.magnitude > 0.1f;
 
-        if (isCrouching || !isMoving) return; // sneaking or standing still = silent
+        if (isCrouching || !isMoving)
+        {
+            playerScript.StopFootsteps();
+            return;
+        }
 
+        bool isSprinting = (speed == sprintSpeed);
+        playerScript.PlayFootsteps(isSprinting);
+
+        float volume = isSprinting ? runVolume : walkVolume;
         soundTimer -= Time.deltaTime;
         if (soundTimer <= 0f)
         {
-            float volume = (speed == sprintSpeed) ? runVolume : walkVolume;
-            //Debug.Log($"[Player] Emitting sound. Volume: {volume}, Position: {transform.position}");
-
             SoundEmissionManager.EmitSound(transform.position, volume);
             soundTimer = soundEmitInterval;
         }
