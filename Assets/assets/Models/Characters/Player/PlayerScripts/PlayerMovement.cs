@@ -166,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             // ALWAYS allow STOPPING a sprint, even in mid-air
-            speed = walkSpeed;
+            speed = isCrouching ? sneakSpeed : walkSpeed;
             if (animator != null) animator.SetBool(AnimationParams.IsSprinting, false);
         }
     }

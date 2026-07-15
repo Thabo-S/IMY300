@@ -52,9 +52,13 @@ public class InputMananger : MonoBehaviour
         // This unified helper method handles BOTH picking up objects and opening doors cleanly without clashing
         pickUp.PickUpObject.performed += ctx => OnInteractionPressed();
 
-        //Turn cursor off
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        pickUp.ThrowObject.performed += ctx => pickUpScript.StartThrowAim();
+        pickUp.ThrowObject.canceled += ctx => pickUpScript.CancelThrowAim();
+
+        // Left-click: only does something if currently aiming — actually throws
+        pickUp.ConfirmThrow.performed += ctx => pickUpScript.ConfirmThrow();
+
+
     }
 
     // Update is called once per frame

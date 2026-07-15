@@ -15,6 +15,11 @@ public class Player : MonoBehaviour
     public AudioSource walkingFootsteps;
     public AudioSource runningFootsteps;
 
+    [Header("Interaction Sound")]
+    public AudioSource interaction;
+    [SerializeField] private float minPitch = 0.9f;
+    [SerializeField] private float maxPitch = 1.1f;
+
     void Start()
     {
         PlayerHealth = MaxHealth;
@@ -60,5 +65,11 @@ public class Player : MonoBehaviour
     {
         walkingFootsteps.Stop();
         runningFootsteps.Stop();
+    }
+
+    public void PlaytInteraction()
+    {
+        interaction.pitch = UnityEngine.Random.Range(minPitch, maxPitch);
+        interaction.Play();
     }
 }

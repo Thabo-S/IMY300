@@ -369,6 +369,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ConfirmThrow"",
+                    ""type"": ""Button"",
+                    ""id"": ""13a6dd66-4a95-4503-af32-7ed843831904"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -404,6 +413,17 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""DropObject"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d0fffccb-1611-4a65-8dfe-1ddca7aefd5a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ConfirmThrow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -422,6 +442,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_PickUp_PickUpObject = m_PickUp.FindAction("PickUpObject", throwIfNotFound: true);
         m_PickUp_ThrowObject = m_PickUp.FindAction("ThrowObject", throwIfNotFound: true);
         m_PickUp_DropObject = m_PickUp.FindAction("DropObject", throwIfNotFound: true);
+        m_PickUp_ConfirmThrow = m_PickUp.FindAction("ConfirmThrow", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -646,6 +667,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_PickUp_PickUpObject;
     private readonly InputAction m_PickUp_ThrowObject;
     private readonly InputAction m_PickUp_DropObject;
+    private readonly InputAction m_PickUp_ConfirmThrow;
     /// <summary>
     /// Provides access to input actions defined in input action map "PickUp".
     /// </summary>
@@ -669,6 +691,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PickUp/DropObject".
         /// </summary>
         public InputAction @DropObject => m_Wrapper.m_PickUp_DropObject;
+        /// <summary>
+        /// Provides access to the underlying input action "PickUp/ConfirmThrow".
+        /// </summary>
+        public InputAction @ConfirmThrow => m_Wrapper.m_PickUp_ConfirmThrow;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -704,6 +730,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DropObject.started += instance.OnDropObject;
             @DropObject.performed += instance.OnDropObject;
             @DropObject.canceled += instance.OnDropObject;
+            @ConfirmThrow.started += instance.OnConfirmThrow;
+            @ConfirmThrow.performed += instance.OnConfirmThrow;
+            @ConfirmThrow.canceled += instance.OnConfirmThrow;
         }
 
         /// <summary>
@@ -724,6 +753,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DropObject.started -= instance.OnDropObject;
             @DropObject.performed -= instance.OnDropObject;
             @DropObject.canceled -= instance.OnDropObject;
+            @ConfirmThrow.started -= instance.OnConfirmThrow;
+            @ConfirmThrow.performed -= instance.OnConfirmThrow;
+            @ConfirmThrow.canceled -= instance.OnConfirmThrow;
         }
 
         /// <summary>
@@ -828,5 +860,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDropObject(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ConfirmThrow" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnConfirmThrow(InputAction.CallbackContext context);
     }
 }

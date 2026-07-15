@@ -12977,6 +12977,10 @@ PrefabInstance:
       value: left_hinge_door (10)
       objectReference: {fileID: 0}
     - target: {fileID: 2584305879565938073, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2584305879565938073, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
       propertyPath: m_TagString
       value: Door
       objectReference: {fileID: 0}

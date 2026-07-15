@@ -5,16 +5,15 @@ using UnityEngine.UI;
 
 public class Guard : MonoBehaviour
 {
+    [Header("References")]
     private StateMachine stateMachine;
     private NavMeshAgent agent;
     private Animator animator;
-
+    public AudioSource audioSource;
     public NavMeshAgent Agent { get => agent; }
     public Animator Animator { get => animator; }
-
-    [SerializeField] private string currentState;
+        [SerializeField] private string currentState;
     public Path path;
-
     public GameObject player;
     public Transform PlayerTransform => player.transform;
     public Vector3 LastKnownPlayerPosition { get; private set; }
@@ -36,6 +35,9 @@ public class Guard : MonoBehaviour
     public float runningFillRate = 100f;
     public float walkingFillRate = 60f;
     public float soundMemoryTime = 0.3f;
+    [SerializeField] private float minPitch = 0.5f;
+    [SerializeField] private float maxPitch = 0.8f;
+    public AudioClip footstepClip;  
 
     [Header("Detection Meter (sound only)")]
     public float detection = 0f;
@@ -79,6 +81,7 @@ public class Guard : MonoBehaviour
         if (animator == null) animator = GetComponent<Animator>();
 
         stateMachine.Initialise();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -96,6 +99,16 @@ public class Guard : MonoBehaviour
             animator.SetBool("isLookingAround", isLookingAround);
             animator.SetBool("isShooting", isShooting);
         }
+
+    }
+
+
+    // ---------------- FOOTSTEPS AUDIO ----------------
+
+    public void OnFootstep()
+    {
+        audioSource.pitch = Random.Range(minPitch, maxPitch);
+        audioSource.PlayOneShot(footstepClip);
     }
 
     public void PlayShootAnimation()
@@ -144,16 +157,24 @@ public class Guard : MonoBehaviour
         return true;
     }
 
-    private void HandleSound(Vector3 soundPos, float volume)
+    private void HandleSound(Vector3 soundPos, float volume, bool instantAlert)
     {
         float distance = Vector3.Distance(transform.position, soundPos);
         if (distance > volume) return;
+
+        if (instantAlert)
+        {
+            detection = maxDetection;
+            LastKnownPlayerPosition = soundPos;
+            soundMemoryTimer = soundMemoryTime;
+            return;
+        }
 
         float strength = Mathf.Clamp01(1f - (distance / volume));
         if (strength >= currentSoundStrength)
         {
             currentSoundStrength = strength;
-            currentSoundIsRunning = volume > 60f;
+            currentSoundIsRunning = volume >= 60f;
         }
 
         LastKnownPlayerPosition = soundPos;
