@@ -12,8 +12,10 @@ public class Guard : MonoBehaviour
     public AudioSource audioSource;
     public NavMeshAgent Agent { get => agent; }
     public Animator Animator { get => animator; }
-        [SerializeField] private string currentState;
+
+    [SerializeField] private string currentState;
     public Path path;
+
     public GameObject player;
     public Transform PlayerTransform => player.transform;
     public Vector3 LastKnownPlayerPosition { get; private set; }
