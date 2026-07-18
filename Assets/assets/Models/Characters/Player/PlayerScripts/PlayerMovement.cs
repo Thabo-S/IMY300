@@ -218,12 +218,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (isCrouching || !isMoving)
         {
-            playerScript.StopFootsteps();
+            //playerScript.StopFootsteps();
             return;
         }
 
         bool isSprinting = (speed == sprintSpeed);
-        playerScript.PlayFootsteps(isSprinting);
+        //playerScript.PlayFootsteps(isSprinting);
 
         float volume = isSprinting ? runVolume : walkVolume;
         soundTimer -= Time.deltaTime;

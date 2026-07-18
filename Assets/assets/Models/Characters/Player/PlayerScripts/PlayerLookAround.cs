@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerLookAround : MonoBehaviour
 {
@@ -6,14 +7,21 @@ public class PlayerLookAround : MonoBehaviour
 
     public float xRotation = 0f;
 
-    public float xDirectionSensitivity = 20f;
-    public float yDirectionSensitivity = 20f;
+    public Slider mouseSensitivity;
+
+    public float xDirectionSensitivity = 5f;
+    public float yDirectionSensitivity = 5f;
 
     [SerializeField] private float VerticalClamp = 20f;
 
+    private void Start()
+    {
+        mouseSensitivity.value = xDirectionSensitivity;
+    }
+
     private void Update()
     {
-
+        xDirectionSensitivity = yDirectionSensitivity = mouseSensitivity.value;
     }
 
     public void CalculatePlayerLookAround(Vector2 PlayerLookAround)
