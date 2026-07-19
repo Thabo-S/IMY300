@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 using static UnityEngine.ProBuilder.AutoUnwrapSettings;
 
@@ -13,8 +14,9 @@ public class Player : MonoBehaviour
     public Image fill;
 
     [Header("Footstep Audio")]
-    public AudioSource walkingFootsteps;
-    public AudioSource runningFootsteps;
+    public AudioSource footstepAudioScource;
+    public AudioClip footstepClip;
+    //public AudioSource runningFootsteps;
 
     [Header("Interaction Sound")]
     public AudioSource interaction;
@@ -30,7 +32,11 @@ public class Player : MonoBehaviour
         HealthBarSlider.value = MaxHealth;
 
         fill.color = gradient.Evaluate(1f);
+
+        footstepAudioScource = GetComponents<AudioSource>()[1];
     }
+
+
 
     public void TakeDamage(int damage)
     {
@@ -54,31 +60,39 @@ public class Player : MonoBehaviour
         Debug.Log("Player healed: " + PlayerHealth);
     }
 
-    public void PlayFootsteps(bool isSprinting)
+
+    public void OnFootstep()
     {
-        if (isSprinting)
-        {
-            if (!runningFootsteps.isPlaying)
-            {
-                walkingFootsteps.Stop();
-                runningFootsteps.Play();
-            }
-        }
-        else
-        {
-            if (!walkingFootsteps.isPlaying)
-            {
-                runningFootsteps.Stop();
-                walkingFootsteps.Play();
-            }
-        }
+        footstepAudioScource.pitch = Random.Range(minPitch, maxPitch);
+        footstepAudioScource.PlayOneShot(footstepClip);
     }
 
-    public void StopFootsteps()
-    {
-        walkingFootsteps.Stop();
-        runningFootsteps.Stop();
-    }
+
+    //public void PlayFootsteps(bool isSprinting)
+    //{
+    //    if (isSprinting)
+    //    {
+    //        if (!runningFootsteps.isPlaying)
+    //        {
+    //            walkingFootsteps.Stop();
+    //            runningFootsteps.Play();
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if (!walkingFootsteps.isPlaying)
+    //        {
+    //            runningFootsteps.Stop();
+    //            walkingFootsteps.Play();
+    //        }
+    //    }
+    //}
+
+    //public void StopFootsteps()
+    //{
+    //    walkingFootsteps.Stop();
+    //    runningFootsteps.Stop();
+    //}
 
     public void PlaytInteraction()
     {

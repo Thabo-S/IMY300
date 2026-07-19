@@ -64,6 +64,8 @@ public class Guard : MonoBehaviour
     private float currentSoundStrength = 0f;
     private bool currentSoundIsRunning = false;
 
+    public float idleFacingYRotation = 90f;
+
     // All guards currently active in the scene. Lets map-wide systems (like
     // LaserSecurityScript) alert every guard without needing each one wired
     // up individually in the Inspector.
@@ -264,6 +266,21 @@ public class Guard : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void ResetGuard()
+    {
+        agent.isStopped = true;
+
+        detection = 0f;
+        UpdateSliderUI();
+        SetSliderColor(Color.green);
+
+        stateMachine.ChangeState(new PatrolState());
+
+        agent.isStopped = false;
+
+        transform.rotation = Quaternion.Euler(0f, idleFacingYRotation, 0f);
     }
 
     // ---------------- LASER ALARM (instant, map-wide alert) ----------------

@@ -56,13 +56,27 @@ namespace Assets.Scripts.Guardscripts
                     fireTimer = 1f / shotsPerSecond;
                     guard.PlayShootAnimation();
 
-                    // TODO: actual damage/VFX logic goes here
-                    ShootAtPlayer();
+                // TODO: actual damage/VFX logic goes here
+                ShootAtPlayer();
+
+                if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+                {
+                    TutorialManager tutorial = Object.FindObjectOfType<TutorialManager>();
+
+                    if (tutorial != null)
+                    {
+                        tutorial.playerSpottedByGuard();
+                    }
                 }
             }
-            else
-            {
-                losePlayerTimer += Time.deltaTime;
+        }
+        else
+        {
+            //guard.UpdateAnimationParameters(false, true, false);
+
+            //guard.SetGunActive(false);
+
+            losePlayerTimer += Time.deltaTime;
 
                 if (losePlayerTimer > waitbeforeSearchTime)
                 {
@@ -122,7 +136,7 @@ namespace Assets.Scripts.Guardscripts
 
             Debug.Log("Shoot");
 
-            fireTimer = 0f;
-        }
+        fireTimer = 0f;
+    }
     }
 }
