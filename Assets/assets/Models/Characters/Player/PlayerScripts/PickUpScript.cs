@@ -14,9 +14,15 @@ public class PickUpScript : MonoBehaviour
     public List<GameObject> hotbarSlots;
     public Sprite emptySlotSprite;
     public HotbarItem[] hotbarItems = new HotbarItem[5];
-    private GameObject currentHighlightedItem;
+    private GameObject currentHighlightedItem; // the ROOT item object, not the child collider hit
     private GameObject currentHighlightedDoor;
     private Player playerScript;
+
+    [Header("Held Item (Viewmodel)")]
+    [Tooltip("Empty transform on the camera where the currently selected hotbar item is shown, first-person style.")]
+    public Transform handSocket;
+    private GameObject currentlyEquippedObject;
+    private int lastSelectedIndex = -1;
 
     [Header("Throwing")]
     public Transform throwPoint;
@@ -46,6 +52,7 @@ public class PickUpScript : MonoBehaviour
     void Update()
     {
         PerformContinuousDetection();
+        UpdateEquippedItem();
 
         if (isAiming)
         {
@@ -73,12 +80,18 @@ public class PickUpScript : MonoBehaviour
             float distance = hit.distance;
 
             // --- Handle Items ---
-            if (hitObject.CompareTag("canPickUp") && distance <= pickUpRange)
+            // Walk up from whatever collider was hit (could be a child part)
+            // to find the PickupItem marker on the root object.
+            PickupItem pickupRoot = hit.transform.GetComponentInParent<PickupItem>();
+
+            if (pickupRoot != null && distance <= pickUpRange)
             {
-                if (hitObject != currentHighlightedItem)
+                GameObject rootObj = pickupRoot.gameObject;
+
+                if (rootObj != currentHighlightedItem)
                 {
                     ClearItemHighlight();
-                    currentHighlightedItem = hitObject;
+                    currentHighlightedItem = rootObj;
                     ApplyItemHighlight(currentHighlightedItem);
                 }
             }
@@ -108,12 +121,15 @@ public class PickUpScript : MonoBehaviour
             ClearDoorHighlight();
         }
     }
+
+    // Applies the outline to EVERY child renderer that has an Outline component,
+    // since multi-part items (MedKit, FlashLight) often have the mesh split
+    // across several children rather than one single renderer.
     private void ApplyItemHighlight(GameObject obj)
     {
-        var outline = obj.GetComponent<Outline>();
-        if (outline != null)
+        var outlines = obj.GetComponentsInChildren<Outline>(true);
+        foreach (var outline in outlines)
         {
-            //outline.OutlineColor = Color.white;
             outline.enabled = true;
         }
     }
@@ -122,8 +138,11 @@ public class PickUpScript : MonoBehaviour
     {
         if (currentHighlightedItem != null)
         {
-            var outline = currentHighlightedItem.GetComponent<Outline>();
-            if (outline != null) outline.enabled = false;
+            var outlines = currentHighlightedItem.GetComponentsInChildren<Outline>(true);
+            foreach (var outline in outlines)
+            {
+                outline.enabled = false;
+            }
             currentHighlightedItem = null;
         }
     }
@@ -148,6 +167,69 @@ public class PickUpScript : MonoBehaviour
         }
     }
 
+    // Watches the hotbar's selected slot and shows/hides the held item to match.
+    private void UpdateEquippedItem()
+    {
+        if (activePanelReferance == null) return;
+
+        int selectedIndex = activePanelReferance.SelectedIndex;
+        if (selectedIndex == lastSelectedIndex) return;
+
+        lastSelectedIndex = selectedIndex;
+        EquipSlot(selectedIndex);
+    }
+
+    private void EquipSlot(int index)
+    {
+        // Put away whatever was previously in-hand
+        if (currentlyEquippedObject != null)
+        {
+            currentlyEquippedObject.SetActive(false);
+            currentlyEquippedObject.transform.SetParent(null);
+            currentlyEquippedObject = null;
+        }
+
+        if (index < 0 || index >= hotbarItems.Length) return;
+
+        HotbarItem item = hotbarItems[index];
+        if (item == null || item.heldObject == null) return;
+
+        if (handSocket == null)
+        {
+            Debug.LogWarning("[PickUpScript] Hand Socket is not assigned - cannot show held item.");
+            return;
+        }
+
+        GameObject obj = item.heldObject;
+
+        // worldPositionStays = true first, so the object's real-world size/rotation
+        // carries over before we then move it to the hand-hold pose.
+        obj.transform.SetParent(handSocket, true);
+        obj.SetActive(true);
+
+        PickupItem pickupInfo = obj.GetComponent<PickupItem>();
+        if (pickupInfo != null)
+        {
+            obj.transform.localPosition = pickupInfo.holdLocalPosition;
+            obj.transform.localRotation = Quaternion.Euler(pickupInfo.holdLocalEulerAngles);
+            obj.transform.localScale *= pickupInfo.holdScaleMultiplier;
+        }
+        else
+        {
+            obj.transform.localPosition = Vector3.zero;
+            obj.transform.localRotation = Quaternion.identity;
+        }
+
+        // Don't let the held item's own colliders interfere with pickup raycasts
+        // or physics while it's floating in front of the camera.
+        foreach (var col in obj.GetComponentsInChildren<Collider>(true))
+        {
+            col.enabled = false;
+        }
+
+        currentlyEquippedObject = obj;
+    }
+
     public void HandleInteraction()
     {
         if (currentHighlightedDoor != null)
@@ -157,7 +239,7 @@ public class PickUpScript : MonoBehaviour
         else
         {
             runPickUpObject();
-            
+
         }
     }
     public void toggleDoorState()
@@ -198,16 +280,20 @@ public class PickUpScript : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, pickUpRange))
         {
-            if (hit.transform.gameObject.tag == "canPickUp")
+            PickupItem pickupRoot = hit.transform.GetComponentInParent<PickupItem>();
+            if (pickupRoot != null)
             {
-                PickUpObject(hit.transform.gameObject);
+                PickUpObject(pickupRoot);
             }
         }
     }
 
-    void PickUpObject(GameObject pickUpObj)
+    void PickUpObject(PickupItem pickupRoot)
     {
         if (PauseMenu.isGamePause) return;
+
+        GameObject pickUpObj = pickupRoot.gameObject;
+        string lookupName = pickupRoot.itemName;
 
         for (int i = 0; i < hotbarSlots.Count; i++)
         {
@@ -219,7 +305,7 @@ public class PickUpScript : MonoBehaviour
             {
                 slot.SetActive(true);
 
-                Sprite[] allSprites = Resources.LoadAll<Sprite>("Items/sprites/" + pickUpObj.name);
+                Sprite[] allSprites = Resources.LoadAll<Sprite>("Items/sprites/" + lookupName);
                 Sprite itemSprite = allSprites.Length > 0 ? allSprites[0] : null;
 
                 playerScript.PlaytInteraction();
@@ -227,6 +313,11 @@ public class PickUpScript : MonoBehaviour
                 if (itemSprite != null)
                 {
                     slotImage.sprite = itemSprite;
+
+                    // Make sure the outline doesn't stay stuck "on" while the
+                    // object is deactivated and later re-dropped.
+                    ClearItemHighlight();
+
                     pickUpObj.SetActive(false);
 
                     hotbarItems[i] = new HotbarItem
@@ -239,7 +330,7 @@ public class PickUpScript : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning("No sprite found for: " + pickUpObj.name);
+                    Debug.LogWarning("No sprite found for: " + lookupName);
                 }
             }
         }
@@ -262,8 +353,18 @@ public class PickUpScript : MonoBehaviour
         HotbarItem item = hotbarItems[index];
         if (item == null || item.heldObject == null) return;
 
-        item.heldObject.transform.position = dropPosition.position;
-        item.heldObject.SetActive(true);
+        GameObject obj = item.heldObject;
+
+        if (obj == currentlyEquippedObject) currentlyEquippedObject = null;
+
+        obj.transform.SetParent(null);
+        obj.transform.position = dropPosition.position;
+        obj.SetActive(true);
+
+        foreach (var col in obj.GetComponentsInChildren<Collider>(true))
+        {
+            col.enabled = true;
+        }
 
         Image slotImage = hotbarSlots[index].GetComponentInChildren<Image>(true);
         slotImage.sprite = emptySlotSprite;
@@ -278,10 +379,104 @@ public class PickUpScript : MonoBehaviour
     {
         if (PauseMenu.isGamePause) return;
 
-        HotbarItem item = hotbarItems[activePanelReferance.SelectedIndex];
+        int index = activePanelReferance.SelectedIndex;
+        HotbarItem item = hotbarItems[index];
         if (item == null || item.heldObject == null) return;
 
+        // Keys unlock whatever LockDoor is currently highlighted instead of
+        // going through the generic consume flow - checked first so a Key
+        // never accidentally falls into the IConsumable/heal path.
+        KeyScript keyItem = item.heldObject.GetComponent<KeyScript>();
+        if (keyItem != null)
+        {
+            UseKeyOnDoor(index, item.heldObject);
+            return;
+        }
+
+        // Consumables (MedKit, Bandages, etc.) get used immediately on
+        // right-click instead of entering the aim-and-throw flow.
+        IConsumable consumable = item.heldObject.GetComponent<IConsumable>();
+        if (consumable != null)
+        {
+            ConsumeSelectedItem(index, consumable);
+            return;
+        }
+
+        PickupItem pickupInfo = item.heldObject.GetComponent<PickupItem>();
+        if (pickupInfo != null && !pickupInfo.canThrow) return; // this item can only be dropped, not thrown
+
         isAiming = true;
+    }
+
+    private void ConsumeSelectedItem(int index, IConsumable consumable)
+    {
+        HotbarItem item = hotbarItems[index];
+        if (item == null || item.heldObject == null) return;
+
+        GameObject obj = item.heldObject;
+
+        // Grab a human-readable label for the log - falls back to the
+        // GameObject's name if there's no PickupItem/itemName for some reason.
+        string itemLabel = obj.name;
+        PickupItem pickupInfo = obj.GetComponent<PickupItem>();
+        if (pickupInfo != null && !string.IsNullOrEmpty(pickupInfo.itemName))
+            itemLabel = pickupInfo.itemName;
+
+        consumable.Consume(playerScript);
+
+        Debug.Log(itemLabel + " was consumed");
+
+        if (obj == currentlyEquippedObject) currentlyEquippedObject = null;
+
+        Image slotImage = hotbarSlots[index].GetComponentInChildren<Image>(true);
+        slotImage.sprite = emptySlotSprite;
+        hotbarItems[index] = null;
+        hotbarSlots[index].SetActive(false);
+
+        Destroy(obj); // consumed - permanently gone, unlike dropping/throwing
+    }
+
+    // Unlocks the door the player is currently looking at (if any) and
+    // consumes the key. Does nothing if there's no door in range, or the
+    // door in range isn't a LockDoor, or it's already unlocked.
+    private void UseKeyOnDoor(int index, GameObject obj)
+    {
+        if (currentHighlightedDoor == null)
+        {
+            Debug.Log("No locked door in range to use the key on.");
+            return;
+        }
+
+        LockDoor lockDoor = currentHighlightedDoor.GetComponent<LockDoor>();
+        if (lockDoor == null)
+        {
+            Debug.Log("This door doesn't use a key.");
+            return;
+        }
+
+        if (!lockDoor.isLocked)
+        {
+            Debug.Log("This door is already unlocked.");
+            return;
+        }
+
+        lockDoor.UnlockWithKey();
+
+        string itemLabel = obj.name;
+        PickupItem pickupInfo = obj.GetComponent<PickupItem>();
+        if (pickupInfo != null && !string.IsNullOrEmpty(pickupInfo.itemName))
+            itemLabel = pickupInfo.itemName;
+
+        Debug.Log(itemLabel + " was consumed");
+
+        if (obj == currentlyEquippedObject) currentlyEquippedObject = null;
+
+        Image slotImage = hotbarSlots[index].GetComponentInChildren<Image>(true);
+        slotImage.sprite = emptySlotSprite;
+        hotbarItems[index] = null;
+        hotbarSlots[index].SetActive(false);
+
+        Destroy(obj);
     }
 
     public void CancelThrowAim()
@@ -311,9 +506,17 @@ public class PickUpScript : MonoBehaviour
         GameObject obj = item.heldObject;
         string originalTag = obj.tag; // should be "canPickUp"
 
+        if (obj == currentlyEquippedObject) currentlyEquippedObject = null;
+
+        obj.transform.SetParent(null);
         obj.transform.position = throwPoint.position;
         obj.SetActive(true);
         obj.tag = throwableTag;
+
+        foreach (var col in obj.GetComponentsInChildren<Collider>(true))
+        {
+            col.enabled = true;
+        }
 
         Rigidbody rb = obj.GetComponent<Rigidbody>();
         if (rb == null) rb = obj.AddComponent<Rigidbody>();

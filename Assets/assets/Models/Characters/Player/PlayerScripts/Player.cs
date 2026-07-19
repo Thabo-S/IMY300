@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.ProBuilder.AutoUnwrapSettings;
 
+
 public class Player : MonoBehaviour
 {
     [Header("Health Variables")]
@@ -41,6 +42,18 @@ public class Player : MonoBehaviour
 
         Debug.Log("Player took damage: " + PlayerHealth);
     }
+
+    public void Heal(float amount)
+    {
+        PlayerHealth = Mathf.Clamp(PlayerHealth + amount, 0, MaxHealth);
+
+        HealthBarSlider.value = PlayerHealth;
+
+        fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
+
+        Debug.Log("Player healed: " + PlayerHealth);
+    }
+
     public void PlayFootsteps(bool isSprinting)
     {
         if (isSprinting)

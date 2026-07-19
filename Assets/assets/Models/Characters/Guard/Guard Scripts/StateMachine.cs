@@ -1,3 +1,4 @@
+using Assets.Scripts.Guardscripts;
 using UnityEngine;
 
 public class StateMachine : MonoBehaviour
@@ -7,11 +8,11 @@ public class StateMachine : MonoBehaviour
 
     public void Initialise()
     {
-        ChangeState(new PatrolState());
+        ChangeState(new PatrolState ());
     }
     void Start()
     {
-        
+        //nothing
     }
 
     // Update is called once per frame

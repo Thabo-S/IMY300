@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Assets.Scripts.Guardscripts;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -7,7 +8,7 @@ public class Guard : MonoBehaviour
 {
     [Header("References")]
     private StateMachine stateMachine;
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
     private Animator animator;
     public AudioSource audioSource;
     public NavMeshAgent Agent { get => agent; }
@@ -39,7 +40,7 @@ public class Guard : MonoBehaviour
     public float soundMemoryTime = 0.3f;
     [SerializeField] private float minPitch = 0.5f;
     [SerializeField] private float maxPitch = 0.8f;
-    public AudioClip footstepClip;  
+    public AudioClip footstepClip;
 
     [Header("Detection Meter (sound only)")]
     public float detection = 0f;
@@ -63,6 +64,11 @@ public class Guard : MonoBehaviour
     private float currentSoundStrength = 0f;
     private bool currentSoundIsRunning = false;
 
+    // All guards currently active in the scene. Lets map-wide systems (like
+    // LaserSecurityScript) alert every guard without needing each one wired
+    // up individually in the Inspector.
+    public static readonly List<Guard> AllGuards = new List<Guard>();
+
     public static class AnimationParams
     {
         public const string Guard_Idle = "Guard_Idle";
@@ -71,8 +77,17 @@ public class Guard : MonoBehaviour
         public const string Guard_Shooting = "Guard_Shooting";
     }
 
-    private void OnEnable() => SoundEmissionManager.OnSoundEmitted += HandleSound;
-    private void OnDisable() => SoundEmissionManager.OnSoundEmitted -= HandleSound;
+    private void OnEnable()
+    {
+        SoundEmissionManager.OnSoundEmitted += HandleSound;
+        AllGuards.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        SoundEmissionManager.OnSoundEmitted -= HandleSound;
+        AllGuards.Remove(this);
+    }
 
     void Start()
     {
@@ -249,6 +264,30 @@ public class Guard : MonoBehaviour
         }
 
         return false;
+    }
+
+    // ---------------- LASER ALARM (instant, map-wide alert) ----------------
+
+    // Called by LaserSecurityScript when the player trips a laser. Forces
+    // this guard straight into AlertState (investigation) at the laser's
+    // position - the same transition AttackState performs when it loses the
+    // player and drops back to searching. A guard already in AttackState is
+    // left alone so the alarm doesn't yank them out of an active firefight.
+    public void TriggerLaserAlarm(Vector3 alarmPosition)
+    {
+        if (stateMachine.activeState is AttackState) return;
+
+        Vector3 targetPosition = alarmPosition;
+        if (NavMesh.SamplePosition(alarmPosition, out NavMeshHit hit, 2.0f, NavMesh.AllAreas))
+        {
+            targetPosition = hit.position;
+        }
+
+        stateMachine.ChangeState(new AlertState { lastKnownPosition = targetPosition });
+
+        LastKnownPlayerPosition = targetPosition;
+        detection = maxDetection;
+        SetSliderColor(Color.red);
     }
 
 

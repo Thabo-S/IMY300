@@ -8,6 +8,12 @@ public class doorMovement : MonoBehaviour
     [Header("Door State")]
     public DoorState currentState = DoorState.Closed;
 
+    [Header("Locking")]
+    [Tooltip("Optional. If assigned and isLocked is true, ToggleDoor() calls are ignored. " +
+             "LockDoor sets isLocked = false itself right before calling ToggleDoor() on a " +
+             "successful QTE, so its own call still goes through.")]
+    [SerializeField] private LockDoor lockDoor;
+
     [Header("Animation Settings")]
     [SerializeField] private float animationDuration = 0.5f;
 
@@ -15,6 +21,12 @@ public class doorMovement : MonoBehaviour
 
     public void ToggleDoor()
     {
+        if (lockDoor != null && lockDoor.isLocked)
+        {
+            // Locked doors can only be opened via LockDoor's own QTE flow.
+            return;
+        }
+
         if (_animationCoroutine != null)
             StopCoroutine(_animationCoroutine);
 

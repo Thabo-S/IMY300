@@ -58,7 +58,6 @@ public class InputMananger : MonoBehaviour
         // Left-click: only does something if currently aiming — actually throws
         pickUp.ConfirmThrow.performed += ctx => pickUpScript.ConfirmThrow();
 
-
     }
 
     // Update is called once per frame

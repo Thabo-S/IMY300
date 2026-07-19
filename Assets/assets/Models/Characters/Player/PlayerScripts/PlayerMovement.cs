@@ -4,6 +4,7 @@ using UnityEngine;
 using static PlayerMovement;
 using System.Collections;
 
+
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Reference")]
@@ -72,14 +73,11 @@ public class PlayerMovement : MonoBehaviour
         EmitMovementSound();
     }
 
-
-
-
     // SO THIS FUNCTION BASCIALLY GETS THE INPUTS FROM THE INPUT MANAGER 
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
     public void CalculatePlayerMovement(Vector2 movementInput)
     {
-        if (PauseMenu.isGamePause) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return; //add lock to stop player movement during QTE
 
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
         move = transform.TransformDirection(move);
@@ -152,7 +150,7 @@ public class PlayerMovement : MonoBehaviour
     // AND PRESSES THE SPRINT BUTTON, PREVENTS THEM FROM TURINING INTO SUPERMAN
     public void PlayerSprint(bool isSprinting)
     {
-        if (PauseMenu.isGamePause) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return;
 
         if (isSprinting)
         {
@@ -173,7 +171,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void playerCrouch()
     {
-        if (PauseMenu.isGamePause) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return;
 
         isCrouching = !isCrouching;
 
@@ -212,7 +210,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void EmitMovementSound()
     {
-        if (PauseMenu.isGamePause) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return;
 
         bool isMoving = currentVelocity.magnitude > 0.1f;
 

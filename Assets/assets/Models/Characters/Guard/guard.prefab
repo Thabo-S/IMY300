@@ -1,5 +1,58 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &361555104578391570
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5878458386007558657}
+  - component: {fileID: 5535728798880941401}
+  m_Layer: 0
+  m_Name: GuardsEyes/Ears
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5878458386007558657
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361555104578391570}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 11.71, z: -0.37}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1665014743087817024}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5535728798880941401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361555104578391570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 946f276abed072b4894caa34cb97b04f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Guardscripts.GuardVisionScript
+  eyePoint: {fileID: 5878458386007558657}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 8
+  guard: {fileID: 0}
+  visionRange: 28.9
+  visionAngle: 41.6
+  eyeIcon: {fileID: 8347423157828153823}
+  playerVisible: 0
 --- !u!1 &3027330711965019169
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,6 +868,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1748918548573582845}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5878458386007558657}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
       insertIndex: -1
@@ -830,13 +886,13 @@ PrefabInstance:
       addedObject: {fileID: 672655689061427495}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 109412443163607102}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3977392496578703735}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1439825165638744167}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6512615457547150302}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5905698026599821097}
   m_SourcePrefab: {fileID: 100100000, guid: b2ec890778a9a1148a8662d12d08f264, type: 3}
 --- !u!4 &1665014743087817024 stripped
 Transform:
@@ -942,58 +998,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &109412443163607102
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2040274369950383098}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a36549b836e1134183ca4aab521cb4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  audioSource: {fileID: 0}
-  currentState: 
-  path: {fileID: 0}
-  player: {fileID: 0}
-  currentWaypointIndex: 0
-  sightDistance: 70
-  fieldOfView: 30
-  eyeHeight: 12
-  catchRadius: 50
-  wanderRadius: 15
-  warningSightDistance: 100
-  warningFieldOfView: 80
-  runningFillRate: 100
-  walkingFillRate: 60
-  soundMemoryTime: 1
-  minPitch: 0.9
-  maxPitch: 1.1
-  footstepClip: {fileID: 8300000, guid: fde53df26a647c24bb90d7ac05325a4b, type: 3}
-  detection: 0
-  maxDetection: 100
-  decayRate: 15
-  detectionSlider: {fileID: 2630660809888299975}
-  detectionSliderFill: {fileID: 7573340084516478441}
-  eyeIcon: {fileID: 8347423157828153823}
-  gun: {fileID: 1373237846862835527}
-  gunBarrel: {fileID: 6861666816770851377}
-  bulletSpeed: 80
-  fireRate: 2
---- !u!114 &3977392496578703735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2040274369950383098}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c75306481639f0e409f1512dd47e5701, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StateMachine
 --- !u!82 &1439825165638744167
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1091,6 +1095,59 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &6512615457547150302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2040274369950383098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c75306481639f0e409f1512dd47e5701, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StateMachine
+--- !u!114 &5905698026599821097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2040274369950383098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a36549b836e1134183ca4aab521cb4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Guardscripts.Guard
+  agent: {fileID: 672655689061427495}
+  audioSource: {fileID: 0}
+  currentState: 
+  path: {fileID: 0}
+  player: {fileID: 6164398561919881152, guid: d306b35f80cf90748a245d08fa18020e, type: 3}
+  currentWaypointIndex: 0
+  sightDistance: 50
+  fieldOfView: 30
+  eyeHeight: 12
+  catchRadius: 20
+  wanderRadius: 15
+  warningSightDistance: 65
+  warningFieldOfView: 45
+  runningFillRate: 100
+  walkingFillRate: 60
+  soundMemoryTime: 0.3
+  minPitch: 0.5
+  maxPitch: 0.8
+  footstepClip: {fileID: 0}
+  detection: 0
+  maxDetection: 100
+  decayRate: 15
+  detectionSlider: {fileID: 2630660809888299975}
+  detectionSliderFill: {fileID: 7573340084516478441}
+  eyeIcon: {fileID: 8347423157828153823}
+  gun: {fileID: 1373237846862835527}
+  gunBarrel: {fileID: 1748918548573582845}
+  bulletSpeed: 80
+  fireRate: 0.1
 --- !u!1001 &2292280920409674262
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1139,6 +1196,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 6cad126caa25137489860211d8e99e74, type: 3}
+      propertyPath: m_ProbeAnchor
+      value: 
+      objectReference: {fileID: 1665014743087817024}
     - target: {fileID: 919132149155446097, guid: 6cad126caa25137489860211d8e99e74, type: 3}
       propertyPath: m_Name
       value: gun
