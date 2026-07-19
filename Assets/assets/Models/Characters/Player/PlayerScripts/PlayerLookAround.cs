@@ -9,8 +9,8 @@ public class PlayerLookAround : MonoBehaviour
 
     public Slider mouseSensitivity;
 
-    public float xDirectionSensitivity = 5f;
-    public float yDirectionSensitivity = 5f;
+    public float xDirectionSensitivity = 8f;
+    public float yDirectionSensitivity = 8f;
 
     [SerializeField] private float VerticalClamp = 20f;
 
