@@ -157,7 +157,7 @@ public class PickUpScript : MonoBehaviour
         else
         {
             runPickUpObject();
-            
+
         }
     }
     public void toggleDoorState()

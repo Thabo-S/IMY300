@@ -24,7 +24,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         return heldItem;
     }
 
-    public int GetItemAmount() 
+    public int GetItemAmount()
     {
         return itemAmount;
     }
@@ -58,10 +58,10 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         UpdateSlot();
         return itemAmount;
     }
-    public int RemoveAmount(int amountToRemove) 
-    { 
-        itemAmount= itemAmount - amountToRemove;
-        if (amountToRemove <= 0) 
+    public int RemoveAmount(int amountToRemove)
+    {
+        itemAmount = itemAmount - amountToRemove;
+        if (amountToRemove <= 0)
         {
             ClearSlot();
         }
@@ -76,7 +76,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         heldItem = null;
         itemAmount = 0;
-        UpdateSlot() ;
+        UpdateSlot();
     }
 
     public bool HasItem()

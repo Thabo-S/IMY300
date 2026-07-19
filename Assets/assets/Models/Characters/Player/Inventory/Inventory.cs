@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
 {
-    public ItemSO woodItem;
-    public ItemSO Axe;
+    //public ItemSO woodItem;
+    //public ItemSO Axe;
 
 
     public GameObject hotbarObj;
@@ -51,7 +51,7 @@ public class Inventory : MonoBehaviour
             container.SetActive(!container.activeInHierarchy);
             Cursor.lockState = CursorLockMode.Locked == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = !Cursor.visible;
-            PlayerCam.instance.updatingRotation = !PlayerCam.instance.updatingRotation;
+            //PlayerCam.instance.updatingRotation = !PlayerCam.instance.updatingRotation;
         }
         DetectLookedAtItem();
         Pickup();
@@ -65,18 +65,18 @@ public class Inventory : MonoBehaviour
         UpdateHotbarOpacity();
     }
 
-    public void Additem(ItemSO itemToAdd, int amount) 
+    public void Additem(ItemSO itemToAdd, int amount)
     {
         int remainingAmount = amount;
 
-        foreach(Slot slot in allSlots)
+        foreach (Slot slot in allSlots)
         {
-            if(slot.HasItem() && slot.GetItem() == itemToAdd)
+            if (slot.HasItem() && slot.GetItem() == itemToAdd)
             {
                 int currentAmount = slot.GetItemAmount();
                 int maxStack = itemToAdd.maxStackSize;
 
-                if(currentAmount < maxStack)
+                if (currentAmount < maxStack)
                 {
                     int spaceLeft = maxStack - currentAmount;
                     int amountToAdd = Mathf.Min(spaceLeft, remainingAmount);
@@ -84,7 +84,7 @@ public class Inventory : MonoBehaviour
                     slot.SetItemAmount(itemToAdd, currentAmount + amountToAdd);
                     remainingAmount -= amountToAdd;
 
-                    if(remainingAmount <= 0)
+                    if (remainingAmount <= 0)
                     {
                         return;
                     }
@@ -92,22 +92,22 @@ public class Inventory : MonoBehaviour
             }
         }
 
-        foreach(Slot slot in allSlots)
+        foreach (Slot slot in allSlots)
         {
             if (!slot.HasItem())
             {
-                int amountToPlace = Mathf.Min(itemToAdd.maxStackSize,remainingAmount);
-                slot.SetItemAmount(itemToAdd,amountToPlace);
+                int amountToPlace = Mathf.Min(itemToAdd.maxStackSize, remainingAmount);
+                slot.SetItemAmount(itemToAdd, amountToPlace);
                 remainingAmount -= amountToPlace;
 
-                if(remainingAmount <= 0)
+                if (remainingAmount <= 0)
                 {
                     return;
                 }
             }
         }
 
-        if(remainingAmount > 0)
+        if (remainingAmount > 0)
         {
             Debug.Log("Inventory Is full could not add " + remainingAmount + " of " + itemToAdd.itemName);
         }
@@ -118,7 +118,7 @@ public class Inventory : MonoBehaviour
         {
             Slot hovered = GetHoverdSlot();
 
-            if(hovered != null && hovered.HasItem())
+            if (hovered != null && hovered.HasItem())
             {
                 draggedSlot = hovered;
                 isDragging = true;
@@ -133,11 +133,11 @@ public class Inventory : MonoBehaviour
 
     private void EndDrag()
     {
-        if(Input.GetMouseButtonUp(0) && isDragging)
+        if (Input.GetMouseButtonUp(0) && isDragging)
         {
             Slot hovered = GetHoverdSlot();
 
-            if(hovered != null)
+            if (hovered != null)
             {
                 HandleDrop(draggedSlot, hovered);
 
@@ -151,7 +151,7 @@ public class Inventory : MonoBehaviour
 
     private Slot GetHoverdSlot()
     {
-        foreach(Slot s in allSlots)
+        foreach (Slot s in allSlots)
         {
             if (s.hovering)
             {
@@ -167,19 +167,19 @@ public class Inventory : MonoBehaviour
 
 
         //Stacking items
-        if(to.HasItem() && to.GetItem() == from.GetItem())
+        if (to.HasItem() && to.GetItem() == from.GetItem())
         {
             int max = to.GetItem().maxStackSize;
             int space = max - to.GetItemAmount();
 
-            if(space > 0)
+            if (space > 0)
             {
                 int move = Mathf.Min(space, from.GetItemAmount());
 
-                to.SetItemAmount(to.GetItem(),to.GetItemAmount() + move);
-                from.SetItemAmount(from.GetItem(),from.GetItemAmount() - move);
+                to.SetItemAmount(to.GetItem(), to.GetItemAmount() + move);
+                from.SetItemAmount(from.GetItem(), from.GetItemAmount() - move);
 
-                if(from.GetItemAmount() <= 0)
+                if (from.GetItemAmount() <= 0)
                 {
                     from.ClearSlot();
                 }
@@ -225,30 +225,64 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    //private void DetectLookedAtItem()
+    //{
+    //    if (lookedAtRenderer != null)
+    //    {
+    //        lookedAtRenderer.material = originalMaterial;
+    //        lookedAtRenderer = null;
+    //        originalMaterial = null;
+    //    }
+
+    //    Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+    //    if (Physics.Raycast(ray, out RaycastHit hit, pickupRange))
+    //    {
+    //        Item item = hit.collider.GetComponent<Item>();
+    //        if (item != null)
+    //        {
+    //            Renderer rend = item.GetComponent<Renderer>();
+    //            if (rend != null)
+    //            {
+    //                originalMaterial = rend.material;
+    //                rend.material = highlightMaterial;
+    //                lookedAtRenderer = rend;
+    //            }
+    //        }
+
+    //    }
+    //}
+
+    // 1. Add this field at the top of your Inventory class variables
+    public Camera playerCamera;
+
     private void DetectLookedAtItem()
     {
-        if(lookedAtRenderer != null)
+        if (lookedAtRenderer != null)
         {
             lookedAtRenderer.material = originalMaterial;
             lookedAtRenderer = null;
             originalMaterial = null;
         }
 
-        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-        if(Physics.Raycast(ray, out RaycastHit hit, pickupRange))
+        // 2. Safety check: Use the assigned camera, or fall back to Camera.main if it's null
+        Camera camToUse = playerCamera != null ? playerCamera : Camera.main;
+        if (camToUse == null) return;
+
+        // 3. Use the verified camera reference
+        Ray ray = new Ray(camToUse.transform.position, camToUse.transform.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, pickupRange))
         {
             Item item = hit.collider.GetComponent<Item>();
-            if(item != null)
+            if (item != null)
             {
                 Renderer rend = item.GetComponent<Renderer>();
-                if(rend != null)
+                if (rend != null)
                 {
                     originalMaterial = rend.material;
                     rend.material = highlightMaterial;
                     lookedAtRenderer = rend;
                 }
             }
-            
         }
     }
 
@@ -266,7 +300,7 @@ public class Inventory : MonoBehaviour
 
     private void HandleHotBarSelection()
     {
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
             {
