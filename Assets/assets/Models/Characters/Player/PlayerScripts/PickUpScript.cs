@@ -1,229 +1,369 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PickUpScript : MonoBehaviour
 {
-    public GameObject player;
-    public Transform holdPosition;
+    public Transform dropPosition;
 
-    public GameObject door;
+    public float pickUpRange = 10f;
+    [SerializeField] private float doorOpenRange = 25f;
 
-    //if you copy from below this point, you are legally required to like the video
-    public float throwForce = 500f; //force at which the object is thrown at
-    public float pickUpRange = 8f; //how far the player can pickup the object from
-    [SerializeField]
-    private float doorOpenRange = 12f; //how far away the player needs to be in order to open or close the door
-    private float rotationSensitivity = 1f; //how fast/slow the object is rotated in relation to mouse movement
-    private GameObject heldObj; //object which we pick up
-    private Rigidbody heldObjRb; //rigidbody of object we pick up
-    private bool canDrop = true; //this is needed so we don't throw/drop object when rotating the object
-    private int LayerNumber; //layer index
+    [Header("References")]
+    public activePanel activePanelReferance;
+    public List<GameObject> hotbarSlots;
+    public Sprite emptySlotSprite;
+    public HotbarItem[] hotbarItems = new HotbarItem[5];
+    private GameObject currentHighlightedItem;
+    private GameObject currentHighlightedDoor;
+    private Player playerScript;
 
-    private Vector3 defaultHeldObjectScale = Vector3.zero;
+    [Header("Throwing")]
+    public Transform throwPoint;
+    public float throwForce = 30f;
+    public float minThrowForce = 20f;
+    public float maxThrowForce = 80F;
+    public float scrollSensitivity = 20f;
+    public string throwableTag = "Throwable";
 
-    //Reference to script which includes mouse movement of player (looking around)
-    //we want to disable the player looking around when rotating the object
-    //example below 
-    //MouseLookScript mouseLookScript;
-    void Start()
+    [Header("Trajectory Preview")]
+    public LineRenderer trajectoryLine;
+    public int trajectoryResolution = 30;
+    public float trajectoryTimeStep = 0.1f;
+
+    public class HotbarItem
     {
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            renderer.material.color = new Color(0f, 0f, 1f, 0.5f);
-        }
-
-        LayerNumber = LayerMask.NameToLayer("holdLayer"); //if your holdLayer is named differently make sure to change this ""
-
-        //mouseLookScript = player.GetComponent<MouseLookScript>();
+        public GameObject heldObject;
+        public Sprite icon;
     }
+
+    private void Start()
+    {
+        playerScript = GetComponent<Player>();
+    }
+
 
     void Update()
     {
+        PerformContinuousDetection();
+
+        if (isAiming)
+        {
+            // Add scroll wheel logic
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+            if (scrollInput != 0f)
+            {
+                // Modify throwForce based on scroll
+                throwForce = Mathf.Clamp(throwForce + (scrollInput * scrollSensitivity), minThrowForce, maxThrowForce);
+            }
+
+            DrawTrajectory();
+        }
     }
 
-    public bool IsHolding(string objectName)
+    private void PerformContinuousDetection()
     {
-        return heldObj != null && heldObj.name == objectName;
+        RaycastHit hit;
+        // We cast using the maximum of the two ranges so we don't miss anything
+        float maxRange = Mathf.Max(pickUpRange, doorOpenRange);
+
+        if (Physics.Raycast(transform.position, transform.forward, out hit, maxRange))
+        {
+            GameObject hitObject = hit.transform.gameObject;
+            float distance = hit.distance;
+
+            // --- Handle Items ---
+            if (hitObject.CompareTag("canPickUp") && distance <= pickUpRange)
+            {
+                if (hitObject != currentHighlightedItem)
+                {
+                    ClearItemHighlight();
+                    currentHighlightedItem = hitObject;
+                    ApplyItemHighlight(currentHighlightedItem);
+                }
+            }
+            else if (currentHighlightedItem != null) // If out of range or not hitting
+            {
+                ClearItemHighlight();
+            }
+
+            // --- Handle Doors ---
+            if (hitObject.CompareTag("Door") && distance <= doorOpenRange)
+            {
+                if (hitObject != currentHighlightedDoor)
+                {
+                    ClearDoorHighlight();
+                    currentHighlightedDoor = hitObject;
+                    ApplyDoorHighlight(currentHighlightedDoor);
+                }
+            }
+            else if (currentHighlightedDoor != null) // If out of range or not hitting
+            {
+                ClearDoorHighlight();
+            }
+        }
+        else
+        {
+            ClearItemHighlight();
+            ClearDoorHighlight();
+        }
+    }
+    private void ApplyItemHighlight(GameObject obj)
+    {
+        var outline = obj.GetComponent<Outline>();
+        if (outline != null)
+        {
+            //outline.OutlineColor = Color.white;
+            outline.enabled = true;
+        }
+    }
+
+    private void ClearItemHighlight()
+    {
+        if (currentHighlightedItem != null)
+        {
+            var outline = currentHighlightedItem.GetComponent<Outline>();
+            if (outline != null) outline.enabled = false;
+            currentHighlightedItem = null;
+        }
+    }
+
+    private void ApplyDoorHighlight(GameObject obj)
+    {
+        var outline = obj.GetComponent<Outline>();
+        if (outline != null)
+        {
+            //outline.OutlineColor = Color.yellow;
+            outline.enabled = true;
+        }
+    }
+
+    private void ClearDoorHighlight()
+    {
+        if (currentHighlightedDoor != null)
+        {
+            var outline = currentHighlightedDoor.GetComponent<Outline>();
+            if (outline != null) outline.enabled = false;
+            currentHighlightedDoor = null;
+        }
+    }
+
+    public void HandleInteraction()
+    {
+        if (currentHighlightedDoor != null)
+        {
+            toggleDoorState();
+        }
+        else
+        {
+            runPickUpObject();
+            
+        }
     }
     public void toggleDoorState()
     {
-        //Debug.Log("toggling...");
-        if (heldObj == null) //if currently not holding anything
+        if (PauseMenu.isGamePause) return;
+
+        if (currentHighlightedDoor == null)
         {
-            Debug.Log("NULL PASS");
-            //perform raycast to check if player is looking at object within interaction range
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, doorOpenRange))
+            if (Physics.Raycast(transform.position, transform.forward, out hit, doorOpenRange))
             {
-                Debug.Log("RAY PASS");
-                //make sure pickup tag is attached
-                if (hit.transform.gameObject.tag == "Door")
+                if (hit.transform.CompareTag("Door"))
                 {
-                    Debug.Log("DOOR FOUND!!");
-
-                    doorMovement targetDoor = hit.transform.GetComponent<doorMovement>();
-
-                    // If the script exists on that door, run its Interact method!
-                    if (targetDoor != null)
-                    {
-                        targetDoor.ToggleDoor();
-                    }
+                    currentHighlightedDoor = hit.transform.gameObject;
                 }
+            }
+
+        }
+
+        if (currentHighlightedDoor != null)
+        {
+            doorMovement targetDoor = currentHighlightedDoor.GetComponent<doorMovement>();
+            if (targetDoor != null)
+            {
+                targetDoor.ToggleDoor();
+            }
+
+            AudioSource doorAudio = currentHighlightedDoor.GetComponent<AudioSource>();
+            if (doorAudio != null)
+            {
+                doorAudio.Play();
             }
         }
     }
 
     public void runPickUpObject()
     {
-        //Debug.Log("running pick up method");
-
-        if (heldObj == null) //if currently not holding anything
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, pickUpRange))
         {
-            //perform raycast to check if player is looking at object within pickuprange
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, pickUpRange))
+            if (hit.transform.gameObject.tag == "canPickUp")
             {
-                //make sure pickup tag is attached
-                if (hit.transform.gameObject.tag == "canPickUp")
-                {
-                    //pass in object hit into the PickUpObject function
-
-                    defaultHeldObjectScale = hit.transform.localScale;
-                    PickUpObject(hit.transform.gameObject);
-                }
+                PickUpObject(hit.transform.gameObject);
             }
-        }
-        else
-        {
-            if (canDrop == true)
-            {
-                StopClipping(); //prevents object from clipping through walls
-                DropObject();
-            }
-        }
-    }
-
-    public void runThrowObject()
-    {
-        if (heldObj != null) //if player is holding object
-        {
-            MoveObject(); //keep object position at holdPos
-            RotateObject();
-            if (canDrop == true)
-            {
-                StopClipping();
-                ThrowObject();
-            }
-        }
-    }
-
-    // New helper method to safely handle collision bypassing for either standard Colliders OR CharacterControllers
-    private void SetIgnoreCollisionWithPlayer(GameObject target, bool ignore)
-    {
-        if (player == null || target == null) return;
-
-        Collider targetCollider = target.GetComponent<Collider>();
-        if (targetCollider == null) return;
-
-        Collider playerCollider = player.GetComponent<Collider>();
-
-        if (playerCollider == null)
-        {
-            CharacterController cc = player.GetComponent<CharacterController>();
-            if (cc != null)
-            {
-                Physics.IgnoreCollision(targetCollider, cc, ignore);
-                return;
-            }
-        }
-
-        if (playerCollider != null)
-        {
-            Physics.IgnoreCollision(targetCollider, playerCollider, ignore);
         }
     }
 
     void PickUpObject(GameObject pickUpObj)
     {
-        if (pickUpObj.GetComponent<Rigidbody>()) //make sure the object has a RigidBody
-        {
-            heldObj = pickUpObj; //assign heldObj to the object that was hit by the raycast (no longer == null)
-            heldObjRb = pickUpObj.GetComponent<Rigidbody>(); //assign Rigidbody
-            heldObjRb.isKinematic = true;
-            heldObj.transform.localScale = defaultHeldObjectScale;
-            heldObjRb.transform.parent = holdPosition.transform; //parent object to holdposition
-            heldObj.layer = LayerNumber; //change the object layer to the holdLayer
+        if (PauseMenu.isGamePause) return;
 
-            //make sure object doesnt collide with player, it can cause weird bugs (Upgraded to support CharacterControllers safely)
-            SetIgnoreCollisionWithPlayer(heldObj, true);
+        for (int i = 0; i < hotbarSlots.Count; i++)
+        {
+            GameObject slot = hotbarSlots[i];
+            Image slotImage = slot.GetComponentInChildren<Image>(true);
+            if (slotImage == null) continue;
+
+            if (slotImage.sprite == emptySlotSprite)
+            {
+                slot.SetActive(true);
+
+                Sprite[] allSprites = Resources.LoadAll<Sprite>("Items/sprites/" + pickUpObj.name);
+                Sprite itemSprite = allSprites.Length > 0 ? allSprites[0] : null;
+
+                playerScript.PlaytInteraction();
+
+                if (itemSprite != null)
+                {
+                    slotImage.sprite = itemSprite;
+                    pickUpObj.SetActive(false);
+
+                    hotbarItems[i] = new HotbarItem
+                    {
+                        heldObject = pickUpObj,
+                        icon = itemSprite
+                    };
+
+                    break;
+                }
+                else
+                {
+                    Debug.LogWarning("No sprite found for: " + pickUpObj.name);
+                }
+            }
         }
     }
 
-    void DropObject()
+    public void DropSelectedSlot()
     {
-        //re-enable collision with player
-        SetIgnoreCollisionWithPlayer(heldObj, false);
-        heldObj.layer = 0; //object assigned back to default layer
-        heldObjRb.isKinematic = false;
-        heldObj.transform.parent = null; //unparent object
-        heldObj = null; //undefine game object
+        if (PauseMenu.isGamePause) return;
+
+        int index = activePanelReferance.SelectedIndex;
+        HotbarItem item = hotbarItems[index];
+
+        if (item == null || item.heldObject == null) return;
+
+        DropFromHotbar(index);
     }
 
-    void MoveObject()
+    public void DropFromHotbar(int index)
     {
-        //keep object position the same as the holdPosition position
-        heldObj.transform.position = holdPosition.transform.position;
+        HotbarItem item = hotbarItems[index];
+        if (item == null || item.heldObject == null) return;
+
+        item.heldObject.transform.position = dropPosition.position;
+        item.heldObject.SetActive(true);
+
+        Image slotImage = hotbarSlots[index].GetComponentInChildren<Image>(true);
+        slotImage.sprite = emptySlotSprite;
+        hotbarItems[index] = null;
+
+        hotbarSlots[index].SetActive(false);
     }
 
-    void RotateObject()
+    private bool isAiming = false;
+
+    public void StartThrowAim()
     {
-        if (Input.GetKey(KeyCode.R))//hold R key to rotate, change this to whatever key you want
+        if (PauseMenu.isGamePause) return;
+
+        HotbarItem item = hotbarItems[activePanelReferance.SelectedIndex];
+        if (item == null || item.heldObject == null) return;
+
+        isAiming = true;
+    }
+
+    public void CancelThrowAim()
+    {
+        if (!isAiming) return;
+        isAiming = false;
+        HideTrajectory();
+    }
+
+    public void ConfirmThrow()
+    {
+        if (!isAiming) return;
+        isAiming = false;
+
+        HideTrajectory();
+        ThrowSelectedSlot();
+    }
+
+    public void ThrowSelectedSlot()
+    {
+        if (PauseMenu.isGamePause) return;
+
+        int index = activePanelReferance.SelectedIndex;
+        HotbarItem item = hotbarItems[index];
+        if (item == null || item.heldObject == null) return;
+
+        GameObject obj = item.heldObject;
+        string originalTag = obj.tag; // should be "canPickUp"
+
+        obj.transform.position = throwPoint.position;
+        obj.SetActive(true);
+        obj.tag = throwableTag;
+
+        Rigidbody rb = obj.GetComponent<Rigidbody>();
+        if (rb == null) rb = obj.AddComponent<Rigidbody>();
+        rb.useGravity = true;
+        rb.linearVelocity = Vector3.zero;
+        rb.AddForce(throwPoint.forward * throwForce, ForceMode.VelocityChange);
+
+        ThrownItem thrownScript = obj.GetComponent<ThrownItem>();
+        if (thrownScript == null) thrownScript = obj.AddComponent<ThrownItem>();
+        thrownScript.Setup(originalTag);
+
+        Image slotImage = hotbarSlots[index].GetComponentInChildren<Image>(true);
+        slotImage.sprite = emptySlotSprite;
+        hotbarItems[index] = null;
+        hotbarSlots[index].SetActive(false);
+    }
+
+    public void DrawTrajectory()
+    {
+        trajectoryLine.enabled = true;
+
+        // --- Added Color Feedback ---
+        float t = Mathf.Clamp01((throwForce - minThrowForce) / (maxThrowForce - minThrowForce));
+        trajectoryLine.startColor = Color.Lerp(Color.green, Color.red, t);
+        trajectoryLine.endColor = Color.Lerp(Color.green, Color.red, t);
+        // ----------------------------
+
+        Vector3 startPos = throwPoint.position;
+        Vector3 startVelocity = throwPoint.forward * throwForce;
+
+        trajectoryLine.positionCount = trajectoryResolution;
+
+        for (int i = 0; i < trajectoryResolution; i++)
         {
-            canDrop = false; //make sure throwing can't occur during rotating
+            float time = i * trajectoryTimeStep;
+            Vector3 point = startPos + startVelocity * time + 0.5f * Physics.gravity * time * time;
 
-            //disable player being able to look around
-            //mouseLookScript.verticalSensitivity = 0f;
-            //mouseLookScript.lateralSensitivity = 0f;
+            if (Physics.Linecast(startPos, point, out RaycastHit hit))
+            {
+                trajectoryLine.positionCount = i + 1;
+                trajectoryLine.SetPosition(i, hit.point);
+                return;
+            }
 
-            float XaxisRotation = Input.GetAxis("Mouse X") * rotationSensitivity;
-            float YaxisRotation = Input.GetAxis("Mouse Y") * rotationSensitivity;
-            //rotate the object depending on mouse X-Y Axis
-            heldObj.transform.Rotate(Vector3.down, XaxisRotation);
-            heldObj.transform.Rotate(Vector3.right, YaxisRotation);
-        }
-        else
-        {
-            //re-enable player being able to look around
-            //mouseLookScript.verticalSensitivity = originalvalue;
-            //mouseLookScript.lateralSensitivity = originalvalue;
-            canDrop = true;
+            trajectoryLine.SetPosition(i, point);
         }
     }
 
-    void ThrowObject()
+    public void HideTrajectory()
     {
-        //same as drop function, but add force to object before undefining it
-        SetIgnoreCollisionWithPlayer(heldObj, false);
-        heldObj.layer = 0;
-        heldObjRb.isKinematic = false;
-        heldObj.transform.parent = null;
-        heldObjRb.AddForce(transform.forward * throwForce);
-        heldObj = null;
-    }
-
-    void StopClipping() //function only called when dropping/throwing
-    {
-        var clipRange = Vector3.Distance(heldObj.transform.position, transform.position); //distance from holdPos to the camera
-        //have to use RaycastAll as object blocks raycast in center screen
-        //RaycastAll returns array of all colliders hit within the cliprange
-        RaycastHit[] hits;
-        hits = Physics.RaycastAll(transform.position, transform.TransformDirection(Vector3.forward), clipRange);
-        //if the array length is greater than 1, meaning it has hit more than just the object we are carrying
-        if (hits.Length > 1)
-        {
-            //change object position to camera position 
-            heldObj.transform.position = transform.position + new Vector3(0f, -0.5f, 0f); //offset slightly downward to stop object dropping above player 
-            //if your player is small, change the -0.5f to a smaller number (in magnitude) ie: -0.1f
-        }
+        trajectoryLine.enabled = false;
     }
 }

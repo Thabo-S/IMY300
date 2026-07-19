@@ -1,142 +1,325 @@
-using System.Collections;
-using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
+//using System.Collections;
+//using UnityEngine;
+//using UnityEngine.AI;
+//using UnityEngine.SceneManagement;
+//using UnityEngine.UI;
 
-public class GuardScript : MonoBehaviour
-{
-    private GameObject player;
-    public float sightDistance = 45f;
-    public float fieldOfView = 30f;
-    public float eyeHeight = 12f;
-    public float waitAtWaypoint = 2f;
-    public float gameOverSightTime = 3f;
+//public enum GuardState
+//{
+//    Patrolling,
+//    Investigating
+//}
 
-    public Path path;
+//public class GuardScript : MonoBehaviour
+//{
+//    private GameObject player;
 
-    public GameObject gameOverUI;
+//    [Header("Sight")]
+//    public float sightDistance = 50f;
+//    public float fieldOfView = 30f;
+//    public float eyeHeight = 12f;
+//    public float sightFillRate = 80f; // detection points per second while directly seen
+//    public float catchRadius = 50f;    // how close counts as "found" at the investigate spot
 
-    private NavMeshAgent agent;
-    private Animator animator;
+//    [Header("Patrol Settings")]
+//    public Path path;
+//    public float waitAtWaypoint = 2f;
+//    public float guardSpeed = 10f;
+//    public float investigateSpeed = 16f;
 
-    private int currentWaypointIndex = 0;
-    private bool isWaiting = false;
-    private float playerSpottedTimer = 0f;
+//    [Header("Sound")]
+//    public float runningFillRate = 100f;  // detection points per second, closest/loudest running sound
+//    public float walkingFillRate = 60f;  // detection points per second, closest/loudest walking sound
+//    public float soundMemoryTime = 0.3f; // how long a sound keeps filling after last heard (covers gaps between footstep events)
 
-    public float guardSpeed = 10f;
+//    [Header("Detection Meter")]
+//    public float detection = 0f;
+//    public float maxDetection = 100f;
+//    public float decayRate = 15f; // per second, when no sound/sight this frame
+//    public Slider detectionSlider;
+//    public Image detectionSliderFill; // optional, drag the Slider's Fill image here for color feedback
 
-    void Start()
-    {
-        player = GameObject.FindGameObjectWithTag("Player");
-        agent = GetComponent<NavMeshAgent>();
-        animator = GetComponentInChildren<Animator>();
+//    [Header("Game Over")]
+//    public GameObject gameOverUI;
 
-        if (animator == null)
-            animator = GetComponent<Animator>();
+//    private NavMeshAgent agent;
+//    public NavMeshAgent Agent { get => agent;  }
+//    private Animator animator;
 
-        agent.speed = guardSpeed;
+//    private int currentWaypointIndex = 0;
+//    private bool isWaiting = false;
 
-        if (path != null && path.waypoints.Count > 0)
-            agent.SetDestination(path.waypoints[0].position);
-    }
-    void Update()
-    {
-        HandleSight();
-        HandlePatrol();
-        UpdateAnimations();
-    }
+//    private GuardState currentState = GuardState.Patrolling;
+//    [Header("Debug")]
+//    [SerializeField] private Vector3 lastKnownPos;
 
-    private void HandlePatrol()
-    {
-        if (isWaiting || path == null || path.waypoints.Count == 0) return;
+//    // Sound tracking (for continuous fill between discrete sound events)
+//    private float soundMemoryTimer = 0f;
+//    private float currentSoundStrength = 0f; // 0-1, based on distance
+//    private bool currentSoundIsRunning = false;
 
-        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
-        {
-            StartCoroutine(WaitAtWaypoint());
-        }
-    }
+//    private void OnEnable() => SoundEmissionManager.OnSoundEmitted += HandleSound;
+//    private void OnDisable() => SoundEmissionManager.OnSoundEmitted -= HandleSound;
 
-    private IEnumerator WaitAtWaypoint()
-    {
-        isWaiting = true;
+//    void Start()
+//    {
+//        player = GameObject.FindGameObjectWithTag("Player");
+//        agent = GetComponent<NavMeshAgent>();
+//        animator = GetComponentInChildren<Animator>();
 
-        if (animator != null) animator.SetBool("isWalking", false);
-        if (animator != null) animator.SetBool("isLookingAround", true);
+//        if (animator == null)
+//            animator = GetComponent<Animator>();
 
-        yield return new WaitForSeconds(waitAtWaypoint);
+//        agent.speed = guardSpeed;
 
-        if (animator != null) animator.SetBool("isLookingAround", false);
+//        if (path != null && path.waypoints.Count > 0)
+//            agent.SetDestination(path.waypoints[0].position);
+//    }
 
-        currentWaypointIndex = (currentWaypointIndex + 1) % path.waypoints.Count;
-        agent.SetDestination(path.waypoints[currentWaypointIndex].position);
+//    void Update()
+//    {
+//        bool seenThisFrame = UpdateSightDetection();
+//        bool heardThisFrame = UpdateSoundDetection();
+//        UpdateDetectionDecay(seenThisFrame || heardThisFrame);
+//        UpdateSliderUI();
 
-        isWaiting = false;
-    }
+//        switch (currentState)
+//        {
+//            case GuardState.Patrolling:
+//                HandlePatrol();
+//                break;
 
-    private void UpdateAnimations()
-    {
-        if (animator == null) return;
+//            case GuardState.Investigating:
+//                HandleInvestigate();
+//                break;
+//        }
 
-        bool isMoving = agent.velocity.magnitude > 0.1f;
-        animator.SetBool("isWalking", isMoving && !isWaiting);
-    }
+//        UpdateAnimations();
+//    }
 
-    private void HandleSight()
-    {
-        if (canSeePlayer())
-        {
-            playerSpottedTimer += Time.deltaTime;
+//    // ---------------- SOUND ----------------
 
-            if (playerSpottedTimer >= gameOverSightTime)
-            {
-                if (gameOverUI != null)
-                    gameOverUI.SetActive(true);
+//    // Called whenever the player emits a sound event (e.g. footstep). Just records
+//    // the stimulus; the actual continuous fill happens in UpdateSoundDetection().
+//    private void HandleSound(Vector3 soundPos, float volume)
+//    {
+//        if (currentState == GuardState.Investigating) return;
 
-                StartCoroutine(ReloadScene());
-                playerSpottedTimer = 0f;
-            }
-        }
-        else
-        {
-            playerSpottedTimer = 0f;
-        }
-    }
+//        float distance = Vector3.Distance(transform.position, soundPos);
 
-    private IEnumerator ReloadScene()
-    {
-        yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
+//        if (distance <= volume)
+//        {
+//            float strength = Mathf.Clamp01(1f - (distance / volume));
 
-    public bool canSeePlayer()
-    {
-        if (player == null) return false;
+//            // Keep the strongest signal if multiple sounds overlap
+//            if (strength >= currentSoundStrength)
+//            {
+//                currentSoundStrength = strength;
+//                currentSoundIsRunning = volume > 60f;
+//            }
 
-        if (Vector3.Distance(transform.position, player.transform.position) < sightDistance)
-        {
-            Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-            Vector3 targetPoint = player.transform.position + (Vector3.up * 6.54f); // center of character controller
-            Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
+//            lastKnownPos = soundPos;
+//            soundMemoryTimer = soundMemoryTime; // refresh the "still hearing it" window
+//        }
+//    }
 
-            float angleToPlayer = Vector3.Angle(targetDirection, transform.forward);
+//    private bool UpdateSoundDetection()
+//    {
+//        if (currentState == GuardState.Investigating) return false;
 
-            if (angleToPlayer <= fieldOfView)
-            {
-                Ray ray = new Ray(rayOrigin, targetDirection);
-                RaycastHit hitInfo;
+//        if (soundMemoryTimer > 0f)
+//        {
+//            soundMemoryTimer -= Time.deltaTime;
 
-                Debug.DrawRay(ray.origin, ray.direction * sightDistance, Color.red);
+//            float rate = currentSoundIsRunning ? runningFillRate : walkingFillRate;
+//            detection = Mathf.Clamp(detection + rate * currentSoundStrength * Time.deltaTime, 0f, maxDetection);
 
-                if (Physics.Raycast(ray, out hitInfo, sightDistance))
-                {
-                    if (hitInfo.transform.gameObject == player || hitInfo.transform.root.gameObject == player)
-                        return true;
-                }
+//            SetSliderColor(Color.yellow);
 
-            }
-        }
+//            if (detection >= maxDetection)
+//                EnterInvestigate();
 
-        return false;
-    }
-}
+//            if (soundMemoryTimer <= 0f)
+//                currentSoundStrength = 0f; // fully faded, next event starts fresh
+
+//            return true;
+//        }
+
+//        return false;
+//    }
+
+//    // ---------------- SIGHT ----------------
+
+//    private bool UpdateSightDetection()
+//    {
+//        if (currentState == GuardState.Investigating) return false;
+
+//        if (CanSeePlayer())
+//        {
+//            detection = Mathf.Clamp(detection + sightFillRate * Time.deltaTime, 0f, maxDetection);
+//            lastKnownPos = player.transform.position; // sight overrides sound as most recent info
+
+//            SetSliderColor(Color.red);
+
+//            if (detection >= maxDetection)
+//                EnterInvestigate();
+
+//            return true;
+//        }
+
+//        return false;
+//    }
+
+//    // ---------------- DECAY / UI ----------------
+
+//    private void UpdateDetectionDecay(bool stimulusThisFrame)
+//    {
+//        if (currentState != GuardState.Patrolling) return;
+//        if (stimulusThisFrame) return;
+
+//        detection = Mathf.Clamp(detection - decayRate * Time.deltaTime, 0f, maxDetection);
+
+//        if (detection <= 0f)
+//            SetSliderColor(Color.green);
+//    }
+
+//    private void UpdateSliderUI()
+//    {
+//        if (detectionSlider != null)
+//            detectionSlider.value = detection / maxDetection;
+//    }
+
+//    private void SetSliderColor(Color color)
+//    {
+//        if (detectionSliderFill != null)
+//            detectionSliderFill.color = color;
+//    }
+
+//    // ---------------- STATES ----------------
+
+//    private void EnterInvestigate()
+//    {
+//        currentState = GuardState.Investigating;
+//        isWaiting = false;
+//        agent.speed = investigateSpeed;
+//        agent.SetDestination(lastKnownPos);
+//    }
+
+//    private void HandleInvestigate()
+//    {
+//        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+//        {
+//            CheckForPlayerAtSpot();
+//        }
+//    }
+
+//    private void CheckForPlayerAtSpot()
+//    {
+//        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+//        if (distanceToPlayer <= catchRadius && CanSeePlayer())
+//        {
+//            Debug.Log("Player found");
+//            GameOver();
+//        }
+//        else
+//        {
+//            detection = 0f;
+//            currentSoundStrength = 0f;
+//            soundMemoryTimer = 0f;
+//            currentState = GuardState.Patrolling;
+//            agent.speed = guardSpeed;
+//            SetSliderColor(Color.green);
+
+//            if (path != null && path.waypoints.Count > 0)
+//                agent.SetDestination(path.waypoints[currentWaypointIndex].position);
+//        }
+//    }
+
+//    // ---------------- PATROL ----------------
+
+//    private void HandlePatrol()
+//    {
+//        if (isWaiting || path == null || path.waypoints.Count == 0) return;
+
+//        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+//        {
+//            StartCoroutine(WaitAtWaypoint());
+//        }
+//    }
+
+//    private IEnumerator WaitAtWaypoint()
+//    {
+//        isWaiting = true;
+
+//        if (animator != null) animator.SetBool("isWalking", false);
+//        if (animator != null) animator.SetBool("isLookingAround", true);
+
+//        yield return new WaitForSeconds(waitAtWaypoint);
+
+//        if (animator != null) animator.SetBool("isLookingAround", false);
+
+//        currentWaypointIndex = (currentWaypointIndex + 1) % path.waypoints.Count;
+//        agent.SetDestination(path.waypoints[currentWaypointIndex].position);
+
+//        isWaiting = false;
+//    }
+
+//    // ---------------- ANIMATION ----------------
+
+//    private void UpdateAnimations()
+//    {
+//        if (animator == null) return;
+
+//        bool isMoving = agent.velocity.magnitude > 0.1f;
+//        animator.SetBool("isWalking", isMoving && !isWaiting);
+//    }
+
+//    // ---------------- GAME OVER ----------------
+
+//    private void GameOver()
+//    {
+//        if (gameOverUI != null)
+//            gameOverUI.SetActive(true);
+
+//        StartCoroutine(ReloadScene());
+//    }
+
+//    private IEnumerator ReloadScene()
+//    {
+//        yield return new WaitForSeconds(3f);
+//        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+//    }
+
+//    // ---------------- SIGHT RAYCAST ----------------
+
+//    public bool CanSeePlayer()
+//    {
+//        if (player == null) return false;
+
+//        if (Vector3.Distance(transform.position, player.transform.position) < sightDistance)
+//        {
+//            Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
+//            Vector3 targetPoint = player.transform.position + (Vector3.up * 6.54f);
+//            Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
+
+//            float angleToPlayer = Vector3.Angle(targetDirection, transform.forward);
+
+//            if (angleToPlayer <= fieldOfView)
+//            {
+//                Ray ray = new Ray(rayOrigin, targetDirection);
+//                RaycastHit hitInfo;
+
+//                Debug.DrawRay(ray.origin, ray.direction * sightDistance, Color.red);
+
+//                if (Physics.Raycast(ray, out hitInfo, sightDistance))
+//                {
+//                    if (hitInfo.transform.gameObject == player || hitInfo.transform.root.gameObject == player)
+//                        return true;
+//                }
+//            }
+//        }
+
+//        return false;
+//    }
+//}

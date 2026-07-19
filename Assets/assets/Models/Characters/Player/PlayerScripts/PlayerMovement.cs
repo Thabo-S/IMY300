@@ -6,8 +6,13 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Reference")]
     private CharacterController characterController;
     private Animator animator;
+    private CameraPosition cameraScript;
+    public Player playerScript;
+
+
     private Vector3 playerVelocity;
     private bool isGrounded;
     private bool isCrouching = false;
@@ -23,14 +28,19 @@ public class PlayerMovement : MonoBehaviour
     [Header("Crouch Dimensions")]
     private float standingHeight;
     private Vector3 standingCenter;
-
     private float crouchHeight = 9.46f;
     private Vector3 crouchCenter = new Vector3(0f, 4.67f, -0.37f);
 
-    private CameraPosition cameraScript;
 
     [SerializeField] private float jumpDelay = 0.71f;
 
+    [Header("Sound Emission")]
+    public float walkVolume = 30f;
+    public float runVolume = 60f;
+    public float soundEmitInterval = 0.5f;
+    private float soundTimer = 0f;
+
+    private Vector3 currentVelocity = Vector3.zero;
     public static class AnimationParams
     {
         public const string IsWalking = "isWalking";
@@ -44,16 +54,14 @@ public class PlayerMovement : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
 
-        //scaleTransform = GetComponent<Transform>();
-
         animator = GetComponentInChildren<Animator>();
 
-        // Saving the player's original height
-        // To fix the squashing bug
         standingHeight = characterController.height;
         standingCenter = characterController.center;
 
         cameraScript = GetComponentInChildren<CameraPosition>();
+
+        playerScript = GetComponent<Player>(); 
 
     }
 
@@ -61,14 +69,17 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         isGrounded = characterController.isGrounded;
+        EmitMovementSound();
     }
 
-    private Vector3 currentVelocity = Vector3.zero;
+
+
 
     // SO THIS FUNCTION BASCIALLY GETS THE INPUTS FROM THE INPUT MANAGER 
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
     public void CalculatePlayerMovement(Vector2 movementInput)
     {
+        if (PauseMenu.isGamePause) return;
 
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
         move = transform.TransformDirection(move);
@@ -115,6 +126,8 @@ public class PlayerMovement : MonoBehaviour
     // THIS BASICALLY PREVENTS DOUBLE JUMPING
     public void PlayerJump()
     {
+        if (PauseMenu.isGamePause) return;
+
         // Check if grounded and not crouching
         if (isGrounded && !isCrouching)
         {
@@ -139,6 +152,8 @@ public class PlayerMovement : MonoBehaviour
     // AND PRESSES THE SPRINT BUTTON, PREVENTS THEM FROM TURINING INTO SUPERMAN
     public void PlayerSprint(bool isSprinting)
     {
+        if (PauseMenu.isGamePause) return;
+
         if (isSprinting)
         {
             // Only allow STARTING a sprint if grounded and not crouching
@@ -151,14 +166,15 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             // ALWAYS allow STOPPING a sprint, even in mid-air
-            speed = walkSpeed;
+            speed = isCrouching ? sneakSpeed : walkSpeed;
             if (animator != null) animator.SetBool(AnimationParams.IsSprinting, false);
         }
     }
 
-
     public void playerCrouch()
     {
+        if (PauseMenu.isGamePause) return;
+
         isCrouching = !isCrouching;
 
         if (isCrouching)
@@ -194,4 +210,27 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void EmitMovementSound()
+    {
+        if (PauseMenu.isGamePause) return;
+
+        bool isMoving = currentVelocity.magnitude > 0.1f;
+
+        if (isCrouching || !isMoving)
+        {
+            playerScript.StopFootsteps();
+            return;
+        }
+
+        bool isSprinting = (speed == sprintSpeed);
+        playerScript.PlayFootsteps(isSprinting);
+
+        float volume = isSprinting ? runVolume : walkVolume;
+        soundTimer -= Time.deltaTime;
+        if (soundTimer <= 0f)
+        {
+            SoundEmissionManager.EmitSound(transform.position, volume);
+            soundTimer = soundEmitInterval;
+        }
+    }
 }
