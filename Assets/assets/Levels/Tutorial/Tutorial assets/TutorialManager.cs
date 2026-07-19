@@ -1,12 +1,21 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class TutorialManager : MonoBehaviour
 {
     public GameObject startTutorialOverlay;
     public GameObject player;
     public GameObject WelcomeCam;
+    public Player playerScript;
+    public GameObject guard;
+
+
+    public GameObject crown2;
+    public GameObject greekSculpture;
+    public GameObject actionKeys;
 
     [Header("Step 1 - Movement")]
     public GameObject step1Panel;
@@ -28,6 +37,7 @@ public class TutorialManager : MonoBehaviour
     public Guard guardScript;
 
 
+    private bool itemsPromptShown = false;
 
 
     // ----------- Reference and Variables -------------
@@ -40,6 +50,7 @@ public class TutorialManager : MonoBehaviour
         startTutorialOverlay.SetActive(true);
         player.SetActive(false);
         WelcomeCam.SetActive(true);
+        playerScript = player.GetComponent<Player>();
     }
 
     void Update()
@@ -50,6 +61,21 @@ public class TutorialManager : MonoBehaviour
         }
 
         CheckDoorProximity();
+
+        if (playerScript != null && playerScript.PlayerHealth < 75f)
+        {
+            if (guard != null && guard.activeSelf)
+            {
+                guard.SetActive(false);
+
+                if (!itemsPromptShown)
+                {
+                    pickUpItems();
+
+                    itemsPromptShown = true;
+                }
+            }
+        }
 
     }
 
@@ -131,6 +157,8 @@ public class TutorialManager : MonoBehaviour
     public void HideStep1Panel()
     {
         if (step1Panel != null) step1Panel.SetActive(false);
+
+        Time.timeScale = 1f;
     }
 
     // ---------------- STEP 2: DOOR PROXIMITY PROMPT ----------------
@@ -159,20 +187,71 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
+    public void pickUpItems()
+    {
+        step1Panel.SetActive(true);
+
+        step1Text.text = "[E] Pick up the items.\r\n Watch them fill up you hotbar";
+
+        Invoke(nameof(HideStep1Panel), 3f);
+
+        greekSculpture.SetActive(true);
+
+        crown2.SetActive(true);
+
+        actionKeys.SetActive(true);
+
+        StartCoroutine(TimeWait());
+
+        HotbarInteractionText();
+
+    }
+
+    public void HotbarInteractionText()
+    {
+        step1Panel.SetActive(true);
+
+        step1Text.text = "[1-5] Select a hotbar slot\r\n [G] Drop selected item\r\n\r\n You can carry, swap, and drop items anytime.";
+
+        Invoke(nameof(HideStep1Panel), 6f);
+    }
+
+    IEnumerator TimeWait()
+    {
+        yield return new WaitForSeconds(3);
+
+    }
+
     public void PlayerFailedStep3()
     {
-        // 1. Move player to the safe spawn point for the room
+        CharacterController cc = player.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+
         player.transform.position = step3SpawnPoint.position;
 
-        // 2. Reset the guard
+        if (cc != null) cc.enabled = true;
+
         guardScript.ResetGuard();
 
-        // 3. Show feedback
-        step1Panel.SetActive(true);
-        step1Text.text = "You were spotted! Try walking to stay quiet.";
 
-        // 4. Hide the message after a delay
+        step1Panel.SetActive(true);
+        step1Text.text = "You were heard! Try walking to stay quiet.";
+
         Invoke(nameof(HideStep1Panel), 3f);
     }
 
+    public bool guardShots = false;
+
+    public void playerSpottedByGuard()
+    {
+        if (guardShots) return;
+
+        step1Panel.SetActive(true);
+
+        step1Text.text = "You were spotted!\r\n Guards will shoot at you and you'll lose health \r\n You restart at 0 healt.";
+
+        Invoke(nameof(HideStep1Panel), 3f);
+
+        guardShots = true;
+    }
 }

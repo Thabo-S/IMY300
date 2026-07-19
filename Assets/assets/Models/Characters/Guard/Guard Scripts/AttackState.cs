@@ -59,10 +59,11 @@ public class AttackState : BaseState
 
                 if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
                 {
-                    TutorialManager tutorial = GameObject.FindObjectOfType<TutorialManager>();
+                    TutorialManager tutorial = Object.FindObjectOfType<TutorialManager>();
+
                     if (tutorial != null)
                     {
-                        tutorial.PlayerFailedStep3();
+                        tutorial.playerSpottedByGuard();
                     }
                 }
             }

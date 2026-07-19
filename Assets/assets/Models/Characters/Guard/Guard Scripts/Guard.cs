@@ -63,6 +63,8 @@ public class Guard : MonoBehaviour
     private float currentSoundStrength = 0f;
     private bool currentSoundIsRunning = false;
 
+    public float idleFacingYRotation = 90f;
+
     public static class AnimationParams
     {
         public const string Guard_Idle = "Guard_Idle";
@@ -262,6 +264,8 @@ public class Guard : MonoBehaviour
         stateMachine.ChangeState(new PatrolState());
 
         agent.isStopped = false;
+
+        transform.rotation = Quaternion.Euler(0f, idleFacingYRotation, 0f);
     }
 
 

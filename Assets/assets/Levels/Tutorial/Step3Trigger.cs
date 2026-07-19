@@ -2,14 +2,19 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Step4Trigger : MonoBehaviour
+public class Step3Trigger : MonoBehaviour
 {
     public TutorialManager tutorialManeger;
+    private bool isTriggered = false;
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !isTriggered)
         {
+            isTriggered = true;
+
             LoadStep4();
+
         }
     }
 

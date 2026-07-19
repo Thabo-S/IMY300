@@ -14,6 +14,7 @@ public class PatrolState : BaseState
         {
             guard.Agent.SetDestination(guard.path.waypoints[guard.currentWaypointIndex].position);
         }
+
     }
 
     public override void Perform()
@@ -32,6 +33,18 @@ public class PatrolState : BaseState
 
         if (guard.TickDetection())
         {
+
+            if (PlayerPrefs.GetInt("LevelIndex", 0) == 0 && !Object.FindObjectOfType<Step4Trigger>().isTriggered)
+            {
+                TutorialManager tutorial = Object.FindObjectOfType<TutorialManager>();
+                if (tutorial != null)
+                {
+                    tutorial.PlayerFailedStep3();
+                    Debug.Log("[PATROL] Heard player during tutorial, calling PlayerFailedStep3");
+                }
+                return;
+            }
+
             AlertState alert = new AlertState();
             alert.lastKnownPosition = guard.LastKnownPlayerPosition;
             stateMachine.ChangeState(alert);

@@ -3,14 +3,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
-public class Step4Trigger : MonoBehaviour
+public class Step5Trigger : MonoBehaviour
 {
     private TutorialManager tutorialManeger;
 
-    public GameObject guardsCanHear;
-    public GameObject RouteToStep3;
+    public GameObject guard;
     public GameObject RouteToStep5;
-    public bool isTriggered = false;
+    public GameObject healthBar;
+
+    private bool isTriggered = false;
     private void Start()
     {
         tutorialManeger = GameObject.FindAnyObjectByType<TutorialManager>();
@@ -21,17 +22,29 @@ public class Step4Trigger : MonoBehaviour
     {
         if (other.CompareTag("Player") && !isTriggered)
         {
-            guardsCanHear.SetActive(false);
+            guard.SetActive(false);
+            RouteToStep5.SetActive(false);
 
-            RouteToStep3.SetActive(false);
+            healthBar.SetActive(true);
 
-            RouteToStep5.SetActive(true);
+            tutorialManeger.guard.SetActive(true);
 
             isTriggered = true;
-            
+
+            LoadStep();
+
             StartCoroutine(TimeWait());
 
         }
+    }
+    
+
+    private void LoadStep()
+    {
+        tutorialManeger.step1Panel.SetActive(true);
+
+        tutorialManeger.step1Text.text = "Watch the eye icon above the guard.\r\nIt lights up before you're actually spotted — that's your warning.";
+
     }
 
     IEnumerator TimeWait()
@@ -39,7 +52,6 @@ public class Step4Trigger : MonoBehaviour
         yield return new WaitForSeconds(6);
 
         tutorialManeger.HideStep1Panel();
-
 
     }
 
