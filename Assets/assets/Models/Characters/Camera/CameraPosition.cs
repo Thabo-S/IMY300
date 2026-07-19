@@ -5,7 +5,7 @@ public class CameraPosition : MonoBehaviour
     private Vector3 thirdPersonPos = new Vector3(4.11f, 12.59f, -16.21f);
     private Vector3 thirdPersonRot = new Vector3(15f, 0f, 0f);
 
-    private Vector3 topDownPos = new Vector3(0f, 11.57f, 1.8f);
+    private Vector3 topDownPos = new Vector3(0f, 11.57f, -0.16f);
     private Vector3 topDownRot = new Vector3(0f, 0f, 0f);
 
     private Vector3 crouchTopDownPos = new Vector3(0f, 8.22f, 1f);
@@ -37,11 +37,11 @@ public class CameraPosition : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            isTopDown = !isTopDown;
-            UpdateCameraTransform();
-        }
+        //if (Input.GetKeyDown(KeyCode.C))
+        //{
+        //    isTopDown = !isTopDown;
+        //    UpdateCameraTransform();
+        //}
 
         PreventCameraClipping();
     }

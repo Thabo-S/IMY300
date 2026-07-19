@@ -3,9 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    public void PlayGame()
+    public GameObject LevelSelectOverlay;
+
+    private void Start()
     {
-        SceneManager.LoadSceneAsync("Scene1");
+
+    }
+
+    public void showLevelSelectOverlay()
+    {
+        LevelSelectOverlay.SetActive(true);
     }
 
     public void QuitGame ()

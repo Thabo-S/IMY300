@@ -88,7 +88,7 @@ public class PickUpScript : MonoBehaviour
             }
 
             // --- Handle Doors ---
-            if (hitObject.CompareTag("Door") && distance <= doorOpenRange)
+            if (hitObject.CompareTag("Door_Left_Swing") || hitObject.CompareTag("Door_Right_Swing") && distance <= doorOpenRange)
             {
                 if (hitObject != currentHighlightedDoor)
                 {
@@ -169,7 +169,7 @@ public class PickUpScript : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(transform.position, transform.forward, out hit, doorOpenRange))
             {
-                if (hit.transform.CompareTag("Door"))
+                if (hit.transform.CompareTag("Door_Left_Swing") || hit.transform.CompareTag("Door_Left_Swing"))
                 {
                     currentHighlightedDoor = hit.transform.gameObject;
                 }

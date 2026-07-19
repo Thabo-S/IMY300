@@ -251,6 +251,19 @@ public class Guard : MonoBehaviour
         return false;
     }
 
+    public void ResetGuard()
+    {
+        agent.isStopped = true;
+
+        detection = 0f;
+        UpdateSliderUI();
+        SetSliderColor(Color.green);
+
+        stateMachine.ChangeState(new PatrolState());
+
+        agent.isStopped = false;
+    }
+
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()

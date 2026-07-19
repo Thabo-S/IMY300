@@ -56,6 +56,15 @@ public class AttackState : BaseState
 
                 // TODO: actual damage/VFX logic goes here
                 ShootAtPlayer();
+
+                if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+                {
+                    TutorialManager tutorial = GameObject.FindObjectOfType<TutorialManager>();
+                    if (tutorial != null)
+                    {
+                        tutorial.PlayerFailedStep3();
+                    }
+                }
             }
         }
         else
@@ -145,4 +154,6 @@ public class AttackState : BaseState
 
         fireTimer = 0f;
     }
+
+
 }
