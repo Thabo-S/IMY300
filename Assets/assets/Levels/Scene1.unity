@@ -3540,11 +3540,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6744387096622902406, guid: 1e598c14ad8cc8e449cec298a03b4ce1, type: 3}
   m_PrefabInstance: {fileID: 501682633}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &508837070 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2584305879565938073, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
-  m_PrefabInstance: {fileID: 1738437595}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &516184414
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5437,17 +5432,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5873137389282017210, guid: 539a9279aa0620c4191887ffe20716a7, type: 3}
   m_PrefabInstance: {fileID: 741341233}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &749316420 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 74762018346771682, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
-  m_PrefabInstance: {fileID: 2296306984244513195}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29ec4875ce9b57b4da8083881133e232, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KeyPadQTE
 --- !u!43 &767281805
 Mesh:
   m_ObjectHideFlags: 0
@@ -5733,17 +5717,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1938638804273199930, guid: f9997c1ada0ac394886ad980f8cd92d6, type: 3}
   m_PrefabInstance: {fileID: 782449126}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &785077615 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4919888059839483889, guid: d306b35f80cf90748a245d08fa18020e, type: 3}
-  m_PrefabInstance: {fileID: 3264308164206171919}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
 --- !u!1001 &789592900
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5854,6 +5827,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3850855839129778942, guid: d306b35f80cf90748a245d08fa18020e, type: 3}
   m_PrefabInstance: {fileID: 3264308164206171919}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &795464852 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2706474147796745546, guid: d306b35f80cf90748a245d08fa18020e, type: 3}
+  m_PrefabInstance: {fileID: 3264308164206171919}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 795464850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29ec4875ce9b57b4da8083881133e232, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeyPadQTE
 --- !u!1001 &818329190
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11340,6 +11324,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 767492272}
     m_Modifications:
+    - target: {fileID: -3554117645392749207, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
+      propertyPath: keypadLockDoor
+      value: 
+      objectReference: {fileID: 1858484666}
     - target: {fileID: 2584305879565938073, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
       propertyPath: m_Name
       value: ValutDoor
@@ -11392,10 +11380,7 @@ PrefabInstance:
     - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2584305879565938073, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1738437603}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
 --- !u!4 &1738437596 stripped
 Transform:
@@ -11407,28 +11392,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -3554117645392749207, guid: b8875c0a145c6eb43825a776dfe276c5, type: 3}
   m_PrefabInstance: {fileID: 1738437595}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 508837070}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cef28242455ef31488eda087d84ff823, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::doorMovement
---- !u!114 &1738437603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 508837070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16be699d8ba4fd24ebce38706a5521e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KeypadLockDoor
-  door: {fileID: 1738437600}
-  qteController: {fileID: 749316420}
-  qtePanel: {fileID: 795464850}
-  isLocked: 1
 --- !u!4 &1744779219 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1665014743087817024, guid: 445d8ac002dc51545b401d77e11e5f9d, type: 3}
@@ -11945,6 +11914,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1938638804273199930, guid: f9997c1ada0ac394886ad980f8cd92d6, type: 3}
   m_PrefabInstance: {fileID: 1840603109}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1858484666 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 777006309956844974, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
+  m_PrefabInstance: {fileID: 2296306984244513195}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16be699d8ba4fd24ebce38706a5521e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeypadLockDoor
 --- !u!4 &1863328751 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7697595725925370300, guid: d306b35f80cf90748a245d08fa18020e, type: 3}
@@ -14407,14 +14387,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 74762018346771682, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
-      propertyPath: timerSlider
-      value: 
-      objectReference: {fileID: 785077615}
     - target: {fileID: 361241320334228817, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
       propertyPath: m_Name
       value: KeyPad
       objectReference: {fileID: 0}
+    - target: {fileID: 777006309956844974, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
+      propertyPath: door
+      value: 
+      objectReference: {fileID: 1738437600}
+    - target: {fileID: 777006309956844974, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
+      propertyPath: qtePanel
+      value: 
+      objectReference: {fileID: 795464850}
+    - target: {fileID: 777006309956844974, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
+      propertyPath: qteController
+      value: 
+      objectReference: {fileID: 795464852}
     - target: {fileID: 1029270142305347563, guid: e9379e8d452c03a43b871db48f6506cf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 84.90308

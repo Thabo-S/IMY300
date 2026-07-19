@@ -18,13 +18,14 @@ public class KeyPadQTE : MonoBehaviour
 
     [Header("Key Pool")]
     [Tooltip("Every key this keypad can draw from, with its display sprite. " +
-             "e.g. C, F, J, L, N, P, T, Y, Z - one entry per letter.")]
+             "F, J, L, N, P, T, Y, Z - do NOT include C, it's reserved as the cancel key.")]
     public List<KeyOption> keyPool = new List<KeyOption>();
 
     [Header("Sequence Display")]
-    [Tooltip("The slots that show the required sequence, left to right. " +
-             "Size this to however many keys you want per attempt (4 by default).")]
-    public SpriteRenderer[] keySlots = new SpriteRenderer[4];
+    [Tooltip("The UI Images that show the required sequence, left to right. " +
+             "Size this to however many keys you want per attempt (4 by default). " +
+             "Must be Image components (not SpriteRenderer) since this panel lives on a Canvas.")]
+    public Image[] keySlots = new Image[4];
 
     [Tooltip("Tint applied to a slot once the player has correctly entered that key.")]
     public Color completedTint = Color.green;
@@ -79,6 +80,12 @@ public class KeyPadQTE : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
         if (!isActive) return;
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            FinishQTE(false); // player manually cancelled
+            return;
+        }
 
         timeRemaining -= Time.deltaTime;
         UpdateTimerVisual();

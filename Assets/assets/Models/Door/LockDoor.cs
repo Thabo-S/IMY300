@@ -27,6 +27,16 @@ public class LockDoor : MonoBehaviour
 
     void Update()
     {
+        // While a QTE is up, keep it hidden behind the pause menu whenever
+        // the game is paused - the QTE itself already freezes (it checks
+        // Time.timeScale), this just handles what's visible on screen.
+        if (qteInProgress)
+        {
+            bool shouldShow = !PauseMenu.isGamePause;
+            if (qtePanel.activeSelf != shouldShow)
+                qtePanel.SetActive(shouldShow);
+        }
+
         if (Time.timeScale == 0f) return; // (pause guard)
         // Only open a NEW qte if one isn't already running - otherwise every
         // press during the minigame (including the success press) restarts it.

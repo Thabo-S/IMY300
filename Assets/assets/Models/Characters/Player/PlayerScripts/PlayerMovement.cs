@@ -77,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
     public void CalculatePlayerMovement(Vector2 movementInput)
     {
-        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return; //add lock to stop player movement during QTE
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive || KeyPadQTE.IsAnyQTEActive) return; //add lock to stop player movement during QTE
 
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
         move = transform.TransformDirection(move);
@@ -124,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
     // THIS BASICALLY PREVENTS DOUBLE JUMPING
     public void PlayerJump()
     {
-        if (PauseMenu.isGamePause) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive || KeyPadQTE.IsAnyQTEActive) return;
 
         // Check if grounded and not crouching
         if (isGrounded && !isCrouching)
@@ -150,7 +150,7 @@ public class PlayerMovement : MonoBehaviour
     // AND PRESSES THE SPRINT BUTTON, PREVENTS THEM FROM TURINING INTO SUPERMAN
     public void PlayerSprint(bool isSprinting)
     {
-        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive || KeyPadQTE.IsAnyQTEActive) return;
 
         if (isSprinting)
         {
@@ -171,7 +171,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void playerCrouch()
     {
-        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive || KeyPadQTE.IsAnyQTEActive) return;
 
         isCrouching = !isCrouching;
 
@@ -210,7 +210,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void EmitMovementSound()
     {
-        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive) return;
+        if (PauseMenu.isGamePause || LockDoorQTE.IsAnyQTEActive || KeyPadQTE.IsAnyQTEActive) return;
 
         bool isMoving = currentVelocity.magnitude > 0.1f;
 

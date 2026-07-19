@@ -29,7 +29,18 @@ public class KeypadLockDoor : MonoBehaviour
 
     void Update()
     {
+        // While a QTE is up, keep it hidden behind the pause menu whenever
+        // the game is paused - the QTE itself already freezes (it checks
+        // Time.timeScale), this just handles what's visible on screen.
+        if (qteInProgress)
+        {
+            bool shouldShow = !PauseMenu.isGamePause;
+            if (qtePanel.activeSelf != shouldShow)
+                qtePanel.SetActive(shouldShow);
+        }
+
         if (Time.timeScale == 0f) return; // (pause guard)
+
         if (playerInRange && isLocked && !qteInProgress && Input.GetKeyDown(KeyCode.E))
         {
             OpenQTE();

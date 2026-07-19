@@ -14,6 +14,10 @@ public class doorMovement : MonoBehaviour
              "successful QTE, so its own call still goes through.")]
     [SerializeField] private LockDoor lockDoor;
 
+    [Tooltip("Optional. Same idea as Lock Door above, but for a keypad-locked door. " +
+             "A door can use one, the other, both, or neither - whichever applies.")]
+    [SerializeField] private KeypadLockDoor keypadLockDoor;
+
     [Header("Animation Settings")]
     [SerializeField] private float animationDuration = 0.5f;
 
@@ -24,6 +28,12 @@ public class doorMovement : MonoBehaviour
         if (lockDoor != null && lockDoor.isLocked)
         {
             // Locked doors can only be opened via LockDoor's own QTE flow.
+            return;
+        }
+
+        if (keypadLockDoor != null && keypadLockDoor.isLocked)
+        {
+            // Locked doors can only be opened via KeypadLockDoor's own QTE flow.
             return;
         }
 

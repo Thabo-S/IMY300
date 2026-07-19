@@ -60,6 +60,12 @@ public class LockDoorQTE : MonoBehaviour
         if (Time.timeScale == 0f) return;// game is paused
         if (!isActive) return; //Do nothing at all unless a door has actually started the QTE.
 
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            FinishQTE(false); // player manually cancelled
+            return;
+        }
+
         //move the pointer towards the target postion
         pointerTransform.position = Vector3.MoveTowards(pointerTransform.position, targetPostion, moveSpped * Time.deltaTime);
 

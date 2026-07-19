@@ -61,10 +61,10 @@ PrefabInstance:
       addedObject: {fileID: 2717290627848691537}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 24aea4fbea99075468ace9c44d47c378, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 74762018346771682}
+      addedObject: {fileID: 2585816036897098705}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 24aea4fbea99075468ace9c44d47c378, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2585816036897098705}
+      addedObject: {fileID: 777006309956844974}
   m_SourcePrefab: {fileID: 100100000, guid: 24aea4fbea99075468ace9c44d47c378, type: 3}
 --- !u!1 &361241320334228817 stripped
 GameObject:
@@ -86,53 +86,12 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.0452652, y: 2.6255236, z: 1.0812874}
-  m_Center: {x: 0.04002762, y: 0.5641475, z: 0.040643692}
---- !u!114 &74762018346771682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 361241320334228817}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29ec4875ce9b57b4da8083881133e232, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KeyPadQTE
-  keyPool:
-  - key: 99
-    sprite: {fileID: 21300000, guid: cb16e1070e13a8d4d8ae6dc57836c2cf, type: 3}
-  - key: 102
-    sprite: {fileID: 21300000, guid: 99c636cb77c262a49b8c02304db24962, type: 3}
-  - key: 108
-    sprite: {fileID: 21300000, guid: 70e0360fba9dfb9438c233435d6edb81, type: 3}
-  - key: 0
-    sprite: {fileID: 0}
-  - key: 110
-    sprite: {fileID: 21300000, guid: 9dfbdfcc000276c4e8f0691b09bd4eec, type: 3}
-  - key: 112
-    sprite: {fileID: 21300000, guid: f3086915a6a5381479f3a123656a2b2b, type: 3}
-  - key: 116
-    sprite: {fileID: 21300000, guid: 903f58c4c07c2fa47b177fbe85723918, type: 3}
-  - key: 121
-    sprite: {fileID: 21300000, guid: b86daad4ee022784e84198a0b5b3b26d, type: 3}
-  - key: 122
-    sprite: {fileID: 21300000, guid: 65a0c2c620c564c4681c39ad2c39d6d5, type: 3}
-  - key: 114
-    sprite: {fileID: 21300000, guid: f3086915a6a5381479f3a123656a2b2b, type: 3}
-  keySlots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  completedTint: {r: 0, g: 1, b: 0, a: 1}
-  timerSlider: {fileID: 0}
-  timeLimit: 5
+  m_Size: {x: 4.7050476, y: 2.6255236, z: 10.357292}
+  m_Center: {x: 0.045303345, y: 0.5641475, z: 4.678646}
 --- !u!114 &2585816036897098705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,3 +110,19 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &777006309956844974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361241320334228817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16be699d8ba4fd24ebce38706a5521e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeypadLockDoor
+  door: {fileID: 0}
+  qteController: {fileID: 0}
+  qtePanel: {fileID: 0}
+  isLocked: 1
