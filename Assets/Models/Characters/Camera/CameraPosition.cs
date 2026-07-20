@@ -5,16 +5,16 @@ public class CameraPosition : MonoBehaviour
     private Vector3 thirdPersonPos = new Vector3(4.11f, 12.59f, -16.21f);
     private Vector3 thirdPersonRot = new Vector3(15f, 0f, 0f);
 
-    private Vector3 topDownPos = new Vector3(0f, 11.57f, -0.16f);
+    private Vector3 topDownPos = new Vector3(0f, 0.7f, 0.13f);
     private Vector3 topDownRot = new Vector3(0f, 0f, 0f);
 
-    private Vector3 crouchTopDownPos = new Vector3(0f, 8.22f, 1f);
+    private Vector3 crouchTopDownPos = new Vector3(0f, 0.4f, 1f);
     private Vector3 crouchTopDownRot = new Vector3(20f, 0f, 0f);
 
     private bool isTopDown = true;
     private bool isCrouching = false;
     private Transform player;
-    public float headPosition = 11.5f;
+    public float headPosition = 0.614f;
 
     private SkinnedMeshRenderer playerMeshRenderer;
 
@@ -49,7 +49,7 @@ public class CameraPosition : MonoBehaviour
     public void ToggleCrouchView(bool crouchingState)
     {
         isCrouching = crouchingState;
-        UpdateCameraTransform();
+        //UpdateCameraTransform();
     }
 
     void UpdateCameraTransform()

@@ -16,7 +16,10 @@ public class PlayerLookAround : MonoBehaviour
 
     private void Start()
     {
+        cam = Camera.main;
+
         mouseSensitivity.value = xDirectionSensitivity;
+
     }
 
     private void Update()

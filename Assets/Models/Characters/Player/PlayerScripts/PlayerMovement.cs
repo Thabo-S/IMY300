@@ -18,18 +18,18 @@ public class PlayerMovement : MonoBehaviour
     private bool isCrouching = false;
 
     [Header("Movement Settings")]
-    public float gravity = -50f;
-    public float speed = 20f;
-    public float walkSpeed = 20f;
-    public float sprintSpeed = 30f;
-    public float sneakSpeed = 9f;
-    public float jumpHeight = 5f;
+    public float gravity = -9.8f;
+    public float speed = 2.2f;
+    public float walkSpeed = 2.2f;
+    public float sprintSpeed = 3.4f;
+    public float sneakSpeed = 1f;
+    public float jumpHeight = 0.56f;
 
     [Header("Crouch Dimensions")]
     private float standingHeight;
     private Vector3 standingCenter;
-    private float crouchHeight = 9.46f;
-    private Vector3 crouchCenter = new Vector3(0f, 4.67f, -0.37f);
+    private float crouchHeight = 1.33f;
+    private Vector3 crouchCenter = new Vector3(0f, -0.31f, -0.04f);
 
 
     [SerializeField] private float jumpDelay = 0.71f;
@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
 
         cameraScript = GetComponentInChildren<CameraPosition>();
 
-        playerScript = GetComponent<Player>(); 
+        playerScript = GetComponent<Player>();
 
     }
 
@@ -175,6 +175,15 @@ public class PlayerMovement : MonoBehaviour
     {
         if (PauseMenu.isGamePause) return;
 
+
+        //if (isCrouching)
+        //{
+        //    if (Physics.Raycast(transform.position, Vector3.up, standingHeight))
+        //    {
+        //        return; // ceiling above — stay crouched
+        //    }
+        //}
+
         isCrouching = !isCrouching;
 
         if (isCrouching)
@@ -186,7 +195,7 @@ public class PlayerMovement : MonoBehaviour
             if (cameraScript != null)
             {
                 // Raycast origin still drops to avoid ceiling clipping
-                cameraScript.headPosition = 5.0f;
+                cameraScript.headPosition = 0.56f;
                 // This now only lowers the Top-Down coordinates
                 cameraScript.ToggleCrouchView(true);
             }
@@ -199,7 +208,7 @@ public class PlayerMovement : MonoBehaviour
 
             if (cameraScript != null)
             {
-                cameraScript.headPosition = 11.5f;
+                cameraScript.headPosition = 1.29f;
                 cameraScript.ToggleCrouchView(false);
             }
         }
