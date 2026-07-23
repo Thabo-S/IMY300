@@ -7,7 +7,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public bool hovering;
 
-    public ItemSO heldItem;
+    private ItemSO heldItem;
     private int itemAmount;
 
     private Image iconImage;
@@ -24,12 +24,12 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         return heldItem;
     }
 
-    public int GetItemAmount()
+    public int GetAmount()
     {
         return itemAmount;
     }
 
-    public void SetItemAmount(ItemSO item, int amount = 1)
+    public void SetItem(ItemSO item, int amount = 1)
     {
         heldItem = item;
         itemAmount = amount;
@@ -39,6 +39,13 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void UpdateSlot()
     {
+
+        if(iconImage == null)
+        {
+            iconImage = transform.GetChild(0).GetComponent<Image>();
+            amountTxt = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        }
+
         if (heldItem != null)
         {
             iconImage.enabled = true;
@@ -94,3 +101,4 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         hovering = false;
     }
 }
+
