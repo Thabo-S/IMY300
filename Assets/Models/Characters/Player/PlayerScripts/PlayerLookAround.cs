@@ -69,9 +69,7 @@ public class PlayerLookAround : MonoBehaviour
     public static PlayerLookAround instance;
 
     public Camera cam;
-
     public float xRotation = 0f;
-
     public Slider mouseSensitivity;
 
     public float xDirectionSensitivity = 8f;
@@ -89,6 +87,9 @@ public class PlayerLookAround : MonoBehaviour
 
     private void Start()
     {
+        // Force rotation state active when the player loads in
+        updatingRotation = true;
+
         if (mouseSensitivity != null)
         {
             mouseSensitivity.value = xDirectionSensitivity;
@@ -106,19 +107,20 @@ public class PlayerLookAround : MonoBehaviour
         }
     }
 
-    public void CalculatePlayerLookAround(Vector2 PlayerLookAround)
+    public void CalculatePlayerLookAround(Vector2 input)
     {
-        // Video logic: Return immediately if not updating rotation
         if (!updatingRotation) return;
 
-        float mouseX = PlayerLookAround.x;
-        float mouseY = PlayerLookAround.y;
+        float mouseX = input.x;
+        float mouseY = input.y;
 
-        // Calculate rotation based on inputs
         xRotation -= (mouseY * Time.deltaTime) * yDirectionSensitivity;
         xRotation = Mathf.Clamp(xRotation, -VerticalClamp + 10, VerticalClamp);
 
-        cam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        if (cam != null)
+        {
+            cam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        }
 
         transform.Rotate(Vector3.up * (mouseX * Time.deltaTime) * xDirectionSensitivity);
     }
