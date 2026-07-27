@@ -79,9 +79,12 @@ public class Inventory : MonoBehaviour
         IsOpen = false;
         if (container != null) container.SetActive(false);
 
-        // Lock cursor & enable rotation
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // NOTE: Cursor locking is no longer forced here. This object gets
+        // SetActive(true) the moment "Start Tutorial" is pressed, so locking
+        // the cursor in Start() hid it before any tutorial intro UI could use
+        // the mouse. Call PauseMenu.LockGameplayCursor() explicitly once
+        // gameplay should actually take control of the mouse (e.g. from the
+        // Start Tutorial button, or after an intro popup is dismissed).
 
         // Explicitly enable rotation on startup
         SetPlayerRotationState(true);
@@ -109,10 +112,10 @@ public class Inventory : MonoBehaviour
         {
             DetectLookedAtItem();
 
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                TryPickupItem();
-            }
+            // NOTE: Pickup is now handled exclusively via the new Input System
+            // (see InputMananger.cs -> pickUp.PickUpObject.performed -> TryPickupItem()).
+            // Having a second binding here caused a single E press to fire
+            // TryPickupItem() twice, duplicating/over-stacking picked up items.
 
             HandleHotbarSelection();
             HandleDropEquippedItem();
