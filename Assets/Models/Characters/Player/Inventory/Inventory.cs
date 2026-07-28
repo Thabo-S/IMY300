@@ -26,6 +26,7 @@ public class Inventory : MonoBehaviour
     public LayerMask pickupLayerMask = ~0; // Set in Inspector to exclude Player layer
 
     private Item lookedAtItem = null;
+    private doorMovement lookedAtDoor = null;
     private Material originalMaterial;
     private Renderer lookedAtRenderer = null;
 
@@ -45,6 +46,12 @@ public class Inventory : MonoBehaviour
     public float maxThrowForce = 60f;
     public float scrollSensitivity = 15f;
 
+    [Header("Fallback Throw Origin (used only if Throw Point is not assigned)")]
+    [Tooltip("Sideways offset from the camera. Positive = player's right.")]
+    public float fallbackSideOffset = 0.35f;
+    [Tooltip("Vertical offset from the camera. Negative = lower, towards hand height.")]
+    public float fallbackVerticalOffset = -0.2f;
+
     [Header("Trajectory Preview")]
     public LineRenderer trajectoryLine;
     public int trajectoryResolution = 30;
@@ -58,14 +65,16 @@ public class Inventory : MonoBehaviour
 
     private void Awake()
     {
-        if (inventorySlotParent != null)
-            inventorySlots.AddRange(inventorySlotParent.GetComponentsInChildren<Slot>());
-
         if (hotbarObject != null)
             hotbarSlots.AddRange(hotbarObject.GetComponentsInChildren<Slot>());
 
-        allSlots.AddRange(inventorySlots);
+        if (inventorySlotParent != null)
+            inventorySlots.AddRange(inventorySlotParent.GetComponentsInChildren<Slot>());
+
+        // Hotbar slots come first so AddItem() fills the hotbar before
+        // spilling over into the main inventory grid.
         allSlots.AddRange(hotbarSlots);
+        allSlots.AddRange(inventorySlots);
     }
 
     private void Start()
@@ -226,10 +235,10 @@ public class Inventory : MonoBehaviour
         ItemSO itemSO = equippedSlot.GetItem();
         if (itemSO == null || itemSO.itemPrefab == null) return;
 
-        Transform spawnPoint = throwPoint != null ? throwPoint : playerCamera.transform;
+        GetThrowOrigin(out Vector3 spawnPosition, out Vector3 spawnForward, out Quaternion spawnRotation);
 
         // Instantiate world item
-        GameObject thrownObj = Instantiate(itemSO.itemPrefab, spawnPoint.position, spawnPoint.rotation);
+        GameObject thrownObj = Instantiate(itemSO.itemPrefab, spawnPosition, spawnRotation);
 
         Item itemComponent = thrownObj.GetComponent<Item>();
         if (itemComponent != null)
@@ -244,7 +253,13 @@ public class Inventory : MonoBehaviour
 
         rb.useGravity = true;
         rb.linearVelocity = Vector3.zero;
-        rb.AddForce(spawnPoint.forward * throwForce, ForceMode.VelocityChange);
+        rb.AddForce(spawnForward * throwForce, ForceMode.VelocityChange);
+
+        // Guarantee thrown items can always alert guards on landing, even if
+        // the prefab was never set up with ThrownItem attached in the Editor.
+        ThrownItem thrownItem = thrownObj.GetComponent<ThrownItem>();
+        if (thrownItem == null) thrownItem = thrownObj.AddComponent<ThrownItem>();
+        thrownItem.Setup(thrownObj.tag);
 
         // Deduct 1 item from slot stack
         int remaining = equippedSlot.GetAmount() - 1;
@@ -267,7 +282,7 @@ public class Inventory : MonoBehaviour
 
         trajectoryLine.enabled = true;
 
-        Transform spawnPoint = throwPoint != null ? throwPoint : playerCamera.transform;
+        GetThrowOrigin(out Vector3 startPos, out Vector3 startForward, out Quaternion _);
 
         // Color gradient based on force
         float t = Mathf.Clamp01((throwForce - minThrowForce) / (maxThrowForce - minThrowForce));
@@ -275,8 +290,7 @@ public class Inventory : MonoBehaviour
         trajectoryLine.startColor = trajectoryColor;
         trajectoryLine.endColor = trajectoryColor;
 
-        Vector3 startPos = spawnPoint.position;
-        Vector3 startVelocity = spawnPoint.forward * throwForce;
+        Vector3 startVelocity = startForward * throwForce;
 
         trajectoryLine.positionCount = trajectoryResolution;
 
@@ -294,6 +308,31 @@ public class Inventory : MonoBehaviour
 
             trajectoryLine.SetPosition(i, point);
         }
+    }
+
+    /// <summary>
+    /// Resolves the world-space origin/direction items are thrown from.
+    /// Uses throwPoint if assigned in the Inspector; otherwise falls back to
+    /// an offset from the camera (to the player's right) instead of dead-center.
+    /// </summary>
+    private void GetThrowOrigin(out Vector3 position, out Vector3 forward, out Quaternion rotation)
+    {
+        if (throwPoint != null)
+        {
+            position = throwPoint.position;
+            forward = throwPoint.forward;
+            rotation = throwPoint.rotation;
+            return;
+        }
+
+        Camera cam = playerCamera != null ? playerCamera : Camera.main;
+        Transform camT = cam != null ? cam.transform : transform;
+
+        position = camT.position
+            + camT.right * fallbackSideOffset
+            + camT.up * fallbackVerticalOffset;
+        forward = camT.forward;
+        rotation = camT.rotation;
     }
 
     public void CancelThrowAim()
@@ -379,6 +418,13 @@ public class Inventory : MonoBehaviour
                     rend.material = highlightMaterial;
                     lookedAtRenderer = rend;
                 }
+                return;
+            }
+
+            doorMovement door = hit.collider.GetComponentInParent<doorMovement>();
+            if (door != null)
+            {
+                lookedAtDoor = door;
             }
         }
     }
@@ -392,6 +438,7 @@ public class Inventory : MonoBehaviour
             originalMaterial = null;
         }
         lookedAtItem = null;
+        lookedAtDoor = null;
     }
 
     public void TryPickupItem()
@@ -402,6 +449,10 @@ public class Inventory : MonoBehaviour
             Destroy(lookedAtItem.gameObject);
             ClearHighlight();
             EquipHandItem();
+        }
+        else if (lookedAtDoor != null)
+        {
+            lookedAtDoor.ToggleDoor();
         }
     }
 
