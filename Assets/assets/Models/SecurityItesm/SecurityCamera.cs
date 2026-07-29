@@ -9,7 +9,7 @@ public class SecurityCamera : MonoBehaviour
     [Header("Trigger")]
     public string playerTag = "Player";
 
-    private AudioSource audioSource;
+    [SerializeField] public AudioSource audioSource;
 
     void Start()
     {
