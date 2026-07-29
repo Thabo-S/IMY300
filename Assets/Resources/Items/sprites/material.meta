@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Testing.meta
+guid: 0b130a686c6850a448d8ea0b333540f2
+========
 guid: 05013c6d08a3ec942b018dc22ad93ad9
+>>>>>>>> dev:Assets/Resources/Items/sprites/material.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
