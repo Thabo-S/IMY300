@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     public Slider HealthBarSlider;
     public float MaxHealth = 100;
     public float PlayerHealth;
-        public Gradient gradient;
+    public Gradient gradient;
     public Image fill;
 
     [Header("Footstep Audio")]

@@ -87,6 +87,7 @@ public class PlayerLookAround : MonoBehaviour
 
     private void Start()
     {
+
         // Force rotation state active when the player loads in
         updatingRotation = true;
 
@@ -94,6 +95,12 @@ public class PlayerLookAround : MonoBehaviour
         {
             mouseSensitivity.value = xDirectionSensitivity;
         }
+
+        cam = Camera.main;
+
+        mouseSensitivity.value = xDirectionSensitivity;
+
+
     }
 
     private void Update()
