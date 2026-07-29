@@ -281,6 +281,7 @@ public class Inventory : MonoBehaviour
         if (trajectoryLine == null) return;
 
         trajectoryLine.enabled = true;
+        trajectoryLine.useWorldSpace = true;
 
         GetThrowOrigin(out Vector3 startPos, out Vector3 startForward, out Quaternion _);
 
