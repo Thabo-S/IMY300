@@ -100,7 +100,7 @@ public class Player : MonoBehaviour
     private GameObject currentHighlightedItem;
     private GameObject currentHighlightedDoor;
 
-    public float pickUpRange = 3f;
+    public float pickUpRange = 2f;
 
     void Update()
     {
