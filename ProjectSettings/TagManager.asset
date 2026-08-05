@@ -14,10 +14,6 @@ TagManager:
   - Guard
   - GameOver
   - GuardGun
-  - Door_Left_Swing
-  - Door_Right_Swing
-  - Door_Left_Keycard
-  - Door_Right_Keycard
   - Throwable
   - Tutorial
   - Level1
@@ -25,6 +21,7 @@ TagManager:
   - Level3
   - Level4
   - Level5
+  - Door_Keycard
   layers:
   - Default
   - TransparentFX

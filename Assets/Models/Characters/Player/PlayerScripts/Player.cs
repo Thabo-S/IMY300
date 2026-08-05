@@ -22,8 +22,14 @@ public class Player : MonoBehaviour
     [SerializeField] private float minPitch = 0.9f;
     [SerializeField] private float maxPitch = 1.1f;
 
+
+    private Camera cam;
+    public GameObject[] keycards;
+
     void Start()
     {
+        cam = Camera.main;
+
         PlayerHealth = MaxHealth;
 
         HealthBarSlider.maxValue = MaxHealth;
@@ -107,21 +113,32 @@ public class Player : MonoBehaviour
         RaycastHit hit;
         // We cast using the maximum of the two ranges so we don't miss anything
 
-        Debug.DrawRay(transform.position, transform.forward * pickUpRange, Color.red);
+        Debug.DrawRay(cam.transform.position, cam.transform.forward * pickUpRange, Color.red);
 
-        if (Physics.Raycast(transform.position, transform.forward, out hit, pickUpRange))
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, pickUpRange))
         {
             GameObject hitObject = hit.transform.gameObject;
             float distance = hit.distance;
 
             // --- Handle Items ---
-            if (hitObject.CompareTag("canPickUp") && distance <= pickUpRange)
+            if (hitObject.CompareTag("canPickUp"))
             {
                 if (hitObject != currentHighlightedItem)
                 {
                     ClearItemHighlight();
                     currentHighlightedItem = hitObject;
                     ApplyItemHighlight(currentHighlightedItem);
+                }
+
+
+                if(hitObject.name == "Keycard")
+                {
+                    Debug.Log(hitObject.name);
+
+                    ClearItemHighlight();
+                    currentHighlightedItem = hitObject;
+                    ApplyItemHighlight(currentHighlightedItem);
+
                 }
             }
             else if (currentHighlightedItem != null) // If out of range or not hitting
@@ -130,7 +147,7 @@ public class Player : MonoBehaviour
             }
 
             // --- Handle Doors ---
-            if (hitObject.CompareTag("Door_Left_Swing") || hitObject.CompareTag("Door_Right_Swing"))
+            if (hitObject.CompareTag("Door"))
             {
                 if (hitObject != currentHighlightedDoor)
                 {
@@ -142,6 +159,23 @@ public class Player : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     hitObject.GetComponent<doorMovement>().ToggleDoor();
+                }
+            } else if (hitObject.CompareTag("Door_Keycard"))
+            {
+                // CHeck if the player has the keycard, else show the message that
+                // says the Keycard is required.
+                if (hitObject != currentHighlightedDoor)
+                {
+                    ClearDoorHighlight();
+                    currentHighlightedDoor = hitObject;
+                    ApplyDoorHighlight(currentHighlightedDoor);
+                }
+
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
+                    Debug.Log("KEYCARD IS REQUIRED");
                 }
             }
             else if (currentHighlightedDoor != null) // If out of range or not hitting

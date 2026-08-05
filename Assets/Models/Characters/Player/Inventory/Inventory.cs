@@ -154,8 +154,8 @@ public class Inventory : MonoBehaviour
         container.SetActive(IsOpen);
 
         // Lock/Unlock cursor state
-        Cursor.lockState = IsOpen ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = IsOpen;
+        //Cursor.lockState = IsOpen ? CursorLockMode.None : CursorLockMode.Locked;
+        //Cursor.visible = IsOpen;
 
         SetPlayerRotationState(!IsOpen);
 
@@ -444,6 +444,8 @@ public class Inventory : MonoBehaviour
 
     public void TryPickupItem()
     {
+
+        
         if (lookedAtItem != null)
         {
             AddItem(lookedAtItem.item, lookedAtItem.amount);
@@ -451,10 +453,11 @@ public class Inventory : MonoBehaviour
             ClearHighlight();
             EquipHandItem();
         }
-        else if (lookedAtDoor != null)
-        {
-            lookedAtDoor.ToggleDoor();
-        }
+
+        //else if (lookedAtDoor != null)
+        //{
+        //    lookedAtDoor.ToggleDoor();
+        //}
     }
 
     #endregion

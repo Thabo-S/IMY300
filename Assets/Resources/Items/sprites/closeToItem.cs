@@ -5,7 +5,12 @@ public class closeToItem : MonoBehaviour
 {
     public GameObject player;
     public GameObject worldSpaceText;
-    public float activationDistance = 12f;
+    public float activationDistance = 2f;
+
+    private void Start()
+    {
+        player = GameObject.FindWithTag("Player");
+    }
 
     private void Update()
     {
