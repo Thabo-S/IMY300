@@ -22,6 +22,7 @@ TagManager:
   - Level4
   - Level5
   - Door_Keycard
+  - GarageDoor
   layers:
   - Default
   - TransparentFX

@@ -177,13 +177,29 @@ public class Player : MonoBehaviour
                     hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
                     Debug.Log("KEYCARD IS REQUIRED");
                 }
-            }
-            else if (currentHighlightedDoor != null) // If out of range or not hitting
+            }else if (hitObject.CompareTag("GarageDoor"))
             {
-                ClearDoorHighlight();
-            }
-        }
-        else
+                // CHeck if the player has the keycard, else show the message that
+                // says the Keycard is required.
+                if (hitObject != currentHighlightedDoor)
+                {
+                    ClearDoorHighlight();
+                    currentHighlightedDoor = hitObject;
+                    ApplyDoorHighlight(currentHighlightedDoor);
+                }
+
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    hitObject.GetComponent<doorMovement>().ToggleGarageDoor();
+
+                    Debug.Log("Openning Garage Door!");
+                }
+            }else if (currentHighlightedDoor != null) // If out of range or not hitting
+                {
+                    ClearDoorHighlight();
+                }
+            }else
         {
             ClearItemHighlight();
             ClearDoorHighlight();
