@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 89606f5fe7b1c184d9a845af07acb55f
+guid: 7b73731ef3faee5438ed232c4121a2b0
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: painting6_0
+      name: Jamaica_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 853
-        height: 1276
+        height: 1402
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 39e90b53ee614d643b3ce21e78bbce94
-      internalID: -1474890887
+      spriteID: ad6fbb0e06a0c1a46b858852de1f36c6
+      internalID: 1197040545
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 4a09cf864beafc64cb9a1b9b45afaf3f
+    spriteID: 1b74dd4dc62d60b4f834e0639771e7ec
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      painting6_0: -1474890887
+      Jamaica_0: 1197040545
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

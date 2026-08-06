@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 70016c48880131f4ea2fc0681ec752ce
+guid: f016d2537c720344d9ef2f25bf429e45
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: painting2_0
+      name: "Imperial Faberg\xE9 Egg_0"
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 951
-        height: 1219
+        width: 934
+        height: 1256
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f366b10f93d623c4ba662bc98033c911
-      internalID: 754513693
+      spriteID: d4cc1a9109cab134dbf7539f9d0ece9a
+      internalID: -73560735
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 3fceaf0e6b97e594a9ac70723dd2349d
+    spriteID: e3e5d7c33a056b249924cf8d3e9121c3
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      painting2_0: 754513693
+      "Imperial Faberg\xE9 Egg_0": -73560735
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

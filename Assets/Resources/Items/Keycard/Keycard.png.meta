@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a8acaf8fa50c7a4449c537bccaf27f23
+guid: 55de1f2b43703c9418b5e63eaff182f3
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: painting3_0
+      name: Keycard_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1267
-        height: 972
+        width: 1883
+        height: 952
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ce35eae31cb9e3e4893b6c0b857e036d
-      internalID: -1699455787
+      spriteID: ea41236acde83fd42bf835419d8ce7bb
+      internalID: -877601879
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 89f924dd991d123429ebab59cd5eb633
+    spriteID: 53d70bc53196d6345bdbd90c64999595
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      painting3_0: -1699455787
+      Keycard_0: -877601879
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

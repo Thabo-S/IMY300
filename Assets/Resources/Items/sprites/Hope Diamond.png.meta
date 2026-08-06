@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3d0b68e0a424e764f8a02e8d50d4232c
+guid: cc8fb8e0f93931840969dc4cccb1c5ba
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: painting1_0
+      name: Hope Diamond_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 845
-        height: 1266
+        width: 1552
+        height: 1356
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ec4edbe5314f9cf42921366a8115dcca
-      internalID: -1139719921
+      spriteID: 8df4cad924cb8304eb8c872afa0b4a19
+      internalID: 1825282547
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 69289816c8721ca488373b6bf1e61056
+    spriteID: 0d5305c39474b6e44ab54ea9f668c289
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      painting1_0: -1139719921
+      Hope Diamond_0: 1825282547
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

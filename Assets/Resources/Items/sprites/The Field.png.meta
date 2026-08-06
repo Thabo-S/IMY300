@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 35ba2a42efa4bdb458e014ea0774bde6
+guid: 1f62804fd3613d24cbae2e9ee821df79
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: bust3_0
+      name: The Field_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 783
-        height: 1282
+        width: 863
+        height: 1424
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 90d2534fe0ef28b40a56377998bf2164
-      internalID: -236305126
+      spriteID: 41f356a7f50878b42876c33537e9704e
+      internalID: 1091050762
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 892f979b608b4654d8c806b3df5ae17d
+    spriteID: 27c86b6af57789b44b829d8a006aa3ea
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      bust3_0: -236305126
+      The Field_0: 1091050762
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -21,7 +21,7 @@ public class Inventory : MonoBehaviour
     public static bool IsOpen { get; private set; }
 
     [Header("Pickup & Interaction Settings")]
-    public float pickupRange = 3f;
+    public float pickupRange = 2f;
     public Material highlightMaterial;
     public LayerMask pickupLayerMask = ~0; // Set in Inspector to exclude Player layer
 

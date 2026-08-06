@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8295837303ab0404d9199b59184170b3
+guid: a4e307c16d9367545bc986f29d3e4767
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: painting4_0
+      name: Her Name_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 963
-        height: 1194
+        width: 850
+        height: 1398
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 28bd0cd0878449f4193de50367f083b2
-      internalID: 1417361945
+      spriteID: e5fc53ffbb8f9f940a9457ad2d578934
+      internalID: 2006379127
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: c62b2b07225c86143aa6ce57a7687e1b
+    spriteID: 9b2149db1617e334da08912e3136d709
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      painting4_0: 1417361945
+      Her Name_0: 2006379127
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -174,7 +174,7 @@ public class Player : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
+                    //hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
                     Debug.Log("KEYCARD IS REQUIRED");
                 }
             }else if (hitObject.CompareTag("GarageDoor"))

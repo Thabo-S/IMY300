@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 27e1c247c716b2644ac2916969744db8
+guid: a079e467e30dc2d46b72503761369220
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: artefact3_0
+      name: MedKit_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 623
-        height: 1062
+        width: 1917
+        height: 1269
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -125,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3dd8af3de6012c145a3bacbe329f7891
-      internalID: 873006083
+      spriteID: 1fbd2a6b04b801a4f9bdc7dd10a121c8
+      internalID: 1042802959
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: f27e46005d65a784f80292478596da43
+    spriteID: a2ab3faabca4da048b671a0f814e4987
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      artefact3_0: 873006083
+      MedKit_0: 1042802959
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
