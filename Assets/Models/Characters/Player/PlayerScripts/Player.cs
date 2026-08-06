@@ -60,6 +60,17 @@ public class Player : MonoBehaviour
         footstepAudioScource.PlayOneShot(footstepClip);
     }
 
+    public void Heal(float amount)
+    {
+        PlayerHealth = Mathf.Clamp(PlayerHealth + amount, 0, MaxHealth);
+
+        HealthBarSlider.value = PlayerHealth;
+
+        fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
+
+        Debug.Log("Player healed: " + PlayerHealth);
+    }
+
 
     //public void PlayFootsteps(bool isSprinting)
     //{
@@ -131,7 +142,7 @@ public class Player : MonoBehaviour
                 }
 
 
-                if(hitObject.name == "Keycard")
+                if (hitObject.name == "Keycard")
                 {
                     Debug.Log(hitObject.name);
 
@@ -160,7 +171,8 @@ public class Player : MonoBehaviour
                 {
                     hitObject.GetComponent<doorMovement>().ToggleDoor();
                 }
-            } else if (hitObject.CompareTag("Door_Keycard"))
+            }
+            else if (hitObject.CompareTag("Door_Keycard"))
             {
                 // CHeck if the player has the keycard, else show the message that
                 // says the Keycard is required.
@@ -177,7 +189,8 @@ public class Player : MonoBehaviour
                     hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
                     Debug.Log("KEYCARD IS REQUIRED");
                 }
-            }else if (hitObject.CompareTag("GarageDoor"))
+            }
+            else if (hitObject.CompareTag("GarageDoor"))
             {
                 // CHeck if the player has the keycard, else show the message that
                 // says the Keycard is required.
@@ -195,11 +208,13 @@ public class Player : MonoBehaviour
 
                     Debug.Log("Openning Garage Door!");
                 }
-            }else if (currentHighlightedDoor != null) // If out of range or not hitting
-                {
-                    ClearDoorHighlight();
-                }
-            }else
+            }
+            else if (currentHighlightedDoor != null) // If out of range or not hitting
+            {
+                ClearDoorHighlight();
+            }
+        }
+        else
         {
             ClearItemHighlight();
             ClearDoorHighlight();
