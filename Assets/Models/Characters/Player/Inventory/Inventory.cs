@@ -60,7 +60,7 @@ public class Inventory : MonoBehaviour
 
     // Internal slot management lists
     private List<Slot> inventorySlots = new List<Slot>();
-    private List<Slot> hotbarSlots = new List<Slot>();
+    public List<Slot> hotbarSlots = new List<Slot>();
     private List<Slot> allSlots = new List<Slot>();
 
     private void Awake()
@@ -97,6 +97,8 @@ public class Inventory : MonoBehaviour
 
         // Explicitly enable rotation on startup
         SetPlayerRotationState(true);
+
+        trajectoryLine = GameObject.FindWithTag("Player").GetComponent<LineRenderer>();
 
         if (trajectoryLine != null)
             trajectoryLine.enabled = false;

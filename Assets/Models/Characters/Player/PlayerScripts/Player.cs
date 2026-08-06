@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -24,7 +25,7 @@ public class Player : MonoBehaviour
 
 
     private Camera cam;
-    public GameObject[] keycards;
+    public List<Slot> hotbarSlots;
 
     void Start()
     {
@@ -39,6 +40,8 @@ public class Player : MonoBehaviour
         fill.color = gradient.Evaluate(1f);
 
         footstepAudioScource = GetComponents<AudioSource>()[1];
+
+        hotbarSlots = FindFirstObjectByType<Inventory>().hotbarSlots;
     }
 
 
@@ -174,8 +177,31 @@ public class Player : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    //hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
-                    Debug.Log("KEYCARD IS REQUIRED");
+
+                    // Need to loop through the slot and look for an item with the
+                    // name Keycard in order to open the door
+
+                    bool hasKeycard = false;
+
+                    foreach (Slot item in hotbarSlots)
+                    {
+                        if (item != null && item.heldItem != null && item.heldItem.itemName == "Keycard")
+                        {
+                            hasKeycard = true;
+                            break;
+                        }
+                    }
+
+                    if (hasKeycard)
+                    {
+                        hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
+                        Debug.Log("KEYCARD found — opening door");
+                    }
+                    else
+                    {
+                        Debug.Log("KEYCARD IS REQUIRED");
+                    }
+
                 }
             }else if (hitObject.CompareTag("GarageDoor"))
             {

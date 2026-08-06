@@ -7,7 +7,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public bool hovering;
 
-    private ItemSO heldItem;
+    public ItemSO heldItem;
     private int itemAmount;
 
     private Image iconImage;
