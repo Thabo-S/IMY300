@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: "Imperial Faberg\xE9 Egg"
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: "Imperial Faberg\xE9 Egg"
+  icon: {fileID: -73560735, guid: f016d2537c720344d9ef2f25bf429e45, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 6073704666327855886, guid: 950e38b154c6a724984dbb53907a374a, type: 3}
+  handItemPrefab: {fileID: 0}

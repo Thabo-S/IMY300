@@ -17,7 +17,7 @@ public class CameraPosition : MonoBehaviour
 
     private SkinnedMeshRenderer playerMeshRenderer;
 
-    [SerializeField] private float smoothSpeed = 10f;
+    //[SerializeField] private float smoothSpeed = 10f;
 
     void Start()
     {

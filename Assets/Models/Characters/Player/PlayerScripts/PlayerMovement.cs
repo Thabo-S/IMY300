@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController characterController;
     private Animator animator;
     private CameraPosition cameraScript;
-    public Player playerScript;
+    //public Player playerScript;
 
 
     private Vector3 playerVelocity;
@@ -62,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
 
         cameraScript = GetComponentInChildren<CameraPosition>();
 
-        playerScript = GetComponent<Player>();
+        //playerScript = GetComponent<Player>();
 
     }
 

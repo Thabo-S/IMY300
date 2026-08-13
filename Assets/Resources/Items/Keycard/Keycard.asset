@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Keycard
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Keycard
+  icon: {fileID: -877601879, guid: 55de1f2b43703c9418b5e63eaff182f3, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 1328132586000978693, guid: 4e4860bd30cd8b643aa53d92771f7cc6, type: 3}
+  handItemPrefab: {fileID: 0}
