@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Hope Diamond
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Hope Diamond
+  icon: {fileID: 1825282547, guid: cc8fb8e0f93931840969dc4cccb1c5ba, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 3653789166609453360, guid: e4c8d8e2a1c58334eb138d991b5958e2, type: 3}
+  handItemPrefab: {fileID: 0}
