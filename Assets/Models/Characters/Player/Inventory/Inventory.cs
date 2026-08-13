@@ -21,7 +21,7 @@ public class Inventory : MonoBehaviour
     public static bool IsOpen { get; private set; }
 
     [Header("Pickup & Interaction Settings")]
-    public float pickupRange = 3f;
+    public float pickupRange = 2f;
     public Material highlightMaterial;
     public LayerMask pickupLayerMask = ~0; // Set in Inspector to exclude Player layer
 
@@ -60,7 +60,7 @@ public class Inventory : MonoBehaviour
 
     // Internal slot management lists
     private List<Slot> inventorySlots = new List<Slot>();
-    private List<Slot> hotbarSlots = new List<Slot>();
+    public List<Slot> hotbarSlots = new List<Slot>();
     private List<Slot> allSlots = new List<Slot>();
 
     private void Awake()
@@ -97,6 +97,8 @@ public class Inventory : MonoBehaviour
 
         // Explicitly enable rotation on startup
         SetPlayerRotationState(true);
+
+        trajectoryLine = GameObject.FindWithTag("Player").GetComponent<LineRenderer>();
 
         if (trajectoryLine != null)
             trajectoryLine.enabled = false;
@@ -154,8 +156,8 @@ public class Inventory : MonoBehaviour
         container.SetActive(IsOpen);
 
         // Lock/Unlock cursor state
-        Cursor.lockState = IsOpen ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = IsOpen;
+        //Cursor.lockState = IsOpen ? CursorLockMode.None : CursorLockMode.Locked;
+        //Cursor.visible = IsOpen;
 
         SetPlayerRotationState(!IsOpen);
 
@@ -444,6 +446,8 @@ public class Inventory : MonoBehaviour
 
     public void TryPickupItem()
     {
+
+        
         if (lookedAtItem != null)
         {
             AddItem(lookedAtItem.item, lookedAtItem.amount);
@@ -451,10 +455,11 @@ public class Inventory : MonoBehaviour
             ClearHighlight();
             EquipHandItem();
         }
-        else if (lookedAtDoor != null)
-        {
-            lookedAtDoor.ToggleDoor();
-        }
+
+        //else if (lookedAtDoor != null)
+        //{
+        //    lookedAtDoor.ToggleDoor();
+        //}
     }
 
     #endregion
