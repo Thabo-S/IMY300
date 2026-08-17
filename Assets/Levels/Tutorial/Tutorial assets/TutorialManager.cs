@@ -85,10 +85,15 @@ public class TutorialManager : MonoBehaviour
         player.SetActive(true);
         WelcomeCam.SetActive(false);
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        LockCursor();
 
         StartStep1();
+    }
+
+    public void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // ---------------- STEP 1: MOVEMENT & CAMERA ----------------
@@ -257,5 +262,4 @@ public class TutorialManager : MonoBehaviour
 
         guardShots = true;
     }
-
 }
