@@ -79,6 +79,7 @@ public class Guard : MonoBehaviour
         public const string Guard_Shooting = "Guard_Shooting";
     }
 
+<<<<<<< HEAD
     private void OnEnable()
     {
         SoundEmissionManager.OnSoundEmitted += HandleSound;
@@ -90,6 +91,22 @@ public class Guard : MonoBehaviour
         SoundEmissionManager.OnSoundEmitted -= HandleSound;
         AllGuards.Remove(this);
     }
+=======
+    public static readonly List<Guard> AllGuards = new List<Guard>();
+
+    private void Awake()
+    {
+        AllGuards.Add(this);
+    }
+
+    private void OnDestroy()
+    {
+        AllGuards.Remove(this);
+    }
+
+    private void OnEnable() => SoundEmissionManager.OnSoundEmitted += HandleSound;
+    private void OnDisable() => SoundEmissionManager.OnSoundEmitted -= HandleSound;
+>>>>>>> adding_assets
 
     void Start()
     {
@@ -202,6 +219,29 @@ public class Guard : MonoBehaviour
 
     // TODO: MAKE A SEPERATE METHOD FOR OBJECTS YOU CAN THROW, 
     // HandleSoundForObject
+
+    // ---------------- LASER / CAMERA ALARM ----------------
+    // Called by SecurityCamera / LaserSecurityScript when the player trips them.
+    // Instantly maxes detection and sends the guard straight into AlertState,
+    // same as a maxed-out sound detection would.
+    public void TriggerLaserAlarm(Vector3 position)
+    {
+        detection = maxDetection;
+        LastKnownPlayerPosition = position;
+        soundMemoryTimer = soundMemoryTime;
+        SetSliderColor(Color.red);
+
+        if (stateMachine != null)
+        {
+            // Don't re-alert if the guard is already mid-Attack; that state
+            // already tracks/loses the player on its own terms.
+            if (stateMachine.activeState is AttackState) return;
+
+            AlertState alert = new AlertState();
+            alert.lastKnownPosition = position;
+            stateMachine.ChangeState(alert);
+        }
+    }
 
     public void UpdateSliderUI()
     {

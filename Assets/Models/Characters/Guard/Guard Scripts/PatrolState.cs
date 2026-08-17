@@ -9,6 +9,14 @@ public class PatrolState : BaseState
 
     public override void Enter()
     {
+        if (!guard.Agent.isOnNavMesh)
+        {
+            Debug.LogWarning($"[PATROL] {guard.gameObject.name}'s NavMeshAgent is not on a baked NavMesh " +
+                              "at Enter() - skipping movement setup. Check the guard's spawn position and " +
+                              "that the NavMesh is baked under it.");
+            return;
+        }
+
         guard.Agent.isStopped = false;
 
         if (guard.path != null && guard.path.waypoints.Count > 0)
