@@ -88,6 +88,8 @@ public class Inventory : MonoBehaviour
         IsOpen = false;
         if (container != null) container.SetActive(false);
 
+        LockCursor();
+
         // NOTE: Cursor locking is no longer forced here. This object gets
         // SetActive(true) the moment "Start Tutorial" is pressed, so locking
         // the cursor in Start() hid it before any tutorial intro UI could use
@@ -102,6 +104,12 @@ public class Inventory : MonoBehaviour
 
         if (trajectoryLine != null)
             trajectoryLine.enabled = false;
+    }
+
+    public void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
@@ -163,6 +171,8 @@ public class Inventory : MonoBehaviour
 
         if (IsOpen)
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             CancelThrowAim();
         }
     }

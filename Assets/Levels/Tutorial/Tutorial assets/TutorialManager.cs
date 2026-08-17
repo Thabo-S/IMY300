@@ -85,6 +85,9 @@ public class TutorialManager : MonoBehaviour
         player.SetActive(true);
         WelcomeCam.SetActive(false);
 
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         StartStep1();
     }
 
@@ -254,4 +257,5 @@ public class TutorialManager : MonoBehaviour
 
         guardShots = true;
     }
+
 }
