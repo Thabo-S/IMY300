@@ -8,19 +8,32 @@ public class ProgressBarController : MonoBehaviour
     [Tooltip("Drag the Slider under RightPanel here.")]
     public Slider progressSlider;
 
-    [Tooltip("Drag the 'itemsCollected' TMP text object here.")]
+    [Tooltip("Drag the 'itemsCollected' TMP text object here. Shows e.g. '4/8'.")]
     public TextMeshProUGUI itemsCollected;
 
-    [Tooltip("Drag the 'TotalAmount' TMP text object here.")]
+    [Tooltip("Drag the 'TotalAmount' TMP text object here. Shows the cash " +
+             "value ('Takeaway Total') of everything collected so far - NOT " +
+             "the item count.")]
     public TextMeshProUGUI totalAmount;
 
-    [Header("Progress")]
+    [Header("Item Count Progress")]
     [Tooltip("Total collectible items in this level. Set via SetTotalItems() " +
              "from a level manager, or just set this in the Inspector if the " +
              "count is fixed per-scene.")]
     [SerializeField] private int totalItems = 8;
 
     [SerializeField] private int collectedItems = 0;
+
+    [Header("Cash Value")]
+    [Tooltip("Running cash total of every item collected so far (sum of " +
+             "each ItemSO's value). Read-only at runtime, shown here for " +
+             "debugging in the Inspector.")]
+    [SerializeField] private int cashCollected = 0;
+
+    // --- Public Getters for External Systems (e.g., ExitZone) ---
+    public int CollectedItems => collectedItems;
+    public int CashCollected => cashCollected;
+    public int TotalItems => totalItems; // Optional bonus getter in case ExitZone needs the level max
 
     private void Start()
     {
@@ -45,18 +58,20 @@ public class ProgressBarController : MonoBehaviour
         RefreshDisplay();
     }
 
-    // Call this whenever the player picks up a collectible item.
-    // See Inventory.AddItem() - call progressBarController.OnItemCollected()
-    // there so every pickup path (world pickup, pickpocketing, etc.) updates
-    // this automatically.
-    public void OnItemCollected(int amount = 1)
+    // Call this whenever the player picks up a collectible item. Pass the
+    // ItemSO so its cash value can be added to the running Takeaway Total.
+    public void OnItemCollected(ItemSO item, int amount = 1)
     {
         collectedItems = Mathf.Clamp(collectedItems + amount, 0, totalItems);
+
+        if (item != null)
+            cashCollected += item.value * amount;
+
         RefreshDisplay();
     }
 
     // Kept for backward compatibility if anything already calls this with an
-    // absolute count rather than an incremental amount.
+    // absolute item count and no cash value.
     public void OnProgressChanged(float numItems)
     {
         collectedItems = Mathf.Clamp((int)numItems, 0, totalItems);
@@ -72,6 +87,6 @@ public class ProgressBarController : MonoBehaviour
             itemsCollected.text = $"{collectedItems}/{totalItems}";
 
         if (totalAmount != null)
-            totalAmount.text = totalItems.ToString();
+            totalAmount.text = "$" + cashCollected.ToString();
     }
 }

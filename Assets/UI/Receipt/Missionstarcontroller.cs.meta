@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b77d024a8badaa745a51cc5c15a269aa
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - emptyStarSprite: {fileID: 21300000, guid: b3306746920d51f46bc9ee2bca6b1c13, type: 3}
+  - fullStarSprite: {fileID: 21300000, guid: a4141488d85f20441a469a4d9af7b47b, type: 3}
+  - audioSource: {instanceID: 0}
+  - starFillSound: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

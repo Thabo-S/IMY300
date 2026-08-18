@@ -18,6 +18,10 @@ public class Inventory : MonoBehaviour
     public Camera playerCamera;
     public PlayerLookAround playerLookAround;
 
+    [Header("Progress UI")]
+    [Tooltip("Reference to the level's progress bar, updated whenever an item is added.")]
+    public ProgressBarController progressBarController;
+
     public static bool IsOpen { get; private set; }
 
     [Header("Pickup & Interaction Settings")]
@@ -382,7 +386,11 @@ public class Inventory : MonoBehaviour
                     slot.SetItem(itemToAdd, currentAmount + amountToAdd);
                     remaining -= amountToAdd;
 
-                    if (remaining <= 0) return;
+                    if (remaining <= 0)
+                    {
+                        ReportItemsCollected(itemToAdd, amount - remaining);
+                        return;
+                    }
                 }
             }
         }
@@ -395,13 +403,33 @@ public class Inventory : MonoBehaviour
                 slot.SetItem(itemToAdd, amountToPlace);
                 remaining -= amountToPlace;
 
-                if (remaining <= 0) return;
+                if (remaining <= 0)
+                {
+                    ReportItemsCollected(itemToAdd, amount - remaining);
+                    return;
+                }
             }
         }
 
         if (remaining > 0)
         {
             Debug.LogWarning($"Inventory is full! Could not add {remaining} of {itemToAdd.itemName}");
+        }
+
+        // Report whatever partial amount did make it in, even if the
+        // inventory filled up before placing everything.
+        int amountActuallyAdded = amount - remaining;
+        if (amountActuallyAdded > 0)
+        {
+            ReportItemsCollected(itemToAdd, amountActuallyAdded);
+        }
+    }
+
+    private void ReportItemsCollected(ItemSO item, int amountAdded)
+    {
+        if (progressBarController != null)
+        {
+            progressBarController.OnItemCollected(item, amountAdded);
         }
     }
 
@@ -457,7 +485,7 @@ public class Inventory : MonoBehaviour
     public void TryPickupItem()
     {
 
-        
+
         if (lookedAtItem != null)
         {
             AddItem(lookedAtItem.item, lookedAtItem.amount);

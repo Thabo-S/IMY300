@@ -4,7 +4,8 @@ using UnityEngine;
 // Place this on a trigger collider at the level's exit/extraction point.
 // On the player entering, optionally checks the player's Inventory for a
 // required item (leave Required Item empty in the Inspector if reaching
-// the zone alone should be enough), then shows the Mission Complete UI.
+// the zone alone should be enough), then shows the Mission Complete UI
+// and evaluates/awards mission stars.
 public class ExitZone : MonoBehaviour
 {
     [Header("Trigger")]
@@ -25,6 +26,16 @@ public class ExitZone : MonoBehaviour
              "doesn't have it. Leave empty to just do nothing (player can " +
              "keep playing and try again).")]
     public GameObject missingItemUI;
+
+    [Header("Mission Results")]
+    [Tooltip("Drag the ProgressBarController here (tracks cash + items collected).")]
+    public ProgressBarController progressBarController;
+
+    [Tooltip("Drag the ElapsedTimeDisplay here (tracks run time).")]
+    public ElapsedTimeDisplay elapsedTimeDisplay;
+
+    [Tooltip("Drag the MissionStarsController here (fills stars + plays sound).")]
+    public MissionStarsController missionStarsController;
 
     [Header("Player Freeze")]
     [Tooltip("Disabling these stops player input/look while the Mission " +
@@ -81,6 +92,17 @@ public class ExitZone : MonoBehaviour
             Animator anim = missionCompleteUI.GetComponent<Animator>();
             if (anim != null)
                 anim.SetTrigger("Show");
+        }
+
+        // Pull the final run stats and award mission stars.
+        if (missionStarsController != null)
+        {
+            int cashCollected = progressBarController != null ? progressBarController.CashCollected : 0;
+            int itemsCollected = progressBarController != null ? progressBarController.CollectedItems : 0;
+            float elapsedSeconds = elapsedTimeDisplay != null ? elapsedTimeDisplay.ElapsedSeconds : Time.timeSinceLevelLoad;
+            bool wasDetected = MissionStats.WasDetected;
+
+            missionStarsController.EvaluateAndAwardStars(cashCollected, elapsedSeconds, itemsCollected, wasDetected);
         }
 
         // Optional: stop guards from continuing to chase/patrol once the

@@ -10,4 +10,8 @@ public class ItemSO : ScriptableObject
     public GameObject itemPrefab;
     public GameObject handItemPrefab;
 
+    [Tooltip("Cash value of a single unit of this item, used for the Takeaway " +
+             "Total on the progress UI.")]
+    public int value;
+
 }
