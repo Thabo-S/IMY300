@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 // Place this on a trigger collider at the level's exit/extraction point.
@@ -26,6 +27,12 @@ public class ExitZone : MonoBehaviour
              "doesn't have it. Leave empty to just do nothing (player can " +
              "keep playing and try again).")]
     public GameObject missingItemUI;
+
+    [Tooltip("Other UI elements (HealthBar, crosshair, hotbar, Action Keys, " +
+             "etc.) to hide once the mission completes, so only the results " +
+             "screen is visible. List them explicitly rather than hiding " +
+             "everything under the Canvas automatically.")]
+    public List<GameObject> uiToHideOnComplete = new List<GameObject>();
 
     [Header("Mission Results")]
     [Tooltip("Drag the ProgressBarController here (tracks cash + items collected).")]
@@ -84,6 +91,12 @@ public class ExitZone : MonoBehaviour
         // (Restart / Main Menu) on the Mission Complete screen.
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        // Hide everything else so only the results screen is visible.
+        foreach (GameObject ui in uiToHideOnComplete)
+        {
+            if (ui != null) ui.SetActive(false);
+        }
 
         if (missionCompleteUI != null)
         {
