@@ -1,2 +1,0 @@
-patrol Box , Area Size :
-
