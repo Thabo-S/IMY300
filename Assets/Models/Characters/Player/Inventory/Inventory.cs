@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Rendering.PostProcessing;
 
 public class Inventory : MonoBehaviour
 {
@@ -167,17 +168,39 @@ public class Inventory : MonoBehaviour
         IsOpen = !container.activeInHierarchy;
         container.SetActive(IsOpen);
 
-        // Lock/Unlock cursor state
-        //Cursor.lockState = IsOpen ? CursorLockMode.None : CursorLockMode.Locked;
-        //Cursor.visible = IsOpen;
-
         SetPlayerRotationState(!IsOpen);
+
+        if (CursorManager.instance != null)
+        {
+            if (IsOpen)
+                CursorManager.instance.UnlockCursor();
+            else
+                CursorManager.instance.LockCursor();
+        }
 
         if (IsOpen)
         {
-            //Cursor.lockState = CursorLockMode.None;
-            //Cursor.visible = true;
             CancelThrowAim();
+        }
+
+        if (playerCamera != null)
+        {
+            PostProcessVolume volume = playerCamera.GetComponent<PostProcessVolume>();
+
+            if (volume != null)
+            {
+                DepthOfField dof;
+
+                if (volume.profile.TryGetSettings(out dof))
+                {
+                    dof.focusDistance.value = IsOpen ? 0.1f : 50f;
+                    dof.focalLength.value = IsOpen ? 50f : 1f;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No PostProcessVolume found on the playerCamera!");
+            }
         }
     }
 
