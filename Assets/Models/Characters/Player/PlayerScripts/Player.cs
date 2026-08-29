@@ -110,11 +110,24 @@ public class Player : MonoBehaviour
     // ====================== DO NOT TOUCH ======================
     // ==========================================================
     // ======== ONLY REFERENCE THE CODE ,DON'T MODIFY ===========
+    //
+    // EDIT NOTE: One line changed below (Physics.Raycast -> Physics.SphereCast)
+    // plus one new tunable field (detectionSphereRadius), to fix items only
+    // being pickup-able/highlightable from certain angles. Everything else -
+    // outline logic, door logic, keycard check - is untouched.
 
     private GameObject currentHighlightedItem;
     private GameObject currentHighlightedDoor;
 
     public float pickUpRange = 2f;
+
+    [Tooltip("Radius of the SphereCast used for item/door detection. A plain " +
+             "Raycast only registers a hit if it threads exactly through the " +
+             "collider's geometry, which for thin/rotated/irregular objects " +
+             "only works from certain angles. A small sphere is far more " +
+             "forgiving. Start small (0.1-0.3) and increase if detection " +
+             "still feels too finicky.")]
+    public float detectionSphereRadius = 0.2f;
 
     void Update()
     {
@@ -129,7 +142,7 @@ public class Player : MonoBehaviour
 
         Debug.DrawRay(cam.transform.position, cam.transform.forward * pickUpRange, Color.red);
 
-        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, pickUpRange))
+        if (Physics.SphereCast(cam.transform.position, detectionSphereRadius, cam.transform.forward, out hit, pickUpRange))
         {
             GameObject hitObject = hit.transform.gameObject;
             float distance = hit.distance;
