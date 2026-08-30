@@ -1,9 +1,17 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class doorMovement : MonoBehaviour
 {
     public enum DoorState { Closed, Open }
+
+    [Header("Keycard UI")]
+    [SerializeField] private Transform canvas;
+    [SerializeField] private float messageDuration = 2f;
+
+    private Coroutine _messageCoroutine;
+
 
     [Header("Door State")]
     public DoorState currentState = DoorState.Closed;
@@ -23,6 +31,8 @@ public class doorMovement : MonoBehaviour
 
     private GameObject player;
 
+    [SerializeField] private Outline outline;
+
     private void Start()
     {
         player = GameObject.FindWithTag("Player");
@@ -30,7 +40,24 @@ public class doorMovement : MonoBehaviour
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
 
+
+        if (outline == null)
+            outline = GetComponent<Outline>();
+
+        if (canvas == null)
+            canvas = transform.Find("Canvas");
+
+        if (canvas == null)
+        {
+            Debug.LogWarning($"{name}: Could not find a child object named 'Canvas'.");
+        }
+        else
+        {
+            canvas.gameObject.SetActive(false);
+        }
+
         LoadDoorSounds();
+
     }
 
     private void LoadDoorSounds()
@@ -72,6 +99,7 @@ public class doorMovement : MonoBehaviour
 
     public void ToggleKeycardDoor()
     {
+
         PlaySound(keycardDoorSound);
 
         if (_animationCoroutine != null)
@@ -109,6 +137,36 @@ public class doorMovement : MonoBehaviour
             currentState = DoorState.Closed;
         }
     }
+    public void RemoveKeycardRequirement()
+    {
+        gameObject.tag = "Door";
+
+        if (outline != null)
+        {
+            outline.OutlineColor = Color.white;
+        }
+    }
+
+
+
+    public void showErrorMessage()
+    {
+        if (canvas == null) return;
+
+        canvas.gameObject.SetActive(true);
+
+        if (_messageCoroutine != null)
+            StopCoroutine(_messageCoroutine);
+
+        _messageCoroutine = StartCoroutine(HideMessageAfterDelay());
+    }
+
+    private IEnumerator HideMessageAfterDelay()
+    {
+        yield return new WaitForSeconds(messageDuration);
+        canvas.gameObject.SetActive(false);
+    }
+
 
     private void PlaySound(AudioClip clip)
     {

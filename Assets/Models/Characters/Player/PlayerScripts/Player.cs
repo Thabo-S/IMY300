@@ -221,11 +221,15 @@ public class Player : MonoBehaviour
                     if (hasKeycard)
                     {
                         hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
+                        hitObject.GetComponent<doorMovement>().RemoveKeycardRequirement();
+
+                        RemoveKeycardFromSlots();
+
                         Debug.Log("KEYCARD found — opening door");
                     }
                     else
                     {
-                        Debug.Log("KEYCARD IS REQUIRED");
+                        hitObject.GetComponent<doorMovement>().showErrorMessage();
                     }
 
                 }
@@ -258,6 +262,18 @@ public class Player : MonoBehaviour
         {
             ClearItemHighlight();
             ClearDoorHighlight();
+        }
+    }
+
+    private void RemoveKeycardFromSlots()
+    {
+        foreach (Slot item in hotbarSlots)
+        {
+            if (item != null && item.heldItem != null && item.heldItem.itemName == "Keycard")
+            {
+                item.heldItem = null; // THABO VERIFY WHETHER OR NOT THIS IS THE RIGHT WAY TO REMOVE SOMETHING FROM A SLOT
+                break;
+            }
         }
     }
 
