@@ -23,18 +23,28 @@ public class CursorManager : MonoBehaviour
         Cursor.SetCursor(cursorTexture, hotSpot, CursorMode.Auto);
     }
 
-    /// Locks + hides the cursor (gameplay state)
+    /// Locks + hides the cursor (gameplay state) — player can look around
     public void LockCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        if (PlayerLookAround.instance != null)
+        {
+            PlayerLookAround.instance.updatingRotation = true;
+        }
     }
 
-    /// Unlocks + shows the cursor, using the custom texture (menu/UI state)
+    /// Unlocks + shows the cursor (menu/panel state) — camera stays frozen
     public void UnlockCursor()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         ApplyCursorTexture(); // re-apply in case OS reset it while locked
+
+        if (PlayerLookAround.instance != null)
+        {
+            PlayerLookAround.instance.updatingRotation = false;
+        }
     }
 }

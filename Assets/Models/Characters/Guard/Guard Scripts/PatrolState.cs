@@ -39,25 +39,25 @@ public class PatrolState : BaseState
             return;
         }
 
-        if (guard.TickDetection())
-        {
+        //if (guard.TickDetection())
+        //{
 
-            if (PlayerPrefs.GetInt("LevelIndex", 0) == 0 && !Object.FindAnyObjectByType<Step4Trigger>().isTriggered)
-            {
-                TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
-                if (tutorial != null)
-                {
-                    tutorial.PlayerFailedStep3();
-                    Debug.Log("[PATROL] Heard player during tutorial, calling PlayerFailedStep3");
-                }
-                return;
-            }
+        //    if (PlayerPrefs.GetInt("LevelIndex", 0) == 0 && !Object.FindAnyObjectByType<Step4Trigger>().isTriggered)
+        //    {
+        //        TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
+        //        if (tutorial != null)
+        //        {
+        //            tutorial.PlayerFailedStep3();
+        //            Debug.Log("[PATROL] Heard player during tutorial, calling PlayerFailedStep3");
+        //        }
+        //        return;
+        //    }
 
-            AlertState alert = new AlertState();
-            alert.lastKnownPosition = guard.LastKnownPlayerPosition;
-            stateMachine.ChangeState(alert);
-            Debug.Log("[PATROL] Heard player, changing to ALERT State");
-        }
+        //    AlertState alert = new AlertState();
+        //    alert.lastKnownPosition = guard.LastKnownPlayerPosition;
+        //    stateMachine.ChangeState(alert);
+        //    Debug.Log("[PATROL] Heard player, changing to ALERT State");
+        //}
     }
 
     public override void Exit() { }

@@ -54,18 +54,18 @@ public class AttackState : BaseState
                 fireTimer = 1f / shotsPerSecond;
                 guard.PlayShootAnimation();
 
-                // TODO: actual damage/VFX logic goes here
+
                 ShootAtPlayer();
 
-                if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
-                {
-                    TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
+                //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+                //{
+                //    TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
 
-                    if (tutorial != null)
-                    {
-                        tutorial.playerSpottedByGuard();
-                    }
-                }
+                //    if (tutorial != null)
+                //    {
+                //        tutorial.playerSpottedByGuard();
+                //    }
+                //}
             }
         }
         else
