@@ -120,7 +120,7 @@ public class Player : MonoBehaviour
     private GameObject currentHighlightedItem;
     private GameObject currentHighlightedDoor;
 
-    public float pickUpRange = 2f;
+    public float pickUpRange = 3f;
 
     [Tooltip("Radius of the SphereCast used for item/door detection. A plain " +
              "Raycast only registers a hit if it threads exactly through the " +
