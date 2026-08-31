@@ -167,6 +167,11 @@ public class Player : MonoBehaviour
                     currentHighlightedItem = hitObject;
                     ApplyItemHighlight(currentHighlightedItem);
 
+                    if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+                    {
+                        Debug.Log("Disable Objective for Keycard");
+                    }
+
                 }
             }
             else if (currentHighlightedItem != null) // If out of range or not hitting
