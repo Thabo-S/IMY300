@@ -2,11 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Place this on a trigger collider at the level's exit/extraction point.
-// On the player entering, optionally checks the player's Inventory for a
-// required item (leave Required Item empty in the Inspector if reaching
-// the zone alone should be enough), then shows the Mission Complete UI
-// and evaluates/awards mission stars.
+
 public class ExitZone : MonoBehaviour
 {
     [Header("Trigger")]
