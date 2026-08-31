@@ -1,11 +1,7 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Ticks up the 'Elapsed Time' text every frame using Time.timeSinceLevelLoad,
-/// and exposes the current value for MissionStarsController's time objective.
-/// Attach to the LevelCompleteUI panel (or anywhere active for the whole level).
-/// </summary>
 public class ElapsedTimeDisplay : MonoBehaviour
 {
     [Tooltip("Drag the 'Elapsed Time:' value TMP text here.")]
@@ -24,4 +20,5 @@ public class ElapsedTimeDisplay : MonoBehaviour
 
         elapsedTimeText.text = $"{hours:00}:{minutes:00}:{seconds:00}s";
     }
+
 }
