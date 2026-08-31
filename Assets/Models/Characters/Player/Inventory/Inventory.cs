@@ -1261,6 +1261,11 @@ public class Inventory : MonoBehaviour
             Destroy(lookedAtItem.gameObject);
             ClearHighlight();
             EquipHandItem();
+
+            //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+            //{
+            //    Debug.Log("Disable Objective for Keycard");
+            //}
         }
 
         //else if (lookedAtDoor != null)

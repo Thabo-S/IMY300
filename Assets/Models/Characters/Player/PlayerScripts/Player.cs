@@ -161,16 +161,11 @@ public class Player : MonoBehaviour
 
                 if (hitObject.name == "Keycard")
                 {
-                    Debug.Log(hitObject.name);
+                    //Debug.Log(hitObject.name);
 
                     ClearItemHighlight();
                     currentHighlightedItem = hitObject;
                     ApplyItemHighlight(currentHighlightedItem);
-
-                    if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
-                    {
-                        Debug.Log("Disable Objective for Keycard");
-                    }
 
                 }
             }
