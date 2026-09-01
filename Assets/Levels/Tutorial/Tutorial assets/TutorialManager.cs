@@ -10,17 +10,33 @@ public class TutorialManager : MonoBehaviour
     public GameObject startTutorialOverlay;
     public GameObject player;
     public Player playerScript;
+    public InputMananger InputMananger;
     //public GameObject guard;
+
+    [Header("Lights References")]
+    public GameObject PlayerWarning;
+    public GameObject spawnPoint;
+
+    [Header("Lights References")]
+    public GameObject officeLights;
+    public GameObject artifactRoomLights;
+    public GameObject displayRoomLights;
+    public GameObject fourththRoomLights;
+
+    [Header("Trigger References")]
+    public GameObject Step2Trigger;
 
     [Header("Step 1 - Movement")]
     public GameObject step1Panel;
+    public GameObject step2Panel;
 
     // ----------- Reference and Variables -------------
     // -------------------------------------------------
 
     private void Awake()
     {
-        
+        player = GameObject.FindGameObjectWithTag("Player");
+        spawnPoint = GameObject.Find("SpawnPoint");
     }
 
     void Start()
@@ -28,7 +44,9 @@ public class TutorialManager : MonoBehaviour
         startTutorialOverlay.SetActive(true);
         player.SetActive(false);
         playerScript = player.GetComponent<Player>();
+        InputMananger = player.GetComponent<InputMananger>();
         step1Panel.SetActive(false);
+        PlayerWarning.SetActive(false);
     }
 
     void Update()
@@ -73,6 +91,9 @@ public class TutorialManager : MonoBehaviour
     {
         panel.SetActive(true);
 
+        if (InputMananger != null)
+            InputMananger.enabled = false;
+
         if (CursorManager.instance != null)
         {
             CursorManager.instance.UnlockCursor();
@@ -82,6 +103,9 @@ public class TutorialManager : MonoBehaviour
     private void HidePanel(GameObject panel)
     {
         panel.SetActive(false);
+
+        if (InputMananger != null)
+            InputMananger.enabled = true;
 
         if (CursorManager.instance != null)
         {
@@ -97,37 +121,38 @@ public class TutorialManager : MonoBehaviour
         ShowPanel(step1Panel);
     }
 
-    public void hideStartStep1()
+    public void hideStep1()
     {
         HidePanel(step1Panel);
     }
 
 
-    // ---------------- STEP 2: DOOR PROXIMITY PROMPT ----------------
+    // ---------------- STEP 2: SOUND AWARENESS ----------------
 
-    //private void CheckDoorProximity()
-    //{
-    //    if (doorWaypoint == null || player == null) return;
-    //    if (doorPromptShown) return; // only trigger once
+    public void StartStep2()
+    {
+        ShowPanel(step2Panel);
+    }
 
-    //    float distance = Vector3.Distance(player.transform.position, doorWaypoint.position);
+    public void hideStep2()
+    {
+        HidePanel(step2Panel);
+    }
 
-    //    if (distance <= doorPromptRange)
-    //    {
-    //        ShowDoorPrompt();
-    //    }
-    //}
+    public void PlayerFailedStep2()
+    {
+        PlayerWarning.SetActive(true);
 
-    //private void ShowDoorPrompt()
-    //{
-    //    doorPromptShown = true;
+        CharacterController cc = player.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
 
-    //    if (step1Panel != null) step1Panel.SetActive(true);
-    //    if (step1Text != null)
-    //    {
-    //        step1Text.text = "[E] Open Door";
-    //    }
-    //}
+        player.transform.position = spawnPoint.transform.position;
+
+        if (cc != null) cc.enabled = true;
+
+        StartCoroutine(TimeWait(4f, PlayerWarning));
+    }
+
 
     //public void pickUpItems()
     //{
@@ -158,11 +183,13 @@ public class TutorialManager : MonoBehaviour
     //    Invoke(nameof(HideStep1Panel), 6f);
     //}
 
-    //IEnumerator TimeWait()
-    //{
-    //    yield return new WaitForSeconds(3);
+    IEnumerator TimeWait(float delay, GameObject panel)
+    {
+        yield return new WaitForSeconds(delay);
 
-    //}
+        panel.SetActive(false);
+
+    }
 
     //public void PlayerFailedStep3()
     //{

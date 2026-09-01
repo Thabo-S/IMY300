@@ -1,37 +1,38 @@
-//using System.Collections;
-//using UnityEngine;
-//using UnityEngine.SceneManagement;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
-//public class Step3Trigger : MonoBehaviour
-//{
-//    public TutorialManager tutorialManeger;
-//    private bool isTriggered = false;
+public class Step3Trigger : MonoBehaviour
+{
+    public TutorialManager tutorialManager;
+    private bool isTriggered = false;
 
-//    private void OnTriggerEnter(Collider other)
-//    {
-//        if (other.CompareTag("Player") && !isTriggered)
-//        {
-//            isTriggered = true;
+    public GameObject blocker;
 
-//            LoadStep4();
+    public GameObject step2Door;
+    public doorMovement step2doorMovement;
 
-//        }
-//    }
+    private void Start()
+    {
+        tutorialManager = GameObject.Find("TutorialManager").GetComponent<TutorialManager>();
+        step2doorMovement = step2Door.GetComponent<doorMovement>();
+    }
 
-//    private void LoadStep4()
-//    {
-//        tutorialManeger.step1Panel.SetActive(true);
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && !isTriggered)
+        {
+            isTriggered = true;
 
-//        tutorialManeger.step1Text.text = "Nice. Doors work like that throughout the game.";
+            step2doorMovement.ToggleDoor();
 
-//        StartCoroutine(TimeWait());
+            tutorialManager.officeLights.SetActive(false);
 
-//    }
+            tutorialManager.artifactRoomLights.SetActive(true);
 
-//    IEnumerator TimeWait()
-//    {
-//        yield return new WaitForSeconds(3);
+            blocker.SetActive(false);
 
-//        tutorialManeger.HideStep1Panel();
-//    }
-//}
+        }
+    }
+
+}

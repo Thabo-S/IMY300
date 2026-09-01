@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
 
         footstepAudioScource = GetComponents<AudioSource>()[1];
 
-        hotbarSlots = FindFirstObjectByType<Inventory>().hotbarSlots;
+        hotbarSlots = FindAnyObjectByType<Inventory>().hotbarSlots;
     }
 
 
