@@ -24,6 +24,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float minPitch = 0.9f;
     [SerializeField] private float maxPitch = 1.1f;
 
+    [Header("Toggle Controls")]
+    [SerializeField] private GameObject ControlsPanel;
+
 
     private Camera cam;
     public List<Slot> hotbarSlots;
@@ -128,11 +131,16 @@ public class Player : MonoBehaviour
              "only works from certain angles. A small sphere is far more " +
              "forgiving. Start small (0.1-0.3) and increase if detection " +
              "still feels too finicky.")]
-    public float detectionSphereRadius = 0.2f;
+    public float detectionSphereRadius = 0.4f;
 
     void Update()
     {
         PerformContinuousDetection();
+
+        if (Input.GetKeyDown(KeyCode.H) && !PauseMenu.isGamePause)
+        {
+            ControlsPanel.SetActive(!ControlsPanel.activeSelf);
+        }
     }
 
 
@@ -143,36 +151,36 @@ public class Player : MonoBehaviour
 
         Debug.DrawRay(cam.transform.position, cam.transform.forward * pickUpRange, Color.red);
 
-        if (Physics.SphereCast(cam.transform.position, detectionSphereRadius, cam.transform.forward, out hit, pickUpRange))
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, pickUpRange))
         {
             GameObject hitObject = hit.transform.gameObject;
             float distance = hit.distance;
 
             // --- Handle Items ---
-            if (hitObject.CompareTag("canPickUp"))
-            {
-                if (hitObject != currentHighlightedItem)
-                {
-                    ClearItemHighlight();
-                    currentHighlightedItem = hitObject;
-                    ApplyItemHighlight(currentHighlightedItem);
-                }
+            //if (hitObject.CompareTag("canPickUp"))
+            //{
+            //    if (hitObject != currentHighlightedItem)
+            //    {
+            //        ClearItemHighlight();
+            //        currentHighlightedItem = hitObject;
+            //        ApplyItemHighlight(currentHighlightedItem);
+            //    }
 
 
-                if (hitObject.name == "Keycard")
-                {
-                    //Debug.Log(hitObject.name);
+            //    if (hitObject.name == "Keycard")
+            //    {
+            //        //Debug.Log(hitObject.name);
 
-                    ClearItemHighlight();
-                    currentHighlightedItem = hitObject;
-                    ApplyItemHighlight(currentHighlightedItem);
+            //        ClearItemHighlight();
+            //        currentHighlightedItem = hitObject;
+            //        ApplyItemHighlight(currentHighlightedItem);
 
-                }
-            }
-            else if (currentHighlightedItem != null) // If out of range or not hitting
-            {
-                ClearItemHighlight();
-            }
+            //    }
+            //}
+            //else if (currentHighlightedItem != null) // If out of range or not hitting
+            //{
+            //    ClearItemHighlight();
+            //}
 
             // --- Handle Doors ---
             if (hitObject.CompareTag("Door"))

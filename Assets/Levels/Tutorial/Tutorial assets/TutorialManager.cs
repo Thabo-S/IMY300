@@ -26,9 +26,10 @@ public class TutorialManager : MonoBehaviour
     [Header("Trigger References")]
     public GameObject Step2Trigger;
 
-    [Header("Step 1 - Movement")]
+    [Header("Steps UI")]
     public GameObject step1Panel;
     public GameObject step2Panel;
+    public GameObject step3Panel;
 
     // ----------- Reference and Variables -------------
     // -------------------------------------------------
@@ -45,8 +46,11 @@ public class TutorialManager : MonoBehaviour
         player.SetActive(false);
         playerScript = player.GetComponent<Player>();
         InputMananger = player.GetComponent<InputMananger>();
-        step1Panel.SetActive(false);
+
         PlayerWarning.SetActive(false);
+        step1Panel.SetActive(false);
+        step2Panel.SetActive(false);
+        step3Panel.SetActive(false);
     }
 
     void Update()
@@ -94,6 +98,10 @@ public class TutorialManager : MonoBehaviour
         if (InputMananger != null)
             InputMananger.enabled = false;
 
+        Animator animator = player.GetComponent<Animator>();
+        if (animator != null)
+            animator.enabled = false;
+
         if (CursorManager.instance != null)
         {
             CursorManager.instance.UnlockCursor();
@@ -106,6 +114,10 @@ public class TutorialManager : MonoBehaviour
 
         if (InputMananger != null)
             InputMananger.enabled = true;
+
+        Animator animator = player.GetComponent<Animator>();
+        if (animator != null)
+            animator.enabled = true;
 
         if (CursorManager.instance != null)
         {
@@ -153,6 +165,18 @@ public class TutorialManager : MonoBehaviour
         StartCoroutine(TimeWait(4f, PlayerWarning));
     }
 
+    // ---------------- STEP 3: Picking Up & Throwing ----------------
+
+    public void StartStep3()
+    {
+        ShowPanel(step3Panel);
+    }
+
+    public void hideStep3()
+    {
+        HidePanel(step3Panel);
+    }
+
 
     //public void pickUpItems()
     //{
@@ -183,7 +207,7 @@ public class TutorialManager : MonoBehaviour
     //    Invoke(nameof(HideStep1Panel), 6f);
     //}
 
-    IEnumerator TimeWait(float delay, GameObject panel)
+    public IEnumerator TimeWait(float delay, GameObject panel)
     {
         yield return new WaitForSeconds(delay);
 

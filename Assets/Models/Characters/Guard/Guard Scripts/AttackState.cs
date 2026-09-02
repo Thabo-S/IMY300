@@ -138,7 +138,7 @@ public class AttackState : BaseState
     {
         Transform gunBarrel = guard.gunBarrel;
 
-        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * 7f);
+        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * 1.6f);
         Vector3 shootDirection = (baseTargetPoint - gunBarrel.position).normalized;
 
         Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-5f, 5f), Vector3.up) * shootDirection;

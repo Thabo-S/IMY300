@@ -8,7 +8,7 @@ public class Step2Trigger : MonoBehaviour
     public GameObject Step2UI;
 
     // THIS IS FOR ALLOWING THE TRIGGER TO ONLY WORK ONCE
-    private bool isTriggered = false;
+    public bool isTriggered = false;
 
     private void Start()
     {
@@ -29,14 +29,9 @@ public class Step2Trigger : MonoBehaviour
         }
     }
 
-    public void hideUi()
-    {
-        Step2UI.SetActive(true);
-    }
-
     IEnumerator TimeWait()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
 
         Step2UI.SetActive(true);
 

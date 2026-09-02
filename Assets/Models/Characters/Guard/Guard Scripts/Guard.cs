@@ -256,7 +256,7 @@ public class Guard : MonoBehaviour
         if (distance > warningSightDistance) return false;
 
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.transform.position + (Vector3.up * 6.54f);
+        Vector3 targetPoint = player.transform.position + (Vector3.up * 1.6f);
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
         float angleToPlayer = Vector3.Angle(targetDirection, transform.forward);
@@ -270,7 +270,7 @@ public class Guard : MonoBehaviour
         if (!IsPlayerInFieldOfViewCone()) return false;
 
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.transform.position + (Vector3.up * 6.54f);
+        Vector3 targetPoint = player.transform.position + (Vector3.up * 1.6f);
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
         Ray ray = new Ray(rayOrigin, targetDirection);

@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class Step3Trigger : MonoBehaviour
 {
     public TutorialManager tutorialManager;
-    private bool isTriggered = false;
+    public bool isTriggered = false;
 
     public GameObject blocker;
 
@@ -32,7 +32,17 @@ public class Step3Trigger : MonoBehaviour
 
             blocker.SetActive(false);
 
+            StartCoroutine(TimeWait());
+
         }
     }
 
+    IEnumerator TimeWait()
+    {
+        yield return new WaitForSeconds(2f);
+
+        tutorialManager.StartStep3();
+
+        //gameObject.SetActive(false);
+    }
 }

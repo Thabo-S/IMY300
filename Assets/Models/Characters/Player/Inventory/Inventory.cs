@@ -1201,6 +1201,58 @@ public class Inventory : MonoBehaviour
 
     #region World Pickup & Highlight
 
+    //private void DetectLookedAtItem()
+    //{
+    //    ClearHighlight();
+
+    //    Camera cam = playerCamera != null ? playerCamera : Camera.main;
+    //    if (cam == null) return;
+
+    //    Ray ray = new Ray(cam.transform.position, cam.transform.forward);
+
+    //    // SphereCast instead of a pinpoint Raycast: a plain ray only hits an
+    //    // item if it threads exactly through the collider's geometry, which
+    //    // for thin/oddly-shaped/rotated items only lines up from certain
+    //    // viewing angles. A small-radius sphere is far more forgiving while
+    //    // still requiring the player to be roughly looking at the item.
+    //    if (Physics.SphereCast(ray, pickupSphereRadius, out RaycastHit hit, pickupRange, pickupLayerMask))
+    //    {
+
+    //        Debug.Log(hit.collider.name + " is the hit object");
+    //        Item item = hit.collider.GetComponentInParent<Item>();
+    //        if (item != null)
+    //        {
+    //            lookedAtItem = item;
+    //            Renderer rend = item.GetComponentInChildren<Renderer>();
+    //            if (rend != null && highlightMaterial != null)
+    //            {
+    //                originalMaterial = rend.material;
+    //                rend.material = highlightMaterial;
+    //                lookedAtRenderer = rend;
+    //            }
+    //            return;
+    //        }
+
+    //        doorMovement door = hit.collider.GetComponentInParent<doorMovement>();
+    //        if (door != null)
+    //        {
+    //            lookedAtDoor = door;
+    //        }
+    //    }
+    //}
+
+    //private void ClearHighlight()
+    //{
+    //    if (lookedAtRenderer != null && originalMaterial != null)
+    //    {
+    //        lookedAtRenderer.material = originalMaterial;
+    //        lookedAtRenderer = null;
+    //        originalMaterial = null;
+    //    }
+    //    lookedAtItem = null;
+    //    lookedAtDoor = null;
+    //}
+
     private void DetectLookedAtItem()
     {
         ClearHighlight();
@@ -1210,24 +1262,15 @@ public class Inventory : MonoBehaviour
 
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
 
-        // SphereCast instead of a pinpoint Raycast: a plain ray only hits an
-        // item if it threads exactly through the collider's geometry, which
-        // for thin/oddly-shaped/rotated items only lines up from certain
-        // viewing angles. A small-radius sphere is far more forgiving while
-        // still requiring the player to be roughly looking at the item.
-        if (Physics.SphereCast(ray, pickupSphereRadius, out RaycastHit hit, pickupRange, pickupLayerMask))
+        if (Physics.SphereCast(ray, pickupSphereRadius, out RaycastHit hit, pickupRange))
         {
+            //Debug.Log(hit.collider.name + " is the hit object");
+
             Item item = hit.collider.GetComponentInParent<Item>();
             if (item != null)
             {
                 lookedAtItem = item;
-                Renderer rend = item.GetComponentInChildren<Renderer>();
-                if (rend != null && highlightMaterial != null)
-                {
-                    originalMaterial = rend.material;
-                    rend.material = highlightMaterial;
-                    lookedAtRenderer = rend;
-                }
+                ApplyItemHighlight(item.gameObject);
                 return;
             }
 
@@ -1239,14 +1282,23 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    private void ApplyItemHighlight(GameObject obj)
+    {
+        var outline = obj.GetComponent<Outline>();
+        if (outline != null)
+        {
+            outline.enabled = true;
+        }
+    }
+
     private void ClearHighlight()
     {
-        if (lookedAtRenderer != null && originalMaterial != null)
+        if (lookedAtItem != null)
         {
-            lookedAtRenderer.material = originalMaterial;
-            lookedAtRenderer = null;
-            originalMaterial = null;
+            var outline = lookedAtItem.GetComponent<Outline>();
+            if (outline != null) outline.enabled = false;
         }
+
         lookedAtItem = null;
         lookedAtDoor = null;
     }
