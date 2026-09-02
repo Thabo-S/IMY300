@@ -241,7 +241,5 @@ public class PlayerMovement : MonoBehaviour
             SoundEmissionManager.EmitSound(transform.position, volume);
             soundTimer = soundEmitInterval;
         }
-
-        Debug.Log("Player making noise");
     }
 }

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a01c5048bb256724199af26e56cb8a0f
+guid: dac0c7c2ce27fc849af4b392fab83d07
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,57 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: activePanel_0
+      name: 1_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 344
-        height: 265
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: dd66ef6a21c7c5344b023578ac12b635
-      internalID: 837999765
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: activePanel_1
-      rect:
-        serializedVersion: 2
-        x: 210
-        y: 21
-        width: 134
-        height: 244
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1606bc68604dd5048816c9a279be2691
-      internalID: -1030640084
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: activePanel_2
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 344
-        height: 265
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -169,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9222ef9487da7cf4c8919fd52c8a5c28
-      internalID: -968031997
+      spriteID: 32199f76d147ec54b8a04709cbad55df
+      internalID: 945281145
       vertices: []
       indices: 
       edges: []
@@ -179,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: d109a863f0c740e49b93f40f0404b5b4
+    spriteID: 6a5b66b35cebbf44eb26cffd694b4c0b
     internalID: 0
     vertices: []
     indices: 
@@ -189,9 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      activePanel_0: 837999765
-      activePanel_1: -1030640084
-      activePanel_2: -968031997
+      1_0: 945281145
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

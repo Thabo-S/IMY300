@@ -11,7 +11,6 @@ public class TutorialManager : MonoBehaviour
     public GameObject player;
     public Player playerScript;
     public InputMananger InputMananger;
-    //public GameObject guard;
 
     [Header("Lights References")]
     public GameObject PlayerWarning;
@@ -30,6 +29,8 @@ public class TutorialManager : MonoBehaviour
     public GameObject step1Panel;
     public GameObject step2Panel;
     public GameObject step3Panel;
+    public GameObject step4Panel;
+    public GameObject step5Panel;
 
     // ----------- Reference and Variables -------------
     // -------------------------------------------------
@@ -51,6 +52,8 @@ public class TutorialManager : MonoBehaviour
         step1Panel.SetActive(false);
         step2Panel.SetActive(false);
         step3Panel.SetActive(false);
+        step4Panel.SetActive(false);
+        step5Panel.SetActive(false);
     }
 
     void Update()
@@ -175,6 +178,48 @@ public class TutorialManager : MonoBehaviour
     public void hideStep3()
     {
         HidePanel(step3Panel);
+    }
+
+    // ---------------- STEP 4: Warning Zone and Getting Caught ----------------
+
+    public void StartStep4()
+    {
+        ShowPanel(step4Panel);
+    }
+
+    public void hideStep4()
+    {
+        HidePanel(step4Panel);
+    }
+    // ---------------- STEP 5: Health & Recouping ----------------
+
+    public void StartStep5()
+    {
+        ShowPanel(step5Panel);
+
+        GameObject.FindAnyObjectByType<Step4Trigger>().guard2.SetActive(false);
+    }
+
+    public void hideStep5()
+    {
+        HidePanel(step5Panel);
+
+        TargetTrigger targetTrigger = GameObject.FindAnyObjectByType<TargetTrigger>();
+
+        targetTrigger.enableInputs();
+    }
+
+    // ---------------- STEP 6: Keypad Iteraction ----------------
+
+    public void StartStep6()
+    {
+        ShowPanel(step5Panel);
+    }
+
+    public void hideStep6()
+    {
+        HidePanel(step5Panel);
+
     }
 
 

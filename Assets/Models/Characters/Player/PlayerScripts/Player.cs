@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -27,9 +28,22 @@ public class Player : MonoBehaviour
     [Header("Toggle Controls")]
     [SerializeField] private GameObject ControlsPanel;
 
+    [Header("Damage Overlay")]
+    public Image damageOverlay;
+    public float flashInAlpha = 0.5f;
+    public float flashInTime = 1f;
+    public float fadeOutTime = 1f;
+
+    private Coroutine damageFlashCoroutine;
 
     private Camera cam;
     public List<Slot> hotbarSlots;
+
+    //================= List Of PlayerPrefs ===================
+    // LevelIndex : Use to determine game level
+    //=========================================================
+
+    // Gents, You'll add more if you wish to do so
 
     void Start()
     {
@@ -50,6 +64,7 @@ public class Player : MonoBehaviour
 
 
 
+
     public void TakeDamage(int damage)
     {
         PlayerHealth -= damage;
@@ -59,6 +74,67 @@ public class Player : MonoBehaviour
         fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
 
         Debug.Log("Player took damage: " + PlayerHealth);
+
+        if (damageOverlay != null)
+        {
+            if (damageFlashCoroutine != null)
+                StopCoroutine(damageFlashCoroutine);
+
+            damageFlashCoroutine = StartCoroutine(DamageFlash());
+        }
+
+        if(PlayerHealth < 40)
+        {
+            TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
+
+            if (tutorial != null)
+                tutorial.StartStep5();
+            
+        }
+    }
+
+    public void RecoupHealth(int increaseHealtj)
+    {
+
+        PlayerHealth += increaseHealtj;
+
+        if(PlayerHealth > 100)
+            PlayerHealth = 100;
+
+        HealthBarSlider.value = PlayerHealth;
+
+        fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
+
+        Debug.Log("Player health increased: " + PlayerHealth);
+
+        if(PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        {
+            TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
+
+            if (tutorial != null)
+                tutorial.StartStep6();
+        }
+    }
+
+
+    private IEnumerator DamageFlash()
+    {
+        Color c = damageOverlay.color;
+
+        c.a = flashInAlpha;
+        damageOverlay.color = c;
+
+        float elapsed = 0f;
+        while (elapsed < fadeOutTime)
+        {
+            elapsed += Time.deltaTime;
+            c.a = Mathf.Lerp(flashInAlpha, 0f, elapsed / fadeOutTime);
+            damageOverlay.color = c;
+            yield return null;
+        }
+
+        c.a = 0f;
+        damageOverlay.color = c;
     }
 
     public void OnFootstep()

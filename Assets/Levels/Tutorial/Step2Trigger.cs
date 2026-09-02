@@ -28,7 +28,6 @@ public class Step2Trigger : MonoBehaviour
             StartCoroutine(TimeWait());
         }
     }
-
     IEnumerator TimeWait()
     {
         yield return new WaitForSeconds(2f);
@@ -36,5 +35,7 @@ public class Step2Trigger : MonoBehaviour
         Step2UI.SetActive(true);
 
         tutorialManager.StartStep2();
+
+
     }
 }

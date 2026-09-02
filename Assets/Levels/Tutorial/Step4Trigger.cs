@@ -5,12 +5,15 @@ using UnityEngine.UIElements;
 
 public class Step4Trigger : MonoBehaviour
 {
-    private TutorialManager tutorialManeger;
+    private TutorialManager tutorialManager;
+
+    public GameObject guard1;
+    public GameObject guard2;
 
     public bool isTriggered = false;
     private void Start()
     {
-        tutorialManeger = GameObject.FindAnyObjectByType<TutorialManager>();
+        tutorialManager = GameObject.FindAnyObjectByType<TutorialManager>();
     }
 
 
@@ -21,6 +24,12 @@ public class Step4Trigger : MonoBehaviour
 
             isTriggered = true;
 
+            Object.FindAnyObjectByType<Step3Trigger>().pathtostep4.SetActive(false);
+
+            guard1.SetActive(false);
+
+            guard2.SetActive(true);
+
             StartCoroutine(TimeWait());
 
         }
@@ -28,10 +37,9 @@ public class Step4Trigger : MonoBehaviour
 
     IEnumerator TimeWait()
     {
-        yield return new WaitForSeconds(6);
+        yield return new WaitForSeconds(2f);
 
-        //tutorialManeger.HideStep1Panel();
-
+        tutorialManager.StartStep4();
 
     }
 

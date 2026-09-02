@@ -138,16 +138,29 @@ public class AttackState : BaseState
     {
         Transform gunBarrel = guard.gunBarrel;
 
-        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * 1.6f);
+        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * guard.eyeHeight);
         Vector3 shootDirection = (baseTargetPoint - gunBarrel.position).normalized;
+        
+        float shotRange;
 
-        Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-5f, 5f), Vector3.up) * shootDirection;
+        if(PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        {
+            shotRange = 0;
+        }
+        else
+        {
+            shotRange = 5f;
+        }
+
+        Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-shotRange, shotRange), Vector3.up) * shootDirection;
 
         GameObject bullet = GameObject.Instantiate(
             Resources.Load("Prefabs/Bullet") as GameObject,
             gunBarrel.position,
             Quaternion.LookRotation(finalDirection)
         );
+
+        bullet.GetComponent<Bullet>().SetShooter(guard.gameObject);
 
         bullet.GetComponent<Rigidbody>().linearVelocity = finalDirection * guard.bulletSpeed;
 

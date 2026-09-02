@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
-  m_Name: Axe
+  m_Name: Medkit
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: 
-  icon: {fileID: 21300000, guid: e8db83e7e5345bb45aa89cf3dac02291, type: 3}
-  maxStackSize: 1
-  itemPrefab: {fileID: 1504306972443944381, guid: aa7ba57fd37d72348985c4e45b3462f8, type: 3}
+  itemName: MedKit
+  icon: {fileID: 1042802959, guid: a079e467e30dc2d46b72503761369220, type: 3}
+  maxStackSize: 2
+  itemPrefab: {fileID: 4185105213926453150, guid: a1caf27a3e1096a4eaa5000a00100e14, type: 3}
   handItemPrefab: {fileID: 0}
-  value: 400
+  value: 1

@@ -23,6 +23,7 @@ TagManager:
   - Level5
   - Door_Keycard
   - GarageDoor
+  - MedKit
   layers:
   - Default
   - TransparentFX

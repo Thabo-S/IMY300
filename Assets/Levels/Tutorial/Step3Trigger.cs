@@ -12,10 +12,15 @@ public class Step3Trigger : MonoBehaviour
     public GameObject step2Door;
     public doorMovement step2doorMovement;
 
+    [Header("Directions")]
+    public GameObject pathtostep3;
+    public GameObject pathtostep4;
     private void Start()
     {
         tutorialManager = GameObject.Find("TutorialManager").GetComponent<TutorialManager>();
         step2doorMovement = step2Door.GetComponent<doorMovement>();
+
+        pathtostep4.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -23,6 +28,10 @@ public class Step3Trigger : MonoBehaviour
         if (other.CompareTag("Player") && !isTriggered)
         {
             isTriggered = true;
+
+
+            pathtostep3.SetActive(false);
+            pathtostep4.SetActive(true);
 
             step2doorMovement.ToggleDoor();
 
@@ -43,6 +52,8 @@ public class Step3Trigger : MonoBehaviour
 
         tutorialManager.StartStep3();
 
-        //gameObject.SetActive(false);
+        Vector3 scale = gameObject.transform.localScale;
+        scale.y = 0.25f;
+        gameObject.transform.localScale = scale;
     }
 }
