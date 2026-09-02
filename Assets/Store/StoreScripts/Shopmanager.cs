@@ -86,7 +86,7 @@ public class ShopManager : MonoBehaviour
     {
         if (balanceText != null)
         {
-            balanceText.text = $"${balance}";
+            balanceText.text = $"Balance: ${balance}";
         }
     }
 }

@@ -24,4 +24,6 @@ public class ItemSO : ScriptableObject
     [Tooltip("Shown in the shop's item description text.")]
     [TextArea(2, 4)]
     public string description;
+
+
 }

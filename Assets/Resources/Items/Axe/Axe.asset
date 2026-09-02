@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
   m_Name: Axe
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: 
+  itemName: Axe
   icon: {fileID: 21300000, guid: e8db83e7e5345bb45aa89cf3dac02291, type: 3}
   maxStackSize: 1
   itemPrefab: {fileID: 1504306972443944381, guid: aa7ba57fd37d72348985c4e45b3462f8, type: 3}
   handItemPrefab: {fileID: 0}
   value: 400
+  purchasable: 1
+  price: 1000
+  description: Mean to cut down trees or do other things...

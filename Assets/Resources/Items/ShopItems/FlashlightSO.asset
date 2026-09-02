@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
-  m_Name: Crown_ItemSO
+  m_Name: FlashlightSO
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: Crown
-  icon: {fileID: 1286363165, guid: 8e767e5d34fcb094ab25e33ec635cb2e, type: 3}
+  itemName: Flashlight
+  icon: {fileID: 21300000, guid: 80df198730c74ee45b72148423bc620e, type: 3}
   maxStackSize: 1
-  itemPrefab: {fileID: 386817010620559591, guid: 8edee58da220efd45b9c6b69847b2960, type: 3}
+  itemPrefab: {fileID: 919132149155446097, guid: bd01c92cdda14ba4b87389da00da3b8a, type: 3}
   handItemPrefab: {fileID: 0}
   value: 0
   purchasable: 1
-  price: 10
-  description: 'Crown meant for royalty '
+  price: 150
+  description: 'This item allows a player to shine light in dark areas
+
+'
