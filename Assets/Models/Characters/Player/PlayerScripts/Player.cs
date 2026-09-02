@@ -44,8 +44,6 @@ public class Player : MonoBehaviour
         hotbarSlots = FindFirstObjectByType<Inventory>().hotbarSlots;
     }
 
-
-
     public void TakeDamage(int damage)
     {
         PlayerHealth -= damage;
@@ -161,9 +159,21 @@ public class Player : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    hitObject.GetComponent<doorMovement>().ToggleDoor();
+                    //modiyfed door interactable for QTE (Tadi)
+                    DoorLockInteractable lockInteractable = hitObject.GetComponent<DoorLockInteractable>();
+
+                    if (lockInteractable != null) // Door requires a QTE
+                    {
+                        lockInteractable.Interact();
+                    }
+                    else // No lock component — open normally
+                    {
+                        hitObject.GetComponent<doorMovement>().ToggleDoor();
+                    }
+
                 }
-            } else if (hitObject.CompareTag("Door_Keycard"))
+            }
+            else if (hitObject.CompareTag("Door_Keycard"))
             {
                 // CHeck if the player has the keycard, else show the message that
                 // says the Keycard is required.
@@ -203,7 +213,8 @@ public class Player : MonoBehaviour
                     }
 
                 }
-            }else if (hitObject.CompareTag("GarageDoor"))
+            }
+            else if (hitObject.CompareTag("GarageDoor"))
             {
                 // CHeck if the player has the keycard, else show the message that
                 // says the Keycard is required.
@@ -213,15 +224,29 @@ public class Player : MonoBehaviour
                     currentHighlightedDoor = hitObject;
                     ApplyDoorHighlight(currentHighlightedDoor);
                 }
-
+                //Chanages(Tadi ) - Garage door QTE
+            }else if(hitObject.CompareTag("KeyPad"))
+            {
+                if (hitObject != currentHighlightedDoor)
+                {
+                    ClearDoorHighlight();
+                    currentHighlightedDoor = hitObject;
+                    ApplyDoorHighlight(currentHighlightedDoor);
+                }
+                //turn on the Qte Text on top of keypad
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    hitObject.GetComponent<doorMovement>().ToggleGarageDoor();
+                    //keypad interactable for the garage door QTE (Tadi)
+                    KeypadDoorInteractable keypadInteractable = hitObject.GetComponent<KeypadDoorInteractable>();
 
-                    Debug.Log("Openning Garage Door!");
+                    if (keypadInteractable != null)
+                    {
+                        keypadInteractable.Interact();
+                    }
                 }
-            }else if (currentHighlightedDoor != null) // If out of range or not hitting
+            }
+            else if (currentHighlightedDoor != null) // If out of range or not hitting
                 {
                     ClearDoorHighlight();
                 }

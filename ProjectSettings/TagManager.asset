@@ -23,6 +23,9 @@ TagManager:
   - Level5
   - Door_Keycard
   - GarageDoor
+  - Door_Left_Swing
+  - Door_Right_Swing
+  - KeyPad
   layers:
   - Default
   - TransparentFX
