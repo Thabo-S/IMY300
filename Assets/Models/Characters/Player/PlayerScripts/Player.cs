@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -24,9 +25,25 @@ public class Player : MonoBehaviour
     [SerializeField] private float minPitch = 0.9f;
     [SerializeField] private float maxPitch = 1.1f;
 
+    [Header("Toggle Controls")]
+    [SerializeField] private GameObject ControlsPanel;
+
+    [Header("Damage Overlay")]
+    public Image damageOverlay;
+    public float flashInAlpha = 0.5f;
+    public float flashInTime = 1f;
+    public float fadeOutTime = 1f;
+
+    private Coroutine damageFlashCoroutine;
 
     private Camera cam;
     public List<Slot> hotbarSlots;
+
+    //================= List Of PlayerPrefs ===================
+    // LevelIndex : Use to determine game level
+    //=========================================================
+
+    // Gents, You'll add more if you wish to do so
 
     void Start()
     {
@@ -42,8 +59,9 @@ public class Player : MonoBehaviour
 
         footstepAudioScource = GetComponents<AudioSource>()[1];
 
-        hotbarSlots = FindFirstObjectByType<Inventory>().hotbarSlots;
+        hotbarSlots = FindAnyObjectByType<Inventory>().hotbarSlots;
     }
+
 
 
 
@@ -56,6 +74,67 @@ public class Player : MonoBehaviour
         fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
 
         Debug.Log("Player took damage: " + PlayerHealth);
+
+        if (damageOverlay != null)
+        {
+            if (damageFlashCoroutine != null)
+                StopCoroutine(damageFlashCoroutine);
+
+            damageFlashCoroutine = StartCoroutine(DamageFlash());
+        }
+
+        if(PlayerHealth < 40)
+        {
+            TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
+
+            if (tutorial != null)
+                tutorial.StartStep5();
+            
+        }
+    }
+
+    public void RecoupHealth(int increaseHealtj)
+    {
+
+        PlayerHealth += increaseHealtj;
+
+        if(PlayerHealth > 100)
+            PlayerHealth = 100;
+
+        HealthBarSlider.value = PlayerHealth;
+
+        fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
+
+        Debug.Log("Player health increased: " + PlayerHealth);
+
+        if(PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        {
+            TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
+
+            if (tutorial != null)
+                tutorial.StartStep6();
+        }
+    }
+
+
+    private IEnumerator DamageFlash()
+    {
+        Color c = damageOverlay.color;
+
+        c.a = flashInAlpha;
+        damageOverlay.color = c;
+
+        float elapsed = 0f;
+        while (elapsed < fadeOutTime)
+        {
+            elapsed += Time.deltaTime;
+            c.a = Mathf.Lerp(flashInAlpha, 0f, elapsed / fadeOutTime);
+            damageOverlay.color = c;
+            yield return null;
+        }
+
+        c.a = 0f;
+        damageOverlay.color = c;
     }
 
     public void OnFootstep()
@@ -128,11 +207,16 @@ public class Player : MonoBehaviour
              "only works from certain angles. A small sphere is far more " +
              "forgiving. Start small (0.1-0.3) and increase if detection " +
              "still feels too finicky.")]
-    public float detectionSphereRadius = 0.2f;
+    public float detectionSphereRadius = 0.4f;
 
     void Update()
     {
         PerformContinuousDetection();
+
+        if (Input.GetKeyDown(KeyCode.H) && !PauseMenu.isGamePause)
+        {
+            ControlsPanel.SetActive(!ControlsPanel.activeSelf);
+        }
     }
 
 
@@ -143,41 +227,36 @@ public class Player : MonoBehaviour
 
         Debug.DrawRay(cam.transform.position, cam.transform.forward * pickUpRange, Color.red);
 
-        if (Physics.SphereCast(cam.transform.position, detectionSphereRadius, cam.transform.forward, out hit, pickUpRange))
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, pickUpRange))
         {
             GameObject hitObject = hit.transform.gameObject;
             float distance = hit.distance;
 
             // --- Handle Items ---
-            if (hitObject.CompareTag("canPickUp"))
-            {
-                if (hitObject != currentHighlightedItem)
-                {
-                    ClearItemHighlight();
-                    currentHighlightedItem = hitObject;
-                    ApplyItemHighlight(currentHighlightedItem);
-                }
+            //if (hitObject.CompareTag("canPickUp"))
+            //{
+            //    if (hitObject != currentHighlightedItem)
+            //    {
+            //        ClearItemHighlight();
+            //        currentHighlightedItem = hitObject;
+            //        ApplyItemHighlight(currentHighlightedItem);
+            //    }
 
 
-                if (hitObject.name == "Keycard")
-                {
-                    Debug.Log(hitObject.name);
+            //    if (hitObject.name == "Keycard")
+            //    {
+            //        //Debug.Log(hitObject.name);
 
-                    ClearItemHighlight();
-                    currentHighlightedItem = hitObject;
-                    ApplyItemHighlight(currentHighlightedItem);
+            //        ClearItemHighlight();
+            //        currentHighlightedItem = hitObject;
+            //        ApplyItemHighlight(currentHighlightedItem);
 
-                    if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
-                    {
-                        Debug.Log("Disable Objective for Keycard");
-                    }
-
-                }
-            }
-            else if (currentHighlightedItem != null) // If out of range or not hitting
-            {
-                ClearItemHighlight();
-            }
+            //    }
+            //}
+            //else if (currentHighlightedItem != null) // If out of range or not hitting
+            //{
+            //    ClearItemHighlight();
+            //}
 
             // --- Handle Doors ---
             if (hitObject.CompareTag("Door"))

@@ -141,7 +141,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public int RemoveAmount(int amountToRemove)
     {
         itemAmount = itemAmount - amountToRemove;
-        if (amountToRemove <= 0)
+        if (itemAmount <= 0)
         {
             ClearSlot();
         }

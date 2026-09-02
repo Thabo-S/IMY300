@@ -32,8 +32,6 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 crouchCenter = new Vector3(0f, -0.31f, -0.04f);
 
 
-    [SerializeField] private float jumpDelay = 0.71f;
-
     [Header("Sound Emission")]
     public float walkVolume = 30f;
     public float runVolume = 60f;
@@ -131,21 +129,23 @@ public class PlayerMovement : MonoBehaviour
         // Check if grounded and not crouching
         if (isGrounded && !isCrouching)
         {
-            StartCoroutine(JumpWithDelay());
+            playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
+
+            //StartCoroutine(JumpWithDelay());
         }
     }
 
-    private IEnumerator JumpWithDelay()
-    {
-        if (animator != null)
-        {
-            animator.SetTrigger(AnimationParams.JumpTrigger);
-        }
+    //private IEnumerator JumpWithDelay()
+    //{
+    //    if (animator != null)
+    //    {
+    //        animator.SetTrigger(AnimationParams.JumpTrigger);
+    //    }
 
-        yield return new WaitForSeconds(jumpDelay);
+    //    yield return new WaitForSeconds(jumpDelay);
 
-        playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
-    }
+    //    playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
+    //}
 
     // THE PLAYER CAN ALSO ONLY SPRINT IF THEY ARE GROUNDED
     // THIS PREVENTS THE CASE WHERE THE PLAYER IS IN MID AIR

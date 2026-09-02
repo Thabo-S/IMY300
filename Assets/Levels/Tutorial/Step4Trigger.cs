@@ -1,48 +1,48 @@
-//using System.Collections;
-//using UnityEngine;
-//using UnityEngine.SceneManagement;
-//using UnityEngine.UIElements;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
-//public class Step4Trigger : MonoBehaviour
-//{
-//    private TutorialManager tutorialManeger;
+public class Step4Trigger : MonoBehaviour
+{
+    private TutorialManager tutorialManager;
 
-//    public GameObject guardsCanHear;
-//    public GameObject RouteToStep3;
-//    public GameObject RouteToStep5;
-//    public bool isTriggered = false;
-//    private void Start()
-//    {
-//        tutorialManeger = GameObject.FindAnyObjectByType<TutorialManager>();
-//    }
+    public GameObject guard1;
+    public GameObject guard2;
 
-
-//    private void OnTriggerEnter(Collider other)
-//    {
-//        if (other.CompareTag("Player") && !isTriggered)
-//        {
-//            guardsCanHear.SetActive(false);
-
-//            RouteToStep3.SetActive(false);
-
-//            RouteToStep5.SetActive(true);
-
-//            isTriggered = true;
-            
-//            StartCoroutine(TimeWait());
-
-//        }
-//    }
-
-//    IEnumerator TimeWait()
-//    {
-//        yield return new WaitForSeconds(6);
-
-//        //tutorialManeger.HideStep1Panel();
+    public bool isTriggered = false;
+    private void Start()
+    {
+        tutorialManager = GameObject.FindAnyObjectByType<TutorialManager>();
+    }
 
 
-//    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && !isTriggered)
+        {
 
-//}
+            isTriggered = true;
+
+            Object.FindAnyObjectByType<Step3Trigger>().pathtostep4.SetActive(false);
+
+            guard1.SetActive(false);
+
+            guard2.SetActive(true);
+
+            StartCoroutine(TimeWait());
+
+        }
+    }
+
+    IEnumerator TimeWait()
+    {
+        yield return new WaitForSeconds(2f);
+
+        tutorialManager.StartStep4();
+
+    }
+
+}
 
 

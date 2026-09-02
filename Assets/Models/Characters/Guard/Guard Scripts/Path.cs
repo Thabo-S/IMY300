@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEditor;
 public class Path : MonoBehaviour
 {
-
     public List<Transform> waypoints;
     [SerializeField]
     private bool alwaysDrawPath;

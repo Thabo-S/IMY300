@@ -1,37 +1,59 @@
-//using System.Collections;
-//using UnityEngine;
-//using UnityEngine.SceneManagement;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
-//public class Step3Trigger : MonoBehaviour
-//{
-//    public TutorialManager tutorialManeger;
-//    private bool isTriggered = false;
+public class Step3Trigger : MonoBehaviour
+{
+    public TutorialManager tutorialManager;
+    public bool isTriggered = false;
 
-//    private void OnTriggerEnter(Collider other)
-//    {
-//        if (other.CompareTag("Player") && !isTriggered)
-//        {
-//            isTriggered = true;
+    public GameObject blocker;
 
-//            LoadStep4();
+    public GameObject step2Door;
+    public doorMovement step2doorMovement;
 
-//        }
-//    }
+    [Header("Directions")]
+    public GameObject pathtostep3;
+    public GameObject pathtostep4;
+    private void Start()
+    {
+        tutorialManager = GameObject.Find("TutorialManager").GetComponent<TutorialManager>();
+        step2doorMovement = step2Door.GetComponent<doorMovement>();
 
-//    private void LoadStep4()
-//    {
-//        tutorialManeger.step1Panel.SetActive(true);
+        pathtostep4.SetActive(false);
+    }
 
-//        tutorialManeger.step1Text.text = "Nice. Doors work like that throughout the game.";
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && !isTriggered)
+        {
+            isTriggered = true;
 
-//        StartCoroutine(TimeWait());
 
-//    }
+            pathtostep3.SetActive(false);
+            pathtostep4.SetActive(true);
 
-//    IEnumerator TimeWait()
-//    {
-//        yield return new WaitForSeconds(3);
+            step2doorMovement.ToggleDoor();
 
-//        tutorialManeger.HideStep1Panel();
-//    }
-//}
+            tutorialManager.officeLights.SetActive(false);
+
+            tutorialManager.artifactRoomLights.SetActive(true);
+
+            blocker.SetActive(false);
+
+            StartCoroutine(TimeWait());
+
+        }
+    }
+
+    IEnumerator TimeWait()
+    {
+        yield return new WaitForSeconds(2f);
+
+        tutorialManager.StartStep3();
+
+        Vector3 scale = gameObject.transform.localScale;
+        scale.y = 0.25f;
+        gameObject.transform.localScale = scale;
+    }
+}

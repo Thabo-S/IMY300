@@ -4,7 +4,7 @@ using UnityEngine;
 public class AlertState : BaseState
 {
     public Vector3 lastKnownPosition;
-    public float alertSpeed = 16f;
+    public float alertSpeed = 3f;
     public float waitAtLocationTime = 10f;
     public float pauseAtEachPoint = 1f;
 

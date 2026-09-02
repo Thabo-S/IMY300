@@ -18,6 +18,7 @@ public class Inventory : MonoBehaviour
     [Header("Camera & Player Control")]
     public Camera playerCamera;
     public PlayerLookAround playerLookAround;
+    public Player player;
 
     [Header("Progress UI")]
     [Tooltip("Reference to the level's progress bar, updated whenever an item is added.")]
@@ -38,7 +39,7 @@ public class Inventory : MonoBehaviour
     private Item lookedAtItem = null;
     private doorMovement lookedAtDoor = null;
     private Material originalMaterial;
-    private Renderer lookedAtRenderer = null;
+    //private Renderer lookedAtRenderer = null;
 
     [Header("Hotbar & Equipment Settings")]
     private int equippedHotbarIndex = 0;
@@ -94,6 +95,8 @@ public class Inventory : MonoBehaviour
         // spilling over into the main inventory grid.
         allSlots.AddRange(hotbarSlots);
         allSlots.AddRange(inventorySlots);
+
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
     }
 
     private void Start()
@@ -168,6 +171,9 @@ public class Inventory : MonoBehaviour
         EndDrag();
 
         UpdateHotbarOpacity();
+
+        if(Input.GetKeyDown(KeyCode.F))
+            useSelectedItem();
     }
 
     #region Inventory Toggle Logic
@@ -470,7 +476,6 @@ public class Inventory : MonoBehaviour
     #endregion
 
     #region World Pickup & Highlight
-
     private void DetectLookedAtItem()
     {
         ClearHighlight();
@@ -480,19 +485,15 @@ public class Inventory : MonoBehaviour
 
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
 
-        if (Physics.SphereCast(ray, pickupSphereRadius, out RaycastHit hit, pickupRange, pickupLayerMask))
+        if (Physics.SphereCast(ray, pickupSphereRadius, out RaycastHit hit, pickupRange))
         {
+            //Debug.Log(hit.collider.name + " is the hit object");
+
             Item item = hit.collider.GetComponentInParent<Item>();
             if (item != null)
             {
                 lookedAtItem = item;
-                Renderer rend = item.GetComponentInChildren<Renderer>();
-                if (rend != null && highlightMaterial != null)
-                {
-                    originalMaterial = rend.material;
-                    rend.material = highlightMaterial;
-                    lookedAtRenderer = rend;
-                }
+                ApplyItemHighlight(item.gameObject);
                 return;
             }
 
@@ -504,14 +505,23 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    private void ApplyItemHighlight(GameObject obj)
+    {
+        var outline = obj.GetComponent<Outline>();
+        if (outline != null)
+        {
+            outline.enabled = true;
+        }
+    }
+
     private void ClearHighlight()
     {
-        if (lookedAtRenderer != null && originalMaterial != null)
+        if (lookedAtItem != null)
         {
-            lookedAtRenderer.material = originalMaterial;
-            lookedAtRenderer = null;
-            originalMaterial = null;
+            var outline = lookedAtItem.GetComponent<Outline>();
+            if (outline != null) outline.enabled = false;
         }
+
         lookedAtItem = null;
         lookedAtDoor = null;
     }
@@ -526,9 +536,17 @@ public class Inventory : MonoBehaviour
             Destroy(lookedAtItem.gameObject);
             ClearHighlight();
             EquipHandItem();
+
+            //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+            //{
+            //    Debug.Log("Disable Objective for Keycard");
+            //}
         }
 
-
+        //else if (lookedAtDoor != null)
+        //{
+        //    lookedAtDoor.ToggleDoor();
+        //}
     }
 
     #endregion
@@ -645,7 +663,7 @@ public class Inventory : MonoBehaviour
 
     private void HandleHotbarSelection()
     {
-        for (int i = 0; i < hotbarSlots.Count && i < 6; i++)
+        for (int i = 0; i < hotbarSlots.Count && i < 2; i++)
         {
             if (Input.GetKeyDown((i + 1).ToString()))
             {
@@ -657,6 +675,26 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public void useSelectedItem()
+    {
+        Slot equippedSlot = GetEquippedSlot();
+        if (equippedSlot == null || !equippedSlot.HasItem()) return;
+
+        ItemSO equippedItem = equippedSlot.GetItem();
+
+        if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("MedKit"))
+        {
+            Debug.Log("MedKit found");
+
+            int healthIncrease = 40;
+
+            player.RecoupHealth(healthIncrease);
+
+            equippedSlot.RemoveAmount(1);
+
+            EquipHandItem();
+        }
+    }
     private void UpdateHotbarOpacity()
     {
         for (int i = 0; i < hotbarSlots.Count; i++)
