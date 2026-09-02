@@ -110,14 +110,7 @@ public class Inventory : MonoBehaviour
         IsOpen = false;
         if (container != null) container.SetActive(false);
 
-        //LockCursor();
 
-        // NOTE: Cursor locking is no longer forced here. This object gets
-        // SetActive(true) the moment "Start Tutorial" is pressed, so locking
-        // the cursor in Start() hid it before any tutorial intro UI could use
-        // the mouse. Call PauseMenu.LockGameplayCursor() explicitly once
-        // gameplay should actually take control of the mouse (e.g. from the
-        // Start Tutorial button, or after an intro popup is dismissed).
 
         // Explicitly enable rotation on startup
         SetPlayerRotationState(true);
@@ -127,12 +120,7 @@ public class Inventory : MonoBehaviour
         if (trajectoryLine != null)
             trajectoryLine.enabled = false;
 
-        // Prevent the drag icon from stealing OnPointerEnter/OnPointerExit
-        // events meant for the Slot underneath the cursor while dragging -
-        // Unity's EventSystem only sends pointer events to the topmost
-        // raycast target, and dragIcon sits directly on top of whatever
-        // Slot is being hovered since it's repositioned to the mouse every
-        // frame. Without this, Slot.hovering stops updating reliably mid-drag.
+
         if (dragIcon != null)
             dragIcon.raycastTarget = false;
     }
