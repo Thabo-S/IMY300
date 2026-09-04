@@ -60,10 +60,7 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Attempts to purchase the given item. Returns true if the purchase
-    /// succeeded (funds deducted, ownership recorded).
-    /// </summary>
+ 
     private bool TryPurchase(ItemSO item)
     {
         if (item == null) return false;

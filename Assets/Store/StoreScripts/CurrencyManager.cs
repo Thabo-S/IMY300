@@ -10,7 +10,6 @@ public static class CurrencyManager
 {
     private const string CurrencyKey = "PlayerCurrency";
 
-    /// <summary>Raised whenever the balance changes, with the new balance.</summary>
     public static event Action<int> OnCurrencyChanged;
 
     public static int GetBalance()

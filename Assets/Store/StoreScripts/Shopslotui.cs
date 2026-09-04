@@ -1,7 +1,8 @@
 using System;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ShopSlotUI : MonoBehaviour
 {
@@ -28,9 +29,22 @@ public class ShopSlotUI : MonoBehaviour
     private Func<ItemSO, bool> onPurchaseAttempt;
     private bool showingDescription = false;
 
+    [Header("Highlight Settings")]
+    [Tooltip("The Image component used for background or border highlighting.")]
+    public Image highlightTarget;
+    [Tooltip("Material applied when hovering over the slot.")]
+    public Material highlightMaterial;
+
+    private Material defaultMaterial;
 
     private void Awake()
     {
+
+        if (highlightTarget != null)
+        {
+            defaultMaterial = highlightTarget.material;
+        }
+
         if (icon == null) icon = FindComponentInChildByName<Image>("Icon");
         if (nameText == null) nameText = FindComponentInChildByName<TextMeshProUGUI>("ItemName");
         if (priceText == null) priceText = FindComponentInChildByName<TextMeshProUGUI>("Price");
@@ -47,10 +61,28 @@ public class ShopSlotUI : MonoBehaviour
             descriptionText = descriptionViewRoot.GetComponentInChildren<TextMeshProUGUI>(true);
         }
 
+
+
         LogMissingReferences();
     }
 
-    /// <summary>Recursive, inactive-inclusive search for a child GameObject by name.</summary>
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (highlightTarget != null && highlightMaterial != null)
+        {
+            highlightTarget.material = highlightMaterial;
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (highlightTarget != null)
+        {
+            highlightTarget.material = defaultMaterial;
+        }
+    }
+
+
     private GameObject FindChildByName(string childName)
     {
         Transform result = FindTransformByName(transform, childName);
@@ -123,7 +155,9 @@ public class ShopSlotUI : MonoBehaviour
 
         if (success)
         {
+            buyButton.image.color = Color.green;
             RefreshOwnedState();
+            
         }
         else
         {
