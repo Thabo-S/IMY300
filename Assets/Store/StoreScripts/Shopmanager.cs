@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VectorGraphics;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Drives the pre-level shop screen: lists purchasable ItemSOs, spawns a
@@ -17,6 +19,8 @@ public class ShopManager : MonoBehaviour
     public Transform slotContainer;
     public ShopSlotUI slotPrefab;
     public TextMeshProUGUI balanceText;
+
+    public string MainMenu = "Main Menu";
 
     private readonly List<ShopSlotUI> spawnedSlots = new List<ShopSlotUI>();
 
@@ -60,10 +64,7 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Attempts to purchase the given item. Returns true if the purchase
-    /// succeeded (funds deducted, ownership recorded).
-    /// </summary>
+ 
     private bool TryPurchase(ItemSO item)
     {
         if (item == null) return false;
@@ -86,7 +87,17 @@ public class ShopManager : MonoBehaviour
     {
         if (balanceText != null)
         {
-            balanceText.text = $"${balance}";
+            balanceText.text = $"Balance: ${balance}";
         }
+    }
+
+    public void MainMenuLoad()
+    {
+        if (string.IsNullOrEmpty(MainMenu))
+        {
+            Debug.Log("Main Menu scene name may be wrong");
+            return;
+        }
+        SceneManager.LoadScene(MainMenu);
     }
 }
