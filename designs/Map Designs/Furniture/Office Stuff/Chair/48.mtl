@@ -1,0 +1,34 @@
+# File produced by AccuTrans 3D
+
+newmtl Executive
+  Ns 35.29
+  d 1.0
+  illum 2
+  Kd 0.52 0.48 0.43
+  Ka 0.7412 0.7176 0.6824
+  Ks 0.898 0.898 0.898
+
+newmtl Executive__1
+  Ns 77.2
+  d 1.0
+  illum 2
+  Kd 0.04 0.04 0.04
+  Ka 0.2275 0.2235 0.2431
+  Ks 0.898 0.898 0.898
+
+newmtl Executive__2
+  Ns 39.1
+  d 1.0
+  illum 2
+  Kd 0.05 0.04 0.02
+  Ka 0.2588 0.2392 0.1725
+  Ks 0.898 0.898 0.898
+  map_Kd E:\LEATHE~2.jpg
+
+newmtl Executive__3
+  Ns 77.2
+  d 1.0
+  illum 2
+  Kd 0.38 0.38 0.36
+  Ka 0.6471 0.6431 0.6275
+  Ks 0.898 0.898 0.898

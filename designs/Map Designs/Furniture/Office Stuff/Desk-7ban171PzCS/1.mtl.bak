@@ -1,0 +1,18 @@
+# File produced by AccuTrans 3D
+
+newmtl _5_Drawer
+  Ns 35.29
+  d 1.0
+  illum 2
+  Kd 0.7412 0.7176 0.6824
+  Ka 0.7412 0.7176 0.6824
+  Ks 0.898 0.898 0.898
+
+newmtl _5_Drawer_1
+  Ns 112.76
+  d 1.0
+  illum 2
+  Kd 0.6118 0.3922 0.2431
+  Ka 0.6118 0.3922 0.2431
+  Ks 0.898 0.898 0.898
+  map_Kd E:\BOIS-0~1.jpg

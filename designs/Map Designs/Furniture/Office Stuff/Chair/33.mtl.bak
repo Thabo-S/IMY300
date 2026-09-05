@@ -1,0 +1,10 @@
+# File produced by AccuTrans 3D
+
+newmtl Bean_Bag
+  Ns 7.35
+  d 1.0
+  illum 2
+  Kd 0.6471 0.2353 0.1608
+  Ka 0.6471 0.2353 0.1608
+  Ks 0.898 0.898 0.898
+  map_Kd E:\STRIPE~1.jpg

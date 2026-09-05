@@ -1,0 +1,25 @@
+#
+## Alias OBJ Material File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+
+newmtl Calendar_Aquamarine
+Ka 0.000000 0.000000 0.000000
+Kd 0.400000 0.803922 0.666667
+Ks 0.330000 0.330000 0.330000
+
+newmtl Calendar_Ivory
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 0.698039
+Ks 0.330000 0.330000 0.330000
+
+newmtl FrontColor
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.330000 0.330000 0.330000
+
+newmtl Calendar_Texture
+Ka 0.000000 0.000000 0.000000
+Kd 0.560784 0.831373 0.854902
+Ks 0.330000 0.330000 0.330000
+map_Kd LowPoly_Calendar/Calendar_Texture.jpg
+
