@@ -24,7 +24,26 @@ public class LoadoutScreenController : MonoBehaviour
 
     private void Start()
     {
-        LoadoutManager.ClearSelection(); 
+        Debug.Log($"--- SAVED IN PLAYERPREFS ---");
+        foreach (var name in ToolLoadout.GetOwnedItemNames())
+        {
+            Debug.Log($"Owned String: '{name}'");
+        }
+
+        Debug.Log($"--- CHECKING CATALOG ITEMS ---");
+        foreach (ItemSO item in allTools)
+        {
+            if (item == null)
+            {
+                Debug.LogWarning("Found NULL item in allTools!");
+                continue;
+            }
+
+            bool owned = ToolLoadout.IsOwned(item);
+            Debug.Log($"SO Name: '{item.name}' | SO itemName field: '{item.itemName}' | IsOwned result: {owned}");
+        }
+
+        LoadoutManager.ClearSelection();
         PopulateLoadoutScreen();
         UpdateLoadoutCountText();
     }
