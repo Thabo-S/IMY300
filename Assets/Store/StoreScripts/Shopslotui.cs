@@ -232,7 +232,7 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         if (success)
         {
-            buyButton.image.color = Color.green;
+            //buyButton.image.color = Color.green;
             RefreshOwnedState();
             PlaySound(buySuccessClip);
         }
@@ -245,6 +245,7 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             if (alreadyOwned)
             {
                 reason = "Already owned";
+               
             }
             else if (!canAfford)
             {
@@ -322,6 +323,6 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         bool owned = ToolLoadout.IsOwned(item);
 
         if (ownedIndicator != null) ownedIndicator.SetActive(owned);
-        if (buyButton != null) buyButton.interactable = !owned;
+        if (buyButton != null) buyButton.gameObject.SetActive(!owned);
     }
 }
