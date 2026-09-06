@@ -1,63 +1,47 @@
 using UnityEngine;
-
+using System.Collections;
+using System;
 public class LaserSecurityScript : MonoBehaviour
 {
-    [Header("Trigger")]
-    [Tooltip("Only objects with this tag trip the laser.")]
-    public string playerTag = "Player";
+    private bool isTriggered = false;
+    public GameObject respawnPoint;
 
-    [Tooltip("If true, the laser can only ever fire once. If false, it re-arms " +
-             "as soon as the player leaves the trigger volume (walking through " +
-             "again will alert the guards again).")]
-    public bool triggerOnce = false;
+    public GameObject laserWarning;
 
-    [Header("Alarm Sound")]
-    [Tooltip("AudioSource that plays the alarm when the laser is tripped. " +
-             "Assign this in the Inspector - typically a source sitting on the " +
-             "laser emitter/panel.")]
-    public AudioSource alarmAudioSource;
-
-    [Tooltip("Alarm clip to play. If left empty, whatever clip is already set " +
-             "on the AudioSource is used instead.")]
-    public AudioClip alarmClip;
-
-    private bool hasTriggered = false;
-
+    private void Start()
+    {
+        if (laserWarning == null)
+            Debug.LogWarning($"{name}: 'laserWarning' is not assigned in the inspector.");
+    }
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag(playerTag)) return;
-        if (triggerOnce && hasTriggered) return;
-
-        hasTriggered = true;
-
-        Vector3 alarmPosition = other.transform.position;
-
-        PlayAlarmSound();
-        AlertAllGuards(alarmPosition);
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag(playerTag)) return;
-        if (!triggerOnce) hasTriggered = false; // re-arm for next crossing
-    }
-
-    private void PlayAlarmSound()
-    {
-        if (alarmAudioSource == null) return;
-
-        if (alarmClip != null)
-            alarmAudioSource.PlayOneShot(alarmClip);
-        else
-            alarmAudioSource.Play();
-    }
-
-    private void AlertAllGuards(Vector3 alarmPosition)
-    {
-        foreach (Guard guard in Guard.AllGuards)
+        if (other.CompareTag("Player") && !isTriggered)
         {
-            if (guard == null) continue; // guard may have been destroyed
-            guard.TriggerLaserAlarm(alarmPosition);
+            isTriggered = true;
+
+            Debug.Log("[LASER] Player triggered the laser, guards alerted!");
+
+            if (laserWarning != null)
+                laserWarning.SetActive(true);
+
+            GameObject player = other.gameObject;
+
+            CharacterController cc = player.GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false;
+
+            player.transform.position = respawnPoint.transform.position;
+
+            if (cc != null) cc.enabled = true;
+
+            if (laserWarning != null)
+                StartCoroutine(TimeWait(4f, laserWarning));
         }
+    }
+
+    public IEnumerator TimeWait(float delay, GameObject panel)
+    {
+        yield return new WaitForSeconds(delay);
+
+        panel.SetActive(false);
     }
 }

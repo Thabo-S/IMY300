@@ -38,6 +38,11 @@ public class PlayerMovement : MonoBehaviour
     public float soundEmitInterval = 0.5f;
     private float soundTimer = 0f;
 
+    [Header("Movement States")]
+    public GameObject walking;
+    public GameObject sprinting;
+    public GameObject crouching;
+
     private Vector3 currentVelocity = Vector3.zero;
     public static class AnimationParams
     {
@@ -51,23 +56,55 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
-
         animator = GetComponentInChildren<Animator>();
-
         standingHeight = characterController.height;
         standingCenter = characterController.center;
-
         cameraScript = GetComponentInChildren<CameraPosition>();
 
-        //playerScript = GetComponent<Player>();
-
+        walking.SetActive(true);
+        sprinting.SetActive(false);
+        crouching.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
         isGrounded = characterController.isGrounded;
-        EmitMovementSound();
+
+        if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        {
+            if (!Step3Trigger.hasTriggered)
+                EmitMovementSound();
+        }
+        else
+        {
+            EmitMovementSound();
+        }
+
+        handleMovementStateIcons();
+    }
+
+    public void handleMovementStateIcons()
+    {
+        if (PauseMenu.isGamePause) return;
+
+        if (speed == walkSpeed)
+        {
+            walking.SetActive(true);
+            sprinting.SetActive(false);
+            crouching.SetActive(false);
+        }
+        else if (speed == sprintSpeed)
+        {
+            walking.SetActive(false);
+            sprinting.SetActive(true);
+            crouching.SetActive(false);
+        }
+        else
+        {
+            walking.SetActive(false);
+            sprinting.SetActive(false);
+            crouching.SetActive(true);
+        }
     }
 
 
@@ -134,18 +171,6 @@ public class PlayerMovement : MonoBehaviour
             //StartCoroutine(JumpWithDelay());
         }
     }
-
-    //private IEnumerator JumpWithDelay()
-    //{
-    //    if (animator != null)
-    //    {
-    //        animator.SetTrigger(AnimationParams.JumpTrigger);
-    //    }
-
-    //    yield return new WaitForSeconds(jumpDelay);
-
-    //    playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
-    //}
 
     // THE PLAYER CAN ALSO ONLY SPRINT IF THEY ARE GROUNDED
     // THIS PREVENTS THE CASE WHERE THE PLAYER IS IN MID AIR

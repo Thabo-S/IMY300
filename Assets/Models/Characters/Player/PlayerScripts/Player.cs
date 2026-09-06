@@ -232,30 +232,29 @@ public class Player : MonoBehaviour
             GameObject hitObject = hit.transform.gameObject;
             float distance = hit.distance;
 
-            // --- Handle Items ---
-            //if (hitObject.CompareTag("canPickUp"))
+            // --- Handle KeyPad ---
+            //if (hitObject.CompareTag("KeyPad"))
             //{
-            //    if (hitObject != currentHighlightedItem)
+            //    if (hitObject != currentHighlightedDoor)
             //    {
-            //        ClearItemHighlight();
+            //        ClearDoorHighlight();
             //        currentHighlightedItem = hitObject;
-            //        ApplyItemHighlight(currentHighlightedItem);
+            //        ApplyDoorHighlight(currentHighlightedDoor);
             //    }
 
+            //    Debug.Log("hitObject found = " + hitObject.name);
+            //    //turn on the Qte Text on top of keypad
 
-            //    if (hitObject.name == "Keycard")
+            //    if (Input.GetKeyDown(KeyCode.E))
             //    {
-            //        //Debug.Log(hitObject.name);
+            //        //keypad interactable for the garage door QTE (Tadi)
+            //        KeypadDoorInteractable keypadInteractable = hitObject.GetComponent<KeypadDoorInteractable>();
 
-            //        ClearItemHighlight();
-            //        currentHighlightedItem = hitObject;
-            //        ApplyItemHighlight(currentHighlightedItem);
-
+            //        if (keypadInteractable != null)
+            //        {
+            //            keypadInteractable.Interact();
+            //        }
             //    }
-            //}
-            //else if (currentHighlightedItem != null) // If out of range or not hitting
-            //{
-            //    ClearItemHighlight();
             //}
 
             // --- Handle Doors ---
@@ -318,23 +317,62 @@ public class Player : MonoBehaviour
 
                 }
             }
-            else if (hitObject.CompareTag("GarageDoor"))
+
+
+            // MOVE TADI'S KEYPAD CHECK HERE AND REMOVE GARAGE DOOR HIGHLIGHTING
+            //else if (hitObject.CompareTag("GarageDoor"))
+            //{
+            //    // CHeck if the player has the keycard, else show the message that
+            //    // says the Keycard is required.
+            //    if (hitObject != currentHighlightedDoor)
+            //    {
+            //        ClearDoorHighlight();
+            //        currentHighlightedDoor = hitObject;
+            //        ApplyDoorHighlight(currentHighlightedDoor);
+            //    }
+
+
+            //    if (Input.GetKeyDown(KeyCode.E))
+            //    {
+            //        hitObject.GetComponent<doorMovement>().ToggleGarageDoor();
+
+            //        Debug.Log("Openning Garage Door!");
+            //    }
+            //}
+            else if (hitObject.CompareTag("KeyPad"))
             {
-                // CHeck if the player has the keycard, else show the message that
-                // says the Keycard is required.
                 if (hitObject != currentHighlightedDoor)
                 {
-                    ClearDoorHighlight();
+                    ClearItemHighlight();
                     currentHighlightedDoor = hitObject;
-                    ApplyDoorHighlight(currentHighlightedDoor);
+                    ApplyItemHighlight(currentHighlightedDoor);
                 }
-
+                //turn on the Qte Text on top of keypad
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    hitObject.GetComponent<doorMovement>().ToggleGarageDoor();
+                    //keypad interactable for the garage door QTE (Tadi)
+                    KeypadDoorInteractable keypadInteractable = hitObject.GetComponent<KeypadDoorInteractable>();
 
-                    Debug.Log("Openning Garage Door!");
+                    if (keypadInteractable != null)
+                    {
+                        keypadInteractable.Interact();
+                    }
+                }
+            }
+            else if (hitObject.CompareTag("Lever"))
+            {
+                if (hitObject != currentHighlightedDoor)
+                {
+                    ClearItemHighlight();
+                    currentHighlightedDoor = hitObject;
+                    ApplyItemHighlight(currentHighlightedDoor);
+                }
+                //turn on the Qte Text on top of keypad
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    hitObject.GetComponent<laser_security_switch>().ToggleSwitch();
                 }
             }
             else if (currentHighlightedDoor != null) // If out of range or not hitting
@@ -355,7 +393,12 @@ public class Player : MonoBehaviour
         {
             if (item != null && item.heldItem != null && item.heldItem.itemName == "Keycard")
             {
-                item.heldItem = null; // THABO VERIFY WHETHER OR NOT THIS IS THE RIGHT WAY TO REMOVE SOMETHING FROM A SLOT
+                item.RemoveAmount(1);
+
+                GameObject inventory = GameObject.FindGameObjectWithTag("Inventory");
+
+                inventory.GetComponent<Inventory>().EquipHandItem();
+
                 break;
             }
         }

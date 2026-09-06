@@ -10,10 +10,17 @@ public class Step4Trigger : MonoBehaviour
     public GameObject guard1;
     public GameObject guard2;
 
+
+    public GameObject lights;
+
     public bool isTriggered = false;
     private void Start()
     {
         tutorialManager = GameObject.FindAnyObjectByType<TutorialManager>();
+
+        guard2.SetActive(false);
+
+        lights.SetActive(false);
     }
 
 
@@ -29,6 +36,8 @@ public class Step4Trigger : MonoBehaviour
             guard1.SetActive(false);
 
             guard2.SetActive(true);
+
+            lights.SetActive(true);
 
             StartCoroutine(TimeWait());
 
