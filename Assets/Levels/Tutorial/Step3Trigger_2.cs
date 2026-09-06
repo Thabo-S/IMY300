@@ -27,7 +27,7 @@ public class Step3Trigger_2 : MonoBehaviour
 
     IEnumerator TimeWait()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
 
         tutorialManager.StartStep3_2();
 

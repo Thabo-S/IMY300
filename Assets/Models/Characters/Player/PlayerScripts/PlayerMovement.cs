@@ -56,26 +56,30 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
-
         animator = GetComponentInChildren<Animator>();
-
         standingHeight = characterController.height;
         standingCenter = characterController.center;
-
         cameraScript = GetComponentInChildren<CameraPosition>();
-
-        //playerScript = GetComponent<Player>();
 
         walking.SetActive(true);
         sprinting.SetActive(false);
         crouching.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
         isGrounded = characterController.isGrounded;
-        EmitMovementSound();
+
+        if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        {
+            if (!Step3Trigger.hasTriggered)
+                EmitMovementSound();
+        }
+        else
+        {
+            EmitMovementSound();
+        }
+
         handleMovementStateIcons();
     }
 

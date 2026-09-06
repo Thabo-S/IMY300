@@ -741,7 +741,7 @@ public class Inventory : MonoBehaviour
         CancelThrowAim();
     }
 
-    private void EquipHandItem()
+    public void EquipHandItem()
     {
         if (currentHandItem != null)
         {

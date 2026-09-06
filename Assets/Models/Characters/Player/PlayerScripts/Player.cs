@@ -393,7 +393,12 @@ public class Player : MonoBehaviour
         {
             if (item != null && item.heldItem != null && item.heldItem.itemName == "Keycard")
             {
-                item.heldItem = null; // THABO VERIFY WHETHER OR NOT THIS IS THE RIGHT WAY TO REMOVE SOMETHING FROM A SLOT
+                item.RemoveAmount(1);
+
+                GameObject inventory = GameObject.FindGameObjectWithTag("Inventory");
+
+                inventory.GetComponent<Inventory>().EquipHandItem();
+
                 break;
             }
         }

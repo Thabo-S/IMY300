@@ -6,6 +6,7 @@ public class Step3Trigger : MonoBehaviour
 {
     public TutorialManager tutorialManager;
     public bool isTriggered = false;
+    public static bool hasTriggered = false;
 
     public GameObject blocker;
     public GameObject step3_2;
@@ -19,8 +20,6 @@ public class Step3Trigger : MonoBehaviour
 
     private void Awake()
     {
-        pathtostep4 = GameObject.Find("Path to step4");
-
         if(pathtostep4 != null)
             pathtostep4.SetActive(false);
 
@@ -40,6 +39,7 @@ private void Start()
         {
             isTriggered = true;
 
+            hasTriggered = true;
 
             pathtostep3.SetActive(false);
 
