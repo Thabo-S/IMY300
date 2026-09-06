@@ -15,8 +15,10 @@ public class TargetTrigger : MonoBehaviour
         tutorialManeger = GameObject.FindAnyObjectByType<TutorialManager>();
 
         player = GameObject.FindGameObjectWithTag("Player");
-    }
 
+        if (player == null)
+            Debug.LogWarning($"{name}: No GameObject tagged 'Player' found in the scene at Start().");
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -24,17 +26,15 @@ public class TargetTrigger : MonoBehaviour
         {
             Debug.Log("[TARGET] Player in the target zone");
 
+            if (player == null)
+                player = GameObject.FindGameObjectWithTag("Player");
+
+
+            isTriggered = true;
+
             disableInputs();
         }
     }
-
-
-    IEnumerator TimeWait()
-    {
-        yield return new WaitForSeconds(3);
-
-    }
-
     public void disableInputs()
     {
         InputMananger input = player.GetComponent<InputMananger>();

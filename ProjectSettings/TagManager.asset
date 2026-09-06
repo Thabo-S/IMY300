@@ -24,6 +24,10 @@ TagManager:
   - Door_Keycard
   - GarageDoor
   - MedKit
+  - KeyPad
+  - Door_Left_Swing
+  - Door_Right_Swing
+  - Lever
   layers:
   - Default
   - TransparentFX

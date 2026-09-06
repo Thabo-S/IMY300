@@ -4,12 +4,14 @@ using UnityEngine;
 public class closeToItem : MonoBehaviour
 {
     public GameObject player;
-    public GameObject worldSpaceText;
-    public float activationDistance = 2f;
+    public float activationDistance = 3f;
+
+    private Canvas canvasToToggle;
 
     private void Start()
     {
         player = GameObject.FindWithTag("Player");
+        canvasToToggle = GetComponent<Canvas>();
     }
 
     private void Update()
@@ -19,18 +21,10 @@ public class closeToItem : MonoBehaviour
 
     private void CheckPlayerDistance()
     {
-        if (player != null && worldSpaceText != null)
+        if (player != null && canvasToToggle != null)
         {
             float distance = Vector3.Distance(transform.position, player.transform.position);
-
-            if (distance <= activationDistance)
-            {
-                worldSpaceText.SetActive(true);
-            }
-            else
-            {
-                worldSpaceText.SetActive(false);
-            }
+            canvasToToggle.enabled = distance <= activationDistance;
         }
     }
 }

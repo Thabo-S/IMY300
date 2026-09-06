@@ -15,12 +15,20 @@ public class Step3Trigger : MonoBehaviour
     [Header("Directions")]
     public GameObject pathtostep3;
     public GameObject pathtostep4;
+
+
+    private void Awake()
+    {
+        pathtostep4 = GameObject.Find("Path to step4");
+
+        if(pathtostep4 != null)
+            pathtostep4.SetActive(false);
+    }
     private void Start()
     {
         tutorialManager = GameObject.Find("TutorialManager").GetComponent<TutorialManager>();
         step2doorMovement = step2Door.GetComponent<doorMovement>();
 
-        pathtostep4.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)

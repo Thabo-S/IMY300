@@ -320,25 +320,25 @@ public class Player : MonoBehaviour
 
 
             // MOVE TADI'S KEYPAD CHECK HERE AND REMOVE GARAGE DOOR HIGHLIGHTING
-            else if (hitObject.CompareTag("GarageDoor"))
-            {
-                // CHeck if the player has the keycard, else show the message that
-                // says the Keycard is required.
-                if (hitObject != currentHighlightedDoor)
-                {
-                    ClearDoorHighlight();
-                    currentHighlightedDoor = hitObject;
-                    ApplyDoorHighlight(currentHighlightedDoor);
-                }
+            //else if (hitObject.CompareTag("GarageDoor"))
+            //{
+            //    // CHeck if the player has the keycard, else show the message that
+            //    // says the Keycard is required.
+            //    if (hitObject != currentHighlightedDoor)
+            //    {
+            //        ClearDoorHighlight();
+            //        currentHighlightedDoor = hitObject;
+            //        ApplyDoorHighlight(currentHighlightedDoor);
+            //    }
 
 
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    hitObject.GetComponent<doorMovement>().ToggleGarageDoor();
+            //    if (Input.GetKeyDown(KeyCode.E))
+            //    {
+            //        hitObject.GetComponent<doorMovement>().ToggleGarageDoor();
 
-                    Debug.Log("Openning Garage Door!");
-                }
-            }
+            //        Debug.Log("Openning Garage Door!");
+            //    }
+            //}
             else if (hitObject.CompareTag("KeyPad"))
             {
                 if (hitObject != currentHighlightedDoor)
@@ -358,6 +358,21 @@ public class Player : MonoBehaviour
                     {
                         keypadInteractable.Interact();
                     }
+                }
+            }
+            else if (hitObject.CompareTag("Lever"))
+            {
+                if (hitObject != currentHighlightedDoor)
+                {
+                    ClearItemHighlight();
+                    currentHighlightedDoor = hitObject;
+                    ApplyItemHighlight(currentHighlightedDoor);
+                }
+                //turn on the Qte Text on top of keypad
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    hitObject.GetComponent<laser_security_switch>().ToggleSwitch();
                 }
             }
             else if (currentHighlightedDoor != null) // If out of range or not hitting
