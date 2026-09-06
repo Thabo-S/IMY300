@@ -25,6 +25,14 @@ public class PlayerMovement : MonoBehaviour
     public float sneakSpeed = 1f;
     public float jumpHeight = 0.56f;
 
+    [Header("Temporary Speed Boost")]
+    [Tooltip("Multiplies actual movement on top of 'speed' - kept separate " +
+             "so sprint/crouch toggling (which directly overwrites 'speed') " +
+             "doesn't cancel a boost early, and so handleMovementStateIcons()'s " +
+             "exact speed== checks aren't thrown off by a boosted value.")]
+    private float speedMultiplier = 1f;
+    private Coroutine speedBoostRoutine;
+
     [Header("Crouch Dimensions")]
     private float standingHeight;
     private Vector3 standingCenter;
@@ -118,9 +126,9 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
         move = transform.TransformDirection(move);
-        characterController.Move(move * speed * Time.deltaTime);
+        characterController.Move(move * speed * speedMultiplier * Time.deltaTime);
 
-        currentVelocity = move * speed;
+        currentVelocity = move * speed * speedMultiplier;
 
         // 2. Gravity Logic
         if (isGrounded && playerVelocity.y < 0)
@@ -194,6 +202,24 @@ public class PlayerMovement : MonoBehaviour
             speed = isCrouching ? sneakSpeed : walkSpeed;
             if (animator != null) animator.SetBool(AnimationParams.IsSprinting, false);
         }
+    }
+
+    public void ApplyTemporarySpeedBoost(float multiplier, float duration)
+    {
+        if (speedBoostRoutine != null)
+        {
+            StopCoroutine(speedBoostRoutine);
+        }
+
+        speedBoostRoutine = StartCoroutine(SpeedBoostRoutine(multiplier, duration));
+    }
+
+    private IEnumerator SpeedBoostRoutine(float multiplier, float duration)
+    {
+        speedMultiplier = multiplier;
+        yield return new WaitForSeconds(duration);
+        speedMultiplier = 1f;
+        speedBoostRoutine = null;
     }
 
     public void playerCrouch()
