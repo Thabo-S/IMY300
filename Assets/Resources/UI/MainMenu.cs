@@ -14,6 +14,9 @@ public class MainMenu : MonoBehaviour
 
     private Coroutine logoMoveCoroutine;
 
+    public string store = "Store";
+
+
 
     private void Start()
     {
@@ -55,6 +58,16 @@ public class MainMenu : MonoBehaviour
     public void showLevelSelectOverlay()
     {
         LevelSelectOverlay.SetActive(true);
+    }
+
+    public void StoreLoad()
+    {
+        if (string.IsNullOrEmpty(store))
+        {
+            Debug.LogWarning("[MainMenu] Store Scnene name is not set.");
+            return;
+        }
+        SceneManager.LoadScene(store);
     }
 
     public void QuitGame()

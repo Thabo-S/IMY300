@@ -17,3 +17,7 @@ MonoBehaviour:
   maxStackSize: 1
   itemPrefab: {fileID: 6073704666327855886, guid: 950e38b154c6a724984dbb53907a374a, type: 3}
   handItemPrefab: {fileID: 0}
+  value: 700
+  purchasable: 0
+  price: 0
+  description: 

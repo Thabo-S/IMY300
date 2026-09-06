@@ -6,8 +6,10 @@ public class Step3Trigger : MonoBehaviour
 {
     public TutorialManager tutorialManager;
     public bool isTriggered = false;
+    public static bool hasTriggered = false;
 
     public GameObject blocker;
+    public GameObject step3_2;
 
     public GameObject step2Door;
     public doorMovement step2doorMovement;
@@ -16,15 +18,15 @@ public class Step3Trigger : MonoBehaviour
     public GameObject pathtostep3;
     public GameObject pathtostep4;
 
-
     private void Awake()
     {
-        pathtostep4 = GameObject.Find("Path to step4");
-
         if(pathtostep4 != null)
             pathtostep4.SetActive(false);
-    }
-    private void Start()
+
+        step3_2.SetActive(false);
+
+}
+private void Start()
     {
         tutorialManager = GameObject.Find("TutorialManager").GetComponent<TutorialManager>();
         step2doorMovement = step2Door.GetComponent<doorMovement>();
@@ -37,8 +39,10 @@ public class Step3Trigger : MonoBehaviour
         {
             isTriggered = true;
 
+            hasTriggered = true;
 
             pathtostep3.SetActive(false);
+
             pathtostep4.SetActive(true);
 
             step2doorMovement.ToggleDoor();
@@ -59,6 +63,8 @@ public class Step3Trigger : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         tutorialManager.StartStep3();
+
+        step3_2.SetActive(true);
 
         Vector3 scale = gameObject.transform.localScale;
         scale.y = 0.25f;

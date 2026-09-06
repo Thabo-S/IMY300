@@ -28,6 +28,9 @@ TagManager:
   - Door_Left_Swing
   - Door_Right_Swing
   - Lever
+  - Inventory
+  - Torch
+  - Adrenaline
   layers:
   - Default
   - TransparentFX

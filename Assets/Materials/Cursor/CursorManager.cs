@@ -8,14 +8,41 @@ public class CursorManager : MonoBehaviour
     public Texture2D cursorTexture;
     public Vector2 hotSpot = Vector2.zero;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip clickSound;
+
     private void Awake()
     {
         instance = this;
+
+        // Auto-fetch AudioSource on the same GameObject if not assigned in Inspector
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     private void Start()
     {
         ApplyCursorTexture();
+    }
+
+    private void Update()
+    {
+        // Plays sound only when cursor is unlocked (in menus/panels)
+        if (Cursor.lockState != CursorLockMode.Locked && Input.GetMouseButtonDown(0))
+        {
+            PlayClickSound();
+        }
+    }
+
+    private void PlayClickSound()
+    {
+        if (audioSource != null && clickSound != null)
+        {
+            audioSource.PlayOneShot(clickSound);
+        }
     }
 
     private void ApplyCursorTexture()
