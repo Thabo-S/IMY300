@@ -34,6 +34,7 @@ public class TutorialManager : MonoBehaviour
     public GameObject step1Panel;
     public GameObject step2Panel;
     public GameObject step3Panel;
+    public GameObject step3Panel_2;
     public GameObject step4Panel;
     public GameObject step5Panel;
     public GameObject step6Panel;
@@ -177,7 +178,7 @@ public class TutorialManager : MonoBehaviour
         StartCoroutine(TimeWait(4f, PlayerWarning));
     }
 
-    // ---------------- STEP 3: Picking Up & Throwing ----------------
+    // ---------------- STEP 3: Picking Up ----------------
 
     public void StartStep3()
     {
@@ -187,6 +188,17 @@ public class TutorialManager : MonoBehaviour
     public void hideStep3()
     {
         HidePanel(step3Panel);
+    }
+    // ---------------- STEP 3.5: Throwing ----------------
+
+    public void StartStep3_2()
+    {
+        ShowPanel(step3Panel_2);
+    }
+
+    public void hideStep3_2()
+    {
+        HidePanel(step3Panel_2);
     }
 
     // ---------------- STEP 4: Warning Zone and Getting Caught ----------------
