@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
-  m_Name: Crown_ItemSO
+  m_Name: AdrenalineSO
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: Crown
-  icon: {fileID: 1286363165, guid: 8e767e5d34fcb094ab25e33ec635cb2e, type: 3}
-  maxStackSize: 1
-  itemPrefab: {fileID: 386817010620559591, guid: 8edee58da220efd45b9c6b69847b2960, type: 3}
+  itemName: Adernaline
+  icon: {fileID: 21300000, guid: d009a2c3d0affff4aa0f255d37dbacc7, type: 3}
+  maxStackSize: 0
+  itemPrefab: {fileID: 919132149155446097, guid: f7e1afe41d12de5498bcb8e21eb0cfb4, type: 3}
   handItemPrefab: {fileID: 0}
   value: 0
   purchasable: 1
-  price: 10
-  description: 'Crown meant for royalty '
+  price: 40
+  description: Gives the player a temporary health and speed boost
