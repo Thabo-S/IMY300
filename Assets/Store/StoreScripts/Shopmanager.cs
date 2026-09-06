@@ -1,14 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-using Unity.VectorGraphics;
 using UnityEngine.SceneManagement;
+using TMPro;
 
-/// <summary>
-/// Drives the pre-level shop screen: lists purchasable ItemSOs, spawns a
-/// ShopSlotUI per item, and handles the actual currency deduction /
-/// ownership recording when a purchase is attempted.
-/// </summary>
 public class ShopManager : MonoBehaviour
 {
     [Header("Shop Contents")]
@@ -20,7 +14,9 @@ public class ShopManager : MonoBehaviour
     public ShopSlotUI slotPrefab;
     public TextMeshProUGUI balanceText;
 
-    public string MainMenu = "Main Menu";
+    [Header("Leave Button")]
+    [Tooltip("Scene to load when the Leave button is clicked.")]
+    public string leaveSceneName = "Main Menu";
 
     private readonly List<ShopSlotUI> spawnedSlots = new List<ShopSlotUI>();
 
@@ -64,7 +60,7 @@ public class ShopManager : MonoBehaviour
         }
     }
 
- 
+
     private bool TryPurchase(ItemSO item)
     {
         if (item == null) return false;
@@ -91,13 +87,14 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    public void MainMenuLoad()
+    public void OnLeaveClicked()
     {
-        if (string.IsNullOrEmpty(MainMenu))
+        if (string.IsNullOrEmpty(leaveSceneName))
         {
-            Debug.Log("Main Menu scene name may be wrong");
+            Debug.LogWarning("[ShopManager] Leave Scene Name is not set.");
             return;
         }
-        SceneManager.LoadScene(MainMenu);
+
+        SceneManager.LoadScene(leaveSceneName);
     }
 }

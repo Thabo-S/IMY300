@@ -17,13 +17,8 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public GameObject ownedIndicator;
 
     [Header("Info Toggle")]
-    [Tooltip("The Button that toggles between normal view and description view.")]
     public Button infoButton;
-    [Tooltip("Container holding everything shown normally - name, price, buy " +
-             "button. Hidden while the description is showing.")]
     public GameObject normalViewRoot;
-    [Tooltip("Container holding just the description text. Hidden by default, " +
-             "shown in place of normalViewRoot when Info is clicked.")]
     public GameObject descriptionViewRoot;
 
     private ItemSO item;
@@ -31,35 +26,39 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private bool showingDescription = false;
 
     [Header("Highlight Settings")]
-    [Tooltip("The border/background shown while hovering OR while this slot " +
-             "is the selected one. Expected child named \"SelectionBar\".")]
     public GameObject selectionBar;
-    [Tooltip("Optional - the Image component used for a material-based hover " +
-             "swap instead of/alongside SelectionBar. Leave unassigned if " +
-             "you're only using SelectionBar.")]
     public Image highlightTarget;
     public Material highlightMaterial;
 
-    [Header("Purchase Feedback")]
-    [Tooltip("Color the Buy button flashes when a purchase fails (e.g. can't afford it).")]
+    [Header("Purchase Feedback - Visual")]
     public Color failFlashColor = Color.red;
-    [Tooltip("How long the fail flash lasts before returning to normal.")]
     public float flashDuration = 0.4f;
+
+    [Header("Purchase Feedback - Message")]
+    [Tooltip("A small TMP text (e.g. below the Buy button) that shows WHY a " +
+             "purchase failed, visible to the player - not just the console. " +
+             "Auto-hides after Message Duration. Leave unassigned to skip.")]
+    public TextMeshProUGUI feedbackText;
+    public float messageDuration = 1.5f;
+
+    [Header("Purchase Feedback - Audio")]
+    [Tooltip("Auto-adds an AudioSource if none is found on this GameObject.")]
+    public AudioSource audioSource;
+    public AudioClip buySuccessClip;
+    public AudioClip buyFailClip;
 
     private Material defaultMaterial;
     private Color buyButtonDefaultColor;
     private Coroutine flashRoutine;
+    private Coroutine messageRoutine;
 
     private bool isHovering = false;
     private bool isSelected = false;
 
-    // Only one slot across the whole grid is "selected" (clicked) at a time -
-    // clicking a new one deselects whichever was selected before.
     private static ShopSlotUI currentlySelected;
 
     private void Awake()
     {
-
         if (highlightTarget != null)
         {
             defaultMaterial = highlightTarget.material;
@@ -74,17 +73,31 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         if (normalViewRoot == null) normalViewRoot = FindChildByName("NormalView");
         if (descriptionViewRoot == null) descriptionViewRoot = FindChildByName("DetailsView");
         if (selectionBar == null) selectionBar = FindChildByName("SelectionBar");
+        if (feedbackText == null) feedbackText = FindComponentInChildByName<TextMeshProUGUI>("FeedbackText");
 
         if (descriptionText == null && descriptionViewRoot != null)
         {
-            // Description text lives inside DetailsView rather than being
-            // named uniquely itself, so search within that subtree.
             descriptionText = descriptionViewRoot.GetComponentInChildren<TextMeshProUGUI>(true);
         }
 
         if (buyButton != null && buyButton.image != null)
         {
             buyButtonDefaultColor = buyButton.image.color;
+        }
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.playOnAwake = false;
+            }
+        }
+
+        if (feedbackText != null)
+        {
+            feedbackText.text = "";
         }
 
         RefreshSelectionBar();
@@ -96,10 +109,10 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         isHovering = true;
         RefreshSelectionBar();
 
-        //if (highlightTarget != null && highlightMaterial != null)
-        //{
-        //    highlightTarget.material = highlightMaterial;
-        //}
+        if (highlightTarget != null && highlightMaterial != null)
+        {
+            highlightTarget.material = highlightMaterial;
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -107,19 +120,14 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         isHovering = false;
         RefreshSelectionBar();
 
-        //if (highlightTarget != null)
-        //{
-        //    highlightTarget.material = defaultMaterial;
-        //}
+        if (highlightTarget != null)
+        {
+            highlightTarget.material = defaultMaterial;
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Clicking directly on BuyBTN/DetailsBTN is handled by their own
-        // Button.onClick listeners and won't reach here (Unity's EventSystem
-        // sends the click to the topmost raycast target only). This fires
-        // for clicks anywhere else on the tile - selecting it for highlight
-        // purposes, separate from buying or viewing details.
         SetSelected(true);
     }
 
@@ -149,7 +157,6 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             selectionBar.SetActive(isHovering || isSelected);
         }
     }
-
 
     private GameObject FindChildByName(string childName)
     {
@@ -186,7 +193,8 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         if (descriptionViewRoot == null) Debug.LogWarning($"[ShopSlotUI] '{name}': could not auto-wire 'descriptionViewRoot' (expected child named \"DetailsView\").", this);
         if (descriptionText == null) Debug.LogWarning($"[ShopSlotUI] '{name}': could not auto-wire 'descriptionText' (expected a TMP text under \"DetailsView\").", this);
         if (selectionBar == null) Debug.LogWarning($"[ShopSlotUI] '{name}': could not auto-wire 'selectionBar' (expected child named \"SelectionBar\").", this);
-
+        // feedbackText is optional - no warning if missing, since not every
+        // slot design needs an inline failure message.
     }
 
     public void Setup(ItemSO itemToDisplay, Func<ItemSO, bool> purchaseCallback)
@@ -226,23 +234,55 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             buyButton.image.color = Color.green;
             RefreshOwnedState();
+            PlaySound(buySuccessClip);
         }
         else
         {
             bool alreadyOwned = ToolLoadout.IsOwned(item);
             bool canAfford = CurrencyManager.GetBalance() >= item.price;
 
+            string reason;
             if (alreadyOwned)
             {
-                Debug.Log($"[ShopSlotUI] '{item.itemName}' is already owned.");
+                reason = "Already owned";
             }
             else if (!canAfford)
             {
-                Debug.Log($"[ShopSlotUI] Can't afford '{item.itemName}' - " +
-                          $"balance ${CurrencyManager.GetBalance()}, price ${item.price}.");
+                int shortBy = item.price - CurrencyManager.GetBalance();
+                reason = $"Need ${shortBy} more";
+            }
+            else
+            {
+                reason = "Can't buy this right now";
             }
 
+            ShowFeedbackMessage(reason);
             FlashBuyButtonRed();
+            PlaySound(buyFailClip);
+        }
+    }
+
+    private void ShowFeedbackMessage(string message)
+    {
+        if (feedbackText == null) return;
+
+        if (messageRoutine != null) StopCoroutine(messageRoutine);
+        messageRoutine = StartCoroutine(MessageRoutine(message));
+    }
+
+    private IEnumerator MessageRoutine(string message)
+    {
+        feedbackText.text = message;
+        yield return new WaitForSeconds(messageDuration);
+        feedbackText.text = "";
+        messageRoutine = null;
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
         }
     }
 
@@ -277,16 +317,11 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             descriptionViewRoot.SetActive(showingDescription);
     }
 
-private void RefreshOwnedState()
-{
-    bool owned = ToolLoadout.IsOwned(item);
-
-    if (ownedIndicator != null) 
-        ownedIndicator.SetActive(owned);
-
-    if (buyButton != null)
+    private void RefreshOwnedState()
     {
-        buyButton.gameObject.SetActive(!owned);
+        bool owned = ToolLoadout.IsOwned(item);
+
+        if (ownedIndicator != null) ownedIndicator.SetActive(owned);
+        if (buyButton != null) buyButton.interactable = !owned;
     }
-}
 }
