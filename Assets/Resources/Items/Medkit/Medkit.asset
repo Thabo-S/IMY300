@@ -10,11 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
-  m_Name: Medkit
+  m_Name: MedKit
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemName: MedKit
   icon: {fileID: 1042802959, guid: a079e467e30dc2d46b72503761369220, type: 3}
-  maxStackSize: 2
+  maxStackSize: 1
   itemPrefab: {fileID: 4185105213926453150, guid: a1caf27a3e1096a4eaa5000a00100e14, type: 3}
   handItemPrefab: {fileID: 0}
-  value: 1
+  value: 50
+  purchasable: 0
+  price: 0
+  description: 

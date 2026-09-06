@@ -19,6 +19,7 @@ public class Inventory : MonoBehaviour
     public Camera playerCamera;
     public PlayerLookAround playerLookAround;
     public Player player;
+    public PlayerMovement playerMovement;
 
     [Header("Progress UI")]
     [Tooltip("Reference to the level's progress bar, updated whenever an item is added.")]
@@ -50,6 +51,17 @@ public class Inventory : MonoBehaviour
     public Transform hand;
     private GameObject currentHandItem;
 
+    [Header("Torch")]
+    [Tooltip("A fixed Light already sitting in the scene (e.g. child of Main " +
+             "Camera), normally disabled. Toggled on/off when the Torch is " +
+             "equipped and F is pressed - no handItemPrefab involved.")]
+    public Light torchLight;
+
+    [Header("Adrenaline")]
+    public int adrenalineHealthIncrease = 20;
+    public float adrenalineSpeedMultiplier = 1.5f;
+    public float adrenalineDuration = 5f;
+
     [Header("Throwing System")]
     public Transform throwPoint;
     public float throwForce = 30f;
@@ -76,11 +88,6 @@ public class Inventory : MonoBehaviour
 
     private void Awake()
     {
-        // Clear first: if hotbarSlots/inventorySlots were ALSO manually
-        // populated in the Inspector (they're public lists, so easy to drag
-        // references into by accident) in addition to hotbarObject /
-        // inventorySlotParent being assigned, AddRange() would previously
-        // append on top of those - silently growing past the intended count.
         hotbarSlots.Clear();
         inventorySlots.Clear();
         allSlots.Clear();
@@ -97,6 +104,7 @@ public class Inventory : MonoBehaviour
         allSlots.AddRange(inventorySlots);
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
     }
 
     private void Start()
@@ -149,12 +157,6 @@ public class Inventory : MonoBehaviour
         if (!IsOpen)
         {
             DetectLookedAtItem();
-
-            // NOTE: Pickup is now handled exclusively via the new Input System
-            // (see InputMananger.cs -> pickUp.PickUpObject.performed -> TryPickupItem()).
-            // Having a second binding here caused a single E press to fire
-            // TryPickupItem() twice, duplicating/over-stacking picked up items.
-
             HandleHotbarSelection();
             HandleDropEquippedItem();
             HandleThrowingLogic();
@@ -172,7 +174,7 @@ public class Inventory : MonoBehaviour
 
         UpdateHotbarOpacity();
 
-        if(Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))
             useSelectedItem();
     }
 
@@ -405,12 +407,79 @@ public class Inventory : MonoBehaviour
 
     #region Add Item Logic
 
+    //public void AddItem(ItemSO itemToAdd, int amount = 1)
+    //{
+    //    if (itemToAdd == null) return;
+
+    //    int remaining = amount;
+
+    //    foreach (Slot slot in allSlots)
+    //    {
+    //        if (slot.HasItem() && slot.GetItem() == itemToAdd)
+    //        {
+    //            int currentAmount = slot.GetAmount();
+    //            int maxStack = itemToAdd.maxStackSize;
+
+    //            if (currentAmount < maxStack)
+    //            {
+    //                int spaceLeft = maxStack - currentAmount;
+    //                int amountToAdd = Mathf.Min(spaceLeft, remaining);
+
+    //                slot.SetItem(itemToAdd, currentAmount + amountToAdd);
+    //                remaining -= amountToAdd;
+
+    //                if (remaining <= 0)
+    //                {
+    //                    ReportItemsCollected(itemToAdd, amount - remaining);
+    //                    return;
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    foreach (Slot slot in allSlots)
+    //    {
+    //        if (!slot.HasItem())
+    //        {
+    //            int amountToPlace = Mathf.Min(itemToAdd.maxStackSize, remaining);
+    //            slot.SetItem(itemToAdd, amountToPlace);
+    //            remaining -= amountToPlace;
+
+    //            if (remaining <= 0)
+    //            {
+    //                ReportItemsCollected(itemToAdd, amount - remaining);
+    //                return;
+    //            }
+    //        }
+    //    }
+
+    //    if (remaining > 0)
+    //    {
+    //        Debug.LogWarning($"Inventory is full! Could not add {remaining} of {itemToAdd.itemName}");
+    //    }
+
+    //    // Report whatever partial amount did make it in, even if the
+    //    // inventory filled up before placing everything.
+    //    int amountActuallyAdded = amount - remaining;
+    //    if (amountActuallyAdded > 0)
+    //    {
+    //        ReportItemsCollected(itemToAdd, amountActuallyAdded);
+    //    }
+    //}
+
     public void AddItem(ItemSO itemToAdd, int amount = 1)
     {
-        if (itemToAdd == null) return;
+        if (itemToAdd == null)
+        {
+            Debug.LogWarning("[Inventory] AddItem called with null item.");
+            return;
+        }
+
+        Debug.Log($"[Inventory] Attempting to add '{itemToAdd.itemName}' (Amount: {amount}). Total available slots in allSlots: {allSlots.Count}");
 
         int remaining = amount;
 
+        // Try stacking onto existing slots
         foreach (Slot slot in allSlots)
         {
             if (slot.HasItem() && slot.GetItem() == itemToAdd)
@@ -426,6 +495,8 @@ public class Inventory : MonoBehaviour
                     slot.SetItem(itemToAdd, currentAmount + amountToAdd);
                     remaining -= amountToAdd;
 
+                    Debug.Log($"[Inventory] Stacked {amountToAdd} x '{itemToAdd.itemName}' into existing slot. Remaining: {remaining}");
+
                     if (remaining <= 0)
                     {
                         ReportItemsCollected(itemToAdd, amount - remaining);
@@ -435,6 +506,7 @@ public class Inventory : MonoBehaviour
             }
         }
 
+        // Try placing in an empty slot
         foreach (Slot slot in allSlots)
         {
             if (!slot.HasItem())
@@ -442,6 +514,8 @@ public class Inventory : MonoBehaviour
                 int amountToPlace = Mathf.Min(itemToAdd.maxStackSize, remaining);
                 slot.SetItem(itemToAdd, amountToPlace);
                 remaining -= amountToPlace;
+
+                Debug.Log($"[Inventory] Placed {amountToPlace} x '{itemToAdd.itemName}' into empty slot '{slot.gameObject.name}'. Remaining: {remaining}");
 
                 if (remaining <= 0)
                 {
@@ -453,11 +527,9 @@ public class Inventory : MonoBehaviour
 
         if (remaining > 0)
         {
-            Debug.LogWarning($"Inventory is full! Could not add {remaining} of {itemToAdd.itemName}");
+            Debug.LogWarning($"[Inventory] Inventory full! Could not add {remaining} x '{itemToAdd.itemName}'. Check if allSlots is properly initialized.");
         }
 
-        // Report whatever partial amount did make it in, even if the
-        // inventory filled up before placing everything.
         int amountActuallyAdded = amount - remaining;
         if (amountActuallyAdded > 0)
         {
@@ -694,15 +766,59 @@ public class Inventory : MonoBehaviour
 
             EquipHandItem();
         }
+        else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Torch"))
+        {
+            if (torchLight != null)
+            {
+                torchLight.enabled = !torchLight.enabled;
+            }
+            else
+            {
+                Debug.LogWarning("[Inventory] Torch equipped but Torch Light is not assigned in the Inspector.");
+            }
+        }
+        else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))
+        {
+            player.RecoupHealth(adrenalineHealthIncrease);
+
+            if (playerMovement != null)
+            {
+                playerMovement.ApplyTemporarySpeedBoost(adrenalineSpeedMultiplier, adrenalineDuration);
+            }
+            else
+            {
+                Debug.LogWarning("[Inventory] Adrenaline used but Player Movement is not assigned.");
+            }
+
+            equippedSlot.RemoveAmount(1);
+
+            EquipHandItem();
+        }
     }
+
+    //private void UpdateHotbarOpacity()
+    //{
+    //    for (int i = 0; i < hotbarSlots.Count; i++)
+    //    {
+    //        Image icon = hotbarSlots[i].GetComponent<Image>();
+    //        if (icon != null)
+    //        {
+    //            icon.color = (i == equippedHotbarIndex)
+    //                ? new Color(1f, 1f, 1f, equippedOpacity)
+    //                : new Color(1f, 1f, 1f, normalOpacity);
+    //        }
+    //    }
+    //}
+
     private void UpdateHotbarOpacity()
     {
         for (int i = 0; i < hotbarSlots.Count; i++)
         {
-            Image icon = hotbarSlots[i].GetComponent<Image>();
-            if (icon != null)
+            // Get root image (background) or target your background Image explicitly
+            Image bg = hotbarSlots[i].GetComponent<Image>();
+            if (bg != null)
             {
-                icon.color = (i == equippedHotbarIndex)
+                bg.color = (i == equippedHotbarIndex)
                     ? new Color(1f, 1f, 1f, equippedOpacity)
                     : new Color(1f, 1f, 1f, normalOpacity);
             }

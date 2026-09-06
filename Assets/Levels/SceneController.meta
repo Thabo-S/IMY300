@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Levels/SceneController.meta
 guid: cb1a754e27ccce648aead0b7d903eecc
+========
+guid: 861d2cf7c5076974cb8e9210c1003e94
+>>>>>>>> coding/store:Assets/Resources/Items/ShopItems.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

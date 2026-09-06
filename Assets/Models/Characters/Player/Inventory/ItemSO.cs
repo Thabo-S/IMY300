@@ -24,4 +24,23 @@ public class ItemSO : ScriptableObject
     [Tooltip("Shown in the shop's item description text.")]
     [TextArea(2, 4)]
     public string description;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (!purchasable) return;
+
+        if (icon == null)
+            Debug.LogWarning($"[ItemSO] '{name}' is purchasable but has no Icon set.", this);
+
+        if (price <= 0)
+            Debug.LogWarning($"[ItemSO] '{name}' is purchasable but Price is {price}.", this);
+
+        if (string.IsNullOrWhiteSpace(description))
+            Debug.LogWarning($"[ItemSO] '{name}' is purchasable but Description is empty.", this);
+
+        if (string.IsNullOrWhiteSpace(itemName))
+            Debug.LogWarning($"[ItemSO] '{name}' is purchasable but Item Name is empty.", this);
+    }
+#endif
 }

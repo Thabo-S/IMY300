@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Resources/UI/controls/leftClick2.png.meta
 guid: f440ee0c358007448ae3778630cd1ef6
+========
+guid: 8c3ec627872b30841974953ca5f38471
+>>>>>>>> coding/store:Assets/Store/Orange Border.png.meta
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
