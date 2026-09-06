@@ -18,12 +18,19 @@ public class LoadoutScreenController : MonoBehaviour
 
     [Header("Mission Start")]
     [Tooltip("Scene to load once the player confirms their loadout.")]
-    public string missionSceneName;
+    //public string missionSceneName;
+
+    private string[] Levels = { "Tutorial", "Level 1", "Level 2" ,"Level 3"};
+
+    private int LevelIndex;
+
 
     private readonly List<LoadoutSlotUI> spawnedSlots = new List<LoadoutSlotUI>();
 
     private void Start()
     {
+        LevelIndex = PlayerPrefs.GetInt("LevelIndex");
+
         Debug.Log($"--- SAVED IN PLAYERPREFS ---");
         foreach (var name in ToolLoadout.GetOwnedItemNames())
         {
@@ -98,12 +105,14 @@ public class LoadoutScreenController : MonoBehaviour
 
     public void OnStartMissionClicked()
     {
-        if (string.IsNullOrEmpty(missionSceneName))
+        if (string.IsNullOrEmpty(Levels[LevelIndex]))
         {
             Debug.LogWarning("[LoadoutScreenController] Mission Scene Name is not set.");
             return;
         }
 
-        SceneManager.LoadScene(missionSceneName);
+        SceneManager.LoadScene(Levels[LevelIndex]);
     }
+
+    
 }
