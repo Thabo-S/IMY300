@@ -169,6 +169,7 @@ public class TutorialManager : MonoBehaviour
         PlayerWarning.SetActive(true);
 
         CharacterController cc = player.GetComponent<CharacterController>();
+
         if (cc != null) cc.enabled = false;
 
         player.transform.position = spawnPoint.transform.position;

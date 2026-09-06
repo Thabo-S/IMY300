@@ -10,27 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
-<<<<<<<< HEAD:Assets/Resources/Items/Medkit/Medkit.asset
-  m_Name: Medkit
+  m_Name: MedKit
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemName: MedKit
   icon: {fileID: 1042802959, guid: a079e467e30dc2d46b72503761369220, type: 3}
-  maxStackSize: 2
+  maxStackSize: 1
   itemPrefab: {fileID: 4185105213926453150, guid: a1caf27a3e1096a4eaa5000a00100e14, type: 3}
   handItemPrefab: {fileID: 0}
-  value: 1
-========
-  m_Name: FlashlightSO
-  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: Flashlight
-  icon: {fileID: 21300000, guid: 80df198730c74ee45b72148423bc620e, type: 3}
-  maxStackSize: 1
-  itemPrefab: {fileID: 919132149155446097, guid: bd01c92cdda14ba4b87389da00da3b8a, type: 3}
-  handItemPrefab: {fileID: 0}
-  value: 0
-  purchasable: 1
-  price: 150
-  description: 'This item allows a player to shine light in dark areas
-
-'
->>>>>>>> coding/store:Assets/Resources/Items/ShopItems/FlashlightSO.asset
+  value: 50
+  purchasable: 0
+  price: 0
+  description: 
