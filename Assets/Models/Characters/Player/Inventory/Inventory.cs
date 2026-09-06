@@ -19,6 +19,7 @@ public class Inventory : MonoBehaviour
     public Camera playerCamera;
     public PlayerLookAround playerLookAround;
     public Player player;
+    public PlayerMovement playerMovement;
 
     [Header("Progress UI")]
     [Tooltip("Reference to the level's progress bar, updated whenever an item is added.")]
@@ -49,6 +50,17 @@ public class Inventory : MonoBehaviour
     [Header("Hand Equipment")]
     public Transform hand;
     private GameObject currentHandItem;
+
+    [Header("Torch")]
+    [Tooltip("A fixed Light already sitting in the scene (e.g. child of Main " +
+             "Camera), normally disabled. Toggled on/off when the Torch is " +
+             "equipped and F is pressed - no handItemPrefab involved.")]
+    public Light torchLight;
+
+    [Header("Adrenaline")]
+    public int adrenalineHealthIncrease = 20;
+    public float adrenalineSpeedMultiplier = 1.5f;
+    public float adrenalineDuration = 5f;
 
     [Header("Throwing System")]
     public Transform throwPoint;
@@ -92,6 +104,7 @@ public class Inventory : MonoBehaviour
         allSlots.AddRange(inventorySlots);
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
     }
 
     private void Start()
@@ -161,7 +174,7 @@ public class Inventory : MonoBehaviour
 
         UpdateHotbarOpacity();
 
-        if(Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))
             useSelectedItem();
     }
 
@@ -753,7 +766,36 @@ public class Inventory : MonoBehaviour
 
             EquipHandItem();
         }
+        else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Torch"))
+        {
+            if (torchLight != null)
+            {
+                torchLight.enabled = !torchLight.enabled;
+            }
+            else
+            {
+                Debug.LogWarning("[Inventory] Torch equipped but Torch Light is not assigned in the Inspector.");
+            }
+        }
+        else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))
+        {
+            player.RecoupHealth(adrenalineHealthIncrease);
+
+            if (playerMovement != null)
+            {
+                playerMovement.ApplyTemporarySpeedBoost(adrenalineSpeedMultiplier, adrenalineDuration);
+            }
+            else
+            {
+                Debug.LogWarning("[Inventory] Adrenaline used but Player Movement is not assigned.");
+            }
+
+            equippedSlot.RemoveAmount(1);
+
+            EquipHandItem();
+        }
     }
+
     //private void UpdateHotbarOpacity()
     //{
     //    for (int i = 0; i < hotbarSlots.Count; i++)
