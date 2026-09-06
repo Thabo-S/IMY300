@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: NoiseMakerSO
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: NoiseMaker
+  icon: {fileID: 21300000, guid: b2a17ef6608d0844397e6e5ba4f5b8c2, type: 3}
+  maxStackSize: 0
+  itemPrefab: {fileID: 919132149155446097, guid: 0a48b123397bdc24f97ac826d48b38ff, type: 3}
+  handItemPrefab: {fileID: 0}
+  value: 0
+  purchasable: 1
+  price: 100
+  description: Makes noise to destract guards
