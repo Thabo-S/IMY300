@@ -9,6 +9,11 @@ public class AlertState : BaseState
     public float pauseAtEachPoint = 1f;
 
     [Header("Alert / Search")]
+    // The laser (or any alert source) that triggered this investigation.
+    // Reset when the guard gives up without finding the player, so that
+    // specific laser can be tripped again. Nullable - other alert sources
+    // (e.g. noise, thrown items) won't set this.
+    public LaserSecurityScript sourceLaser;
 
     private bool hasArrived = false;
     private bool isPausedAtPoint = false;
@@ -39,7 +44,7 @@ public class AlertState : BaseState
             if (guard.Agent.pathStatus == UnityEngine.AI.NavMeshPathStatus.PathInvalid)
             {
                 Debug.Log("[ALERT] Pathing failed, skipping to Patrol");
-                stateMachine.ChangeState(new PatrolState());
+                GiveUpSearch();
                 return;
             }
 
@@ -75,7 +80,6 @@ public class AlertState : BaseState
 
             if (!isPausedAtPoint && !guard.Agent.pathPending && guard.Agent.remainingDistance <= guard.Agent.stoppingDistance)
             {
-                // Just arrived at a wander point - pause briefly before picking the next one
                 isPausedAtPoint = true;
                 float pauseTimer = 0f;
 
@@ -112,8 +116,23 @@ public class AlertState : BaseState
 
         if (stateMachine.activeState != this) yield break;
 
-        stateMachine.ChangeState(new PatrolState());
         Debug.Log("[ALERT] Search finished, didn't find player, returning to Patrol");
+        GiveUpSearch();
+    }
+
+    /// <summary>
+    /// Called whenever the guard stops searching without finding the player -
+    /// either the search timer ran out, or pathing to the alert location failed.
+    /// Resets the laser that triggered this alert (if any) so it can fire again.
+    /// </summary>
+    private void GiveUpSearch()
+    {
+        if (sourceLaser != null)
+        {
+            sourceLaser.resetAlertTrigger();
+        }
+
+        stateMachine.ChangeState(new PatrolState());
     }
 
     public override void Exit()

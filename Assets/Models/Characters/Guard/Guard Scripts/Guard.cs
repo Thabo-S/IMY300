@@ -204,7 +204,7 @@ public class Guard : MonoBehaviour
     // Called by SecurityCamera / LaserSecurityScript when the player trips them.
     // Instantly maxes detection and sends the guard straight into AlertState,
     // same as a maxed-out sound detection would.
-    public void TriggerLaserAlarm(Vector3 position)
+    public void TriggerLaserAlarm(Vector3 position, LaserSecurityScript sourceLaser = null)
     {
         detection = maxDetection;
         LastKnownPlayerPosition = position;
@@ -219,6 +219,7 @@ public class Guard : MonoBehaviour
 
             AlertState alert = new AlertState();
             alert.lastKnownPosition = position;
+            alert.sourceLaser = sourceLaser;
             stateMachine.ChangeState(alert);
         }
     }
@@ -292,21 +293,6 @@ public class Guard : MonoBehaviour
         }
 
         return false;
-    }
-
-    public void ResetGuard()
-    {
-        agent.isStopped = true;
-
-        detection = 0f;
-        UpdateSliderUI();
-        SetSliderColor(Color.green);
-
-        stateMachine.ChangeState(new PatrolState());
-
-        agent.isStopped = false;
-
-        transform.rotation = Quaternion.Euler(0f, idleFacingYRotation, 0f);
     }
 
 

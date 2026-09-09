@@ -108,7 +108,7 @@ public class Player : MonoBehaviour
 
         Debug.Log("Player health increased: " + PlayerHealth);
 
-        if(PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        if(PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
         {
             TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
 
@@ -154,34 +154,6 @@ public class Player : MonoBehaviour
 
         Debug.Log("Player healed: " + PlayerHealth);
     }
-
-
-    //public void PlayFootsteps(bool isSprinting)
-    //{
-    //    if (isSprinting)
-    //    {
-    //        if (!runningFootsteps.isPlaying)
-    //        {
-    //            walkingFootsteps.Stop();
-    //            runningFootsteps.Play();
-    //        }
-    //    }
-    //    else
-    //    {
-    //        if (!walkingFootsteps.isPlaying)
-    //        {
-    //            runningFootsteps.Stop();
-    //            walkingFootsteps.Play();
-    //        }
-    //    }
-    //}
-
-    //public void StopFootsteps()
-    //{
-    //    walkingFootsteps.Stop();
-    //    runningFootsteps.Stop();
-    //}
-
     public void PlaytInteraction()
     {
         interaction.pitch = UnityEngine.Random.Range(minPitch, maxPitch);
