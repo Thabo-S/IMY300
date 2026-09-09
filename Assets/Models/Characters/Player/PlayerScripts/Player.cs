@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
 
     //================= List Of PlayerPrefs ===================
     // LevelIndex : Use to determine game level
+    // currentLevelPrefKey : Use for the currentlevel being played
     //=========================================================
 
     // Gents, You'll add more if you wish to do so

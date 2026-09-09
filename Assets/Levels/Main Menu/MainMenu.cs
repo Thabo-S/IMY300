@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
@@ -8,21 +9,34 @@ public class MainMenu : MonoBehaviour
     public GameObject mainMenu;
     public GameObject startBtn;
     public GameObject Logo;
+    public GameObject settingsPanel;
 
     public float logoMoveDuration = 0.6f;
     public float targetLogoY = 230f;
 
     private Coroutine logoMoveCoroutine;
 
-    public string store = "Store";
-
-
+    public Button[] levelButtons;
 
     private void Start()
     {
         Logo = GameObject.Find("Logo");
-    }
 
+        settingsPanel.SetActive(false);
+
+        
+        int progress = PlayerPrefs.GetInt("LevelIndex", 0);
+        int currentLevelPrefKey = PlayerPrefs.GetInt("currentLevelPrefKey", 0);
+
+        Debug.Log("HIghest Level Complete is : " + progress);
+        Debug.Log("Current Level Being played is : " + currentLevelPrefKey);
+
+        for (int i = 0; i < levelButtons.Length; i++)
+        {
+            levelButtons[i].interactable = (i <= progress);
+        }
+        
+    }
     public void StartGame()
     {
         Debug.Log("started game");
@@ -60,16 +74,14 @@ public class MainMenu : MonoBehaviour
         LevelSelectOverlay.SetActive(true);
     }
 
-    public void StoreLoad()
+    public void showSettings()
     {
-        if (string.IsNullOrEmpty(store))
-        {
-            Debug.LogWarning("[MainMenu] Store Scnene name is not set.");
-            return;
-        }
-        SceneManager.LoadScene(store);
+        settingsPanel.SetActive(true);
     }
-
+    public void hideSettings()
+    {
+        settingsPanel.SetActive(false);
+    }
     public void QuitGame()
     {
         Application.Quit();

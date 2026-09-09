@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 public class LoadoutScreenController : MonoBehaviour
@@ -14,23 +13,12 @@ public class LoadoutScreenController : MonoBehaviour
     [Header("UI References")]
     public Transform slotContainer;
     public LoadoutSlotUI slotPrefab;
-    public TextMeshProUGUI loadoutCountText; 
-
-    [Header("Mission Start")]
-    [Tooltip("Scene to load once the player confirms their loadout.")]
-    //public string missionSceneName;
-
-    private string[] Levels = { "Tutorial", "Level 1", "Level 2" ,"Level 3"};
-
-    private int LevelIndex;
-
+    public TextMeshProUGUI loadoutCountText;
 
     private readonly List<LoadoutSlotUI> spawnedSlots = new List<LoadoutSlotUI>();
 
     private void Start()
     {
-        LevelIndex = PlayerPrefs.GetInt("LevelIndex");
-
         Debug.Log($"--- SAVED IN PLAYERPREFS ---");
         foreach (var name in ToolLoadout.GetOwnedItemNames())
         {
@@ -91,7 +79,6 @@ public class LoadoutScreenController : MonoBehaviour
 
     private void Update()
     {
-
         UpdateLoadoutCountText();
     }
 
@@ -105,14 +92,12 @@ public class LoadoutScreenController : MonoBehaviour
 
     public void OnStartMissionClicked()
     {
-        if (string.IsNullOrEmpty(Levels[LevelIndex]))
+        if (SceneController.Instance == null)
         {
-            Debug.LogWarning("[LoadoutScreenController] Mission Scene Name is not set.");
+            Debug.LogWarning("[LoadoutScreenController] SceneController.Instance is null - make sure it exists in a persistent scene.");
             return;
         }
 
-        SceneManager.LoadScene(Levels[LevelIndex]);
+        SceneController.Instance.StartSelectedLevel();
     }
-
-    
 }

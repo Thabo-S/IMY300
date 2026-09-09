@@ -64,6 +64,15 @@ public class TutorialManager : MonoBehaviour
         step3Panel.SetActive(false);
         step4Panel.SetActive(false);
         step5Panel.SetActive(false);
+
+        if (CursorManager.instance != null)
+            CursorManager.instance.UnlockCursor();
+
+        int progress = PlayerPrefs.GetInt("LevelIndex" );
+        int currentLevelPrefKey = PlayerPrefs.GetInt("currentLevelPrefKey" );
+
+        Debug.Log("HIghest Level Complete is : " + progress);
+        Debug.Log("Current Level Being played is : " + currentLevelPrefKey);
     }
 
     void Update()
@@ -78,15 +87,9 @@ public class TutorialManager : MonoBehaviour
         player.SetActive(true);
         //WelcomeCam.SetActive(false);
 
-        LockCursor();
+        CursorManager.instance.LockCursor();
 
         RunDelayed(StartStep1, 3f);
-    }
-
-    public void LockCursor()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     // ---------------- DELAYED CALL HELPER ----------------

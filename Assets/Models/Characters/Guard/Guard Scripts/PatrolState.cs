@@ -42,7 +42,7 @@ public class PatrolState : BaseState
         if (guard.TickDetection())
         {
 
-            if (PlayerPrefs.GetInt("LevelIndex", 0) == 0 && !Object.FindAnyObjectByType<Step3Trigger>().isTriggered)
+            if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0 && !Object.FindAnyObjectByType<Step4Trigger>().isTriggered)
             //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
             {
                 TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();

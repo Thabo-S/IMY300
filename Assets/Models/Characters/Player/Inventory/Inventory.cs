@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.UI;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class Inventory : MonoBehaviour
 {
@@ -84,10 +85,14 @@ public class Inventory : MonoBehaviour
     // Internal slot management lists
     private List<Slot> inventorySlots = new List<Slot>();
     public List<Slot> hotbarSlots = new List<Slot>();
-    private List<Slot> allSlots = new List<Slot>();
+    public List<Slot> allSlots = new List<Slot>();
+
+    public static Inventory instance;
 
     private void Awake()
     {
+        instance = this;
+
         hotbarSlots.Clear();
         inventorySlots.Clear();
         allSlots.Clear();
@@ -131,12 +136,6 @@ public class Inventory : MonoBehaviour
 
         if (dragIcon != null)
             dragIcon.raycastTarget = false;
-    }
-
-    public void LockCursor()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     private void Update()
