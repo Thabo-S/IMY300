@@ -595,6 +595,7 @@ public class Inventory : MonoBehaviour
 
         lookedAtItem = null;
         lookedAtDoor = null;
+
     }
 
     public void TryPickupItem()

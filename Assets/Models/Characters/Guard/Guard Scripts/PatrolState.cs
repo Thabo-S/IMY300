@@ -8,6 +8,8 @@ public class PatrolState : BaseState
 
     public override void Enter()
     {
+        guard.SetVocalState(Guard.GuardVocalState.Patrolling);
+
         if (!guard.Agent.isOnNavMesh)
         {
             Debug.LogWarning($"[PATROL] {guard.gameObject.name}'s NavMeshAgent is not on a baked NavMesh " +
@@ -42,7 +44,7 @@ public class PatrolState : BaseState
         if (guard.TickDetection())
         {
 
-            if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0 && !Object.FindAnyObjectByType<Step4Trigger>().isTriggered)
+            if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0 && Object.FindAnyObjectByType<Step3Trigger>() != null && !Object.FindAnyObjectByType<Step3Trigger>().isTriggered)
             //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
             {
                 TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
@@ -56,6 +58,9 @@ public class PatrolState : BaseState
                 }
                 return;
             }
+
+            if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0 && !Object.FindAnyObjectByType<Step3Trigger_2>().isTriggered)
+                return;
 
             AlertState alert = new AlertState();
             alert.lastKnownPosition = guard.LastKnownPlayerPosition;

@@ -26,7 +26,7 @@ public class Step3Trigger : MonoBehaviour
         step3_2.SetActive(false);
 
 }
-private void Start()
+    private void Start()
     {
         tutorialManager = GameObject.Find("TutorialManager").GetComponent<TutorialManager>();
         step2doorMovement = step2Door.GetComponent<doorMovement>();

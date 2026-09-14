@@ -16,6 +16,16 @@ public class SceneController : MonoBehaviour
     private const string CURRENT_LEVEL_KEY = "currentLevelPrefKey"; // which level is queued/being played
     private const string HIGHEST_UNLOCKED_KEY = "LevelIndex";       // highest level unlocked so far
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Bootstrap()
+    {
+        if (Instance != null) return; // already exists (e.g. scene had one placed manually)
+
+        GameObject go = new GameObject("SceneController");
+        go.AddComponent<SceneController>();
+        // Awake() below handles Instance assignment + DontDestroyOnLoad
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -39,9 +49,6 @@ public class SceneController : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Always resume normal time and set the correct cursor state on load.
-        // This prevents a reload/restart from inheriting a paused/frozen state
-        // left over from the previous scene (e.g. Mission Complete screen).
         Time.timeScale = 1f;
 
         if (IsGameplayScene(scene.name))
@@ -77,7 +84,7 @@ public class SceneController : MonoBehaviour
         SceneManager.LoadScene(storeScene);
     }
 
-    /// <summary>Tutorial is playable directly from Main Menu — no Loadout step.</summary>
+    /// Tutorial is playable directly from Main Menu — no Loadout step.
     public void GoToTutorial()
     {
         int tutorialIndex = System.Array.IndexOf(levels, "Tutorial");
@@ -87,10 +94,6 @@ public class SceneController : MonoBehaviour
 
     // ---------- Level selection flow ----------
 
-    /// <summary>
-    /// Call this when the player picks a level from the level-select overlay.
-    /// Stores which level was picked, then routes to Loadout to equip before playing.
-    /// </summary>
     public void SelectLevel(int levelIndex)
     {
         if (!IsValidLevelIndex(levelIndex)) return;
@@ -105,7 +108,6 @@ public class SceneController : MonoBehaviour
         SceneManager.LoadScene(loadoutScene);
     }
 
-    /// <summary>Call this from the Loadout scene's "Start" button.</summary>
     public void StartSelectedLevel()
     {
         int levelIndex = PlayerPrefs.GetInt(CURRENT_LEVEL_KEY, 0);
@@ -120,11 +122,6 @@ public class SceneController : MonoBehaviour
         LoadLevelByIndex(levelIndex);
     }
 
-    /// <summary>
-    /// Call this when the player completes a level successfully.
-    /// Unlocks the next level (if this was the highest unlocked) and loads it.
-    /// </summary>
-    /// 
     public void UnlockNextLevel(int completedLevelIndex)
     {
         int nextIndex = completedLevelIndex + 1;
@@ -136,6 +133,7 @@ public class SceneController : MonoBehaviour
             PlayerPrefs.SetInt(HIGHEST_UNLOCKED_KEY, nextIndex);
         }
     }
+
     public void NextLevel()
     {
         int currentIndex = PlayerPrefs.GetInt(CURRENT_LEVEL_KEY, 0);

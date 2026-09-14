@@ -5,11 +5,16 @@ using UnityEngine.UI;
 
 public class Guard : MonoBehaviour
 {
+    public enum GuardVocalState { Patrolling, Alerted, Spotted }
+    public GuardVocalState CurrentVocalState { get; private set; } = GuardVocalState.Patrolling;
+    public void SetVocalState(GuardVocalState state) => CurrentVocalState = state;
+
     [Header("References")]
     private StateMachine stateMachine;
     private NavMeshAgent agent;
     private Animator animator;
     public AudioSource audioSource;
+    public AudioSource speechAudioSource;
     public NavMeshAgent Agent { get => agent; }
     public Animator Animator { get => animator; }
 
@@ -97,7 +102,8 @@ public class Guard : MonoBehaviour
         if (animator == null) animator = GetComponent<Animator>();
 
         stateMachine.Initialise();
-        audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponents<AudioSource>()[0];
+        speechAudioSource = GetComponents<AudioSource>()[1];
     }
 
     private void Update()

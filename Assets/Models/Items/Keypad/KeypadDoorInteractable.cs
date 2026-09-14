@@ -27,6 +27,10 @@ public class KeypadDoorInteractable : MonoBehaviour
 
         if (door == null)
             Debug.LogWarning($"{name}: 'Door' reference is not assigned on KeypadDoorInteractable.");
+
+        qteUI = GameObject.FindGameObjectWithTag("QTeEventsLockDoor");
+
+        qteScript = qteUI.GetComponent<KepPadQTE>();
     }
 
     private void OnEnable()

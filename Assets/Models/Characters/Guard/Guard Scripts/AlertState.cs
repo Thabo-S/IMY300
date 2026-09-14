@@ -25,6 +25,10 @@ public class AlertState : BaseState
 
     public override void Enter()
     {
+        guard.SetVocalState(Guard.GuardVocalState.Alerted); 
+        if (GuardSpeechManager.Instance != null)
+            GuardSpeechManager.Instance.PlayAlertBark(guard);
+
         guard.Agent.speed = alertSpeed;
         guard.Agent.SetDestination(lastKnownPosition);
         hasArrived = false;

@@ -22,6 +22,8 @@ public class LaserSecurityScript : MonoBehaviour
             Debug.LogWarning($"{name}: 'laserWarning' is not assigned in the inspector.");
 
         guardsList = GameObject.FindGameObjectsWithTag("Guard");
+
+        laserWarning = GameObject.FindGameObjectWithTag("laserWarning");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,9 +32,10 @@ public class LaserSecurityScript : MonoBehaviour
         {
             isTriggered = true;
 
+                Debug.Log("Level index : " + SceneController.Instance.GetCurrentLevelIndex());
+
             if (SceneController.Instance.GetCurrentLevelIndex() != 0)
             {
-                Debug.Log("Level index : " + SceneController.Instance.GetCurrentLevelIndex());
                 alertGuards();
                 return;
             }

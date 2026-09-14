@@ -31,6 +31,10 @@ TagManager:
   - Inventory
   - Torch
   - Adrenaline
+  - LockedDoor
+  - QTeEventsLockDoor
+  - QTeEventsKepPad
+  - LaserWarning
   layers:
   - Default
   - TransparentFX

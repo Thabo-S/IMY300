@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 playerVelocity;
     private bool isGrounded;
-    private bool isCrouching = false;
+    public bool isCrouching { get; private set; } = false;
 
     [Header("Movement Settings")]
     public float gravity = -9.8f;
@@ -24,6 +24,9 @@ public class PlayerMovement : MonoBehaviour
     public float sprintSpeed = 3.4f;
     public float sneakSpeed = 1f;
     public float jumpHeight = 0.56f;
+
+    [Header("Debug Info")]
+    public float currentEffectiveSpeed;
 
     [Header("Temporary Speed Boost")]
     [Tooltip("Multiplies actual movement on top of 'speed' - kept separate " +
@@ -120,17 +123,51 @@ public class PlayerMovement : MonoBehaviour
 
     // SO THIS FUNCTION BASCIALLY GETS THE INPUTS FROM THE INPUT MANAGER 
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
+    //public void CalculatePlayerMovement(Vector2 movementInput)
+    //{
+    //    if (PauseMenu.isGamePause) return;
+
+    //    float staminaMultiplier = Player.Instance != null ? Player.Instance.SpeedMultiplier : 1f;
+
+    //    currentEffectiveSpeed = speed * speedMultiplier * staminaMultiplier;
+
+    //    Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
+    //    move = transform.TransformDirection(move);
+    //    characterController.Move(move * speed * speedMultiplier * Time.deltaTime);
+
+    //    currentVelocity = move * speed * speedMultiplier;
+
+    //    // 2. Gravity Logic
+    //    if (isGrounded && playerVelocity.y < 0)
+    //    {
+    //        playerVelocity.y = -2f; // Keeps player glued to slopes
+    //    }
+
+    //    playerVelocity.y += gravity * Time.deltaTime;
+    //    characterController.Move(playerVelocity * Time.deltaTime);
+
+    //    UpdateAnimations();
+    //}
+
     public void CalculatePlayerMovement(Vector2 movementInput)
     {
         if (PauseMenu.isGamePause) return;
 
+        // 1. Get the stamina penalty from the Player script (defaults to 1 if missing)
+        float staminaMultiplier = Player.Instance != null ? Player.Instance.SpeedMultiplier : 1f;
+
+        // 2. Calculate the true final speed (Base Speed * Potion Boosts * Stamina Penalty)
+        currentEffectiveSpeed = speed * speedMultiplier * staminaMultiplier;
+
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
         move = transform.TransformDirection(move);
-        characterController.Move(move * speed * speedMultiplier * Time.deltaTime);
 
-        currentVelocity = move * speed * speedMultiplier;
+        // 3. Move the character using the true final speed
+        characterController.Move(move * currentEffectiveSpeed * Time.deltaTime);
 
-        // 2. Gravity Logic
+        currentVelocity = move * currentEffectiveSpeed;
+
+        // 4. Gravity Logic
         if (isGrounded && playerVelocity.y < 0)
         {
             playerVelocity.y = -2f; // Keeps player glued to slopes
@@ -187,7 +224,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (PauseMenu.isGamePause) return;
 
-        if (isSprinting)
+        if (isSprinting )
         {
             // Only allow STARTING a sprint if grounded and not crouching
             if (isGrounded && !isCrouching)

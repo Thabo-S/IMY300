@@ -24,7 +24,7 @@ public class MusicManager : MonoBehaviour
     [SerializeField] private bool loopPlaylist = true;
 
     [Header("Playback Settings")]
-    [SerializeField][Range(0f, 1f)] private float volume = 0.5f;
+    [SerializeField][Range(0f, 1f)] private float volume = 0.2f;
     [SerializeField] private float fadeDuration = 1.5f;
 
     private AudioSource audioSource;
@@ -173,7 +173,6 @@ public class MusicManager : MonoBehaviour
         fadeCoroutine = null;
     }
 
-    /// <summary>Hook this directly to a UI Slider's OnValueChanged (0-1 range).</summary>
     public void SetVolume(float newVolume)
     {
         volume = Mathf.Clamp01(newVolume);
