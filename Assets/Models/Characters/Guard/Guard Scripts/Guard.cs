@@ -5,11 +5,16 @@ using UnityEngine.UI;
 
 public class Guard : MonoBehaviour
 {
+    public enum GuardVocalState { Patrolling, Alerted, Spotted }
+    public GuardVocalState CurrentVocalState { get; private set; } = GuardVocalState.Patrolling;
+    public void SetVocalState(GuardVocalState state) => CurrentVocalState = state;
+
     [Header("References")]
     private StateMachine stateMachine;
     private NavMeshAgent agent;
     private Animator animator;
     public AudioSource audioSource;
+    public AudioSource speechAudioSource;
     public NavMeshAgent Agent { get => agent; }
     public Animator Animator { get => animator; }
 
@@ -23,22 +28,22 @@ public class Guard : MonoBehaviour
     public int currentWaypointIndex = 0;
 
     [Header("Sight")]
-    public float sightDistance = 50f;
-    public float fieldOfView = 30f;
-    public float eyeHeight = 12f;
-    public float catchRadius = 20f;
-    public float wanderRadius = 15f;
+    public float sightDistance = 8f;
+    public float fieldOfView = 15f;
+    public float eyeHeight = 0.7f;
+    public float catchRadius = 10f;
+    public float wanderRadius = 10f;
 
     [Header("Warning cone (eye icon, should be larger)")]
-    public float warningSightDistance = 65f;
-    public float warningFieldOfView = 45f;
+    public float warningSightDistance = 12f;
+    public float warningFieldOfView = 25f;
 
     [Header("Sound")]
     public float runningFillRate = 100f;
     public float walkingFillRate = 60f;
     public float soundMemoryTime = 0.3f;
-    [SerializeField] private float minPitch = 0.5f;
-    [SerializeField] private float maxPitch = 0.8f;
+    [SerializeField] private float minPitch = 0.9f;
+    [SerializeField] private float maxPitch = 1.1f;
     public AudioClip footstepClip;
 
     [Header("Detection Meter (sound only)")]
@@ -54,7 +59,7 @@ public class Guard : MonoBehaviour
     [Header("Weapons")]
     public GameObject gun;
     public Transform gunBarrel;
-    public float bulletSpeed = 80f;
+    public float bulletSpeed = 10f;
 
     [Range(0.1f, 10f)]
     public float fireRate;
@@ -97,7 +102,8 @@ public class Guard : MonoBehaviour
         if (animator == null) animator = GetComponent<Animator>();
 
         stateMachine.Initialise();
-        audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponents<AudioSource>()[0];
+        speechAudioSource = GetComponents<AudioSource>()[1];
     }
 
     private void Update()
@@ -204,7 +210,7 @@ public class Guard : MonoBehaviour
     // Called by SecurityCamera / LaserSecurityScript when the player trips them.
     // Instantly maxes detection and sends the guard straight into AlertState,
     // same as a maxed-out sound detection would.
-    public void TriggerLaserAlarm(Vector3 position)
+    public void TriggerLaserAlarm(Vector3 position, LaserSecurityScript sourceLaser = null)
     {
         detection = maxDetection;
         LastKnownPlayerPosition = position;
@@ -219,6 +225,7 @@ public class Guard : MonoBehaviour
 
             AlertState alert = new AlertState();
             alert.lastKnownPosition = position;
+            alert.sourceLaser = sourceLaser;
             stateMachine.ChangeState(alert);
         }
     }
@@ -256,10 +263,13 @@ public class Guard : MonoBehaviour
         if (distance > warningSightDistance) return false;
 
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.transform.position + (Vector3.up * 6.54f);
+        Vector3 targetPoint = player.transform.position + (Vector3.up * 1.6f);
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
+
         float angleToPlayer = Vector3.Angle(targetDirection, transform.forward);
+
+        //Debug.Log("[Angle to the player is - " + angleToPlayer);
         return angleToPlayer <= warningFieldOfView;
     }
 
@@ -270,37 +280,25 @@ public class Guard : MonoBehaviour
         if (!IsPlayerInFieldOfViewCone()) return false;
 
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.transform.position + (Vector3.up * 6.54f);
+        Vector3 targetPoint = player.transform.position + (Vector3.up * eyeHeight);
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
         Ray ray = new Ray(rayOrigin, targetDirection);
         RaycastHit hitInfo;
 
+        Debug.DrawRay(rayOrigin, targetDirection * sightDistance, Color.red);
+
         if (Physics.Raycast(ray, out hitInfo, sightDistance))
         {
-            if (hitInfo.transform.gameObject == player || hitInfo.transform.root.gameObject == player)
+            if (hitInfo.transform.gameObject.tag == "Player"|| hitInfo.transform.root.gameObject == player)
             {
+                Debug.Log("[SIGHT TEST] Player was seen");
                 LastKnownPlayerPosition = player.transform.position;
                 return true;
             }
         }
 
         return false;
-    }
-
-    public void ResetGuard()
-    {
-        agent.isStopped = true;
-
-        detection = 0f;
-        UpdateSliderUI();
-        SetSliderColor(Color.green);
-
-        stateMachine.ChangeState(new PatrolState());
-
-        agent.isStopped = false;
-
-        transform.rotation = Quaternion.Euler(0f, idleFacingYRotation, 0f);
     }
 
 

@@ -23,6 +23,18 @@ TagManager:
   - Level5
   - Door_Keycard
   - GarageDoor
+  - MedKit
+  - KeyPad
+  - Door_Left_Swing
+  - Door_Right_Swing
+  - Lever
+  - Inventory
+  - Torch
+  - Adrenaline
+  - LockedDoor
+  - QTeEventsLockDoor
+  - QTeEventsKepPad
+  - LaserWarning
   layers:
   - Default
   - TransparentFX

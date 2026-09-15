@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -46,6 +47,7 @@ public class PauseMenu : MonoBehaviour
         if (CursorManager.instance != null)
             CursorManager.instance.UnlockCursor();
     }
+
 
     public void blurBackground()
     {

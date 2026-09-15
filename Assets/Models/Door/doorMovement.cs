@@ -44,16 +44,19 @@ public class doorMovement : MonoBehaviour
         if (outline == null)
             outline = GetComponent<Outline>();
 
-        if (canvas == null)
-            canvas = transform.Find("Canvas");
+        if (this.tag == "Door_Keycard")
+        {
+            if (canvas == null)
+                canvas = transform.Find("Canvas");
 
-        if (canvas == null)
-        {
-            Debug.LogWarning($"{name}: Could not find a child object named 'Canvas'.");
-        }
-        else
-        {
-            canvas.gameObject.SetActive(false);
+            if (canvas == null)
+            {
+                Debug.LogWarning($"{name}: Could not find a child object named 'Canvas'.");
+            }
+            else
+            {
+                canvas.gameObject.SetActive(false);
+            }
         }
 
         LoadDoorSounds();

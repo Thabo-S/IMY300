@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 playerVelocity;
     private bool isGrounded;
-    private bool isCrouching = false;
+    public bool isCrouching { get; private set; } = false;
 
     [Header("Movement Settings")]
     public float gravity = -9.8f;
@@ -25,6 +25,17 @@ public class PlayerMovement : MonoBehaviour
     public float sneakSpeed = 1f;
     public float jumpHeight = 0.56f;
 
+    [Header("Debug Info")]
+    public float currentEffectiveSpeed;
+
+    [Header("Temporary Speed Boost")]
+    [Tooltip("Multiplies actual movement on top of 'speed' - kept separate " +
+             "so sprint/crouch toggling (which directly overwrites 'speed') " +
+             "doesn't cancel a boost early, and so handleMovementStateIcons()'s " +
+             "exact speed== checks aren't thrown off by a boosted value.")]
+    private float speedMultiplier = 1f;
+    private Coroutine speedBoostRoutine;
+
     [Header("Crouch Dimensions")]
     private float standingHeight;
     private Vector3 standingCenter;
@@ -32,13 +43,16 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 crouchCenter = new Vector3(0f, -0.31f, -0.04f);
 
 
-    [SerializeField] private float jumpDelay = 0.71f;
-
     [Header("Sound Emission")]
     public float walkVolume = 30f;
     public float runVolume = 60f;
     public float soundEmitInterval = 0.5f;
     private float soundTimer = 0f;
+
+    [Header("Movement States")]
+    public GameObject walking;
+    public GameObject sprinting;
+    public GameObject crouching;
 
     private Vector3 currentVelocity = Vector3.zero;
     public static class AnimationParams
@@ -53,23 +67,55 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
-
         animator = GetComponentInChildren<Animator>();
-
         standingHeight = characterController.height;
         standingCenter = characterController.center;
-
         cameraScript = GetComponentInChildren<CameraPosition>();
 
-        //playerScript = GetComponent<Player>();
-
+        walking.SetActive(true);
+        sprinting.SetActive(false);
+        crouching.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
         isGrounded = characterController.isGrounded;
-        EmitMovementSound();
+
+        if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        {
+            if (!Step3Trigger.hasTriggered)
+                EmitMovementSound();
+        }
+        else
+        {
+            EmitMovementSound();
+        }
+
+        handleMovementStateIcons();
+    }
+
+    public void handleMovementStateIcons()
+    {
+        if (PauseMenu.isGamePause) return;
+
+        if (speed == walkSpeed)
+        {
+            walking.SetActive(true);
+            sprinting.SetActive(false);
+            crouching.SetActive(false);
+        }
+        else if (speed == sprintSpeed)
+        {
+            walking.SetActive(false);
+            sprinting.SetActive(true);
+            crouching.SetActive(false);
+        }
+        else
+        {
+            walking.SetActive(false);
+            sprinting.SetActive(false);
+            crouching.SetActive(true);
+        }
     }
 
 
@@ -77,17 +123,51 @@ public class PlayerMovement : MonoBehaviour
 
     // SO THIS FUNCTION BASCIALLY GETS THE INPUTS FROM THE INPUT MANAGER 
     // AND APPLIES THEM TO THE CHARACTER CONTROLLER TO MOVE THE PLAYER
+    //public void CalculatePlayerMovement(Vector2 movementInput)
+    //{
+    //    if (PauseMenu.isGamePause) return;
+
+    //    float staminaMultiplier = Player.Instance != null ? Player.Instance.SpeedMultiplier : 1f;
+
+    //    currentEffectiveSpeed = speed * speedMultiplier * staminaMultiplier;
+
+    //    Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
+    //    move = transform.TransformDirection(move);
+    //    characterController.Move(move * speed * speedMultiplier * Time.deltaTime);
+
+    //    currentVelocity = move * speed * speedMultiplier;
+
+    //    // 2. Gravity Logic
+    //    if (isGrounded && playerVelocity.y < 0)
+    //    {
+    //        playerVelocity.y = -2f; // Keeps player glued to slopes
+    //    }
+
+    //    playerVelocity.y += gravity * Time.deltaTime;
+    //    characterController.Move(playerVelocity * Time.deltaTime);
+
+    //    UpdateAnimations();
+    //}
+
     public void CalculatePlayerMovement(Vector2 movementInput)
     {
         if (PauseMenu.isGamePause) return;
 
+        // 1. Get the stamina penalty from the Player script (defaults to 1 if missing)
+        float staminaMultiplier = Player.Instance != null ? Player.Instance.SpeedMultiplier : 1f;
+
+        // 2. Calculate the true final speed (Base Speed * Potion Boosts * Stamina Penalty)
+        currentEffectiveSpeed = speed * speedMultiplier * staminaMultiplier;
+
         Vector3 move = new Vector3(movementInput.x, 0, movementInput.y);
         move = transform.TransformDirection(move);
-        characterController.Move(move * speed * Time.deltaTime);
 
-        currentVelocity = move * speed;
+        // 3. Move the character using the true final speed
+        characterController.Move(move * currentEffectiveSpeed * Time.deltaTime);
 
-        // 2. Gravity Logic
+        currentVelocity = move * currentEffectiveSpeed;
+
+        // 4. Gravity Logic
         if (isGrounded && playerVelocity.y < 0)
         {
             playerVelocity.y = -2f; // Keeps player glued to slopes
@@ -131,20 +211,10 @@ public class PlayerMovement : MonoBehaviour
         // Check if grounded and not crouching
         if (isGrounded && !isCrouching)
         {
-            StartCoroutine(JumpWithDelay());
+            playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
+
+            //StartCoroutine(JumpWithDelay());
         }
-    }
-
-    private IEnumerator JumpWithDelay()
-    {
-        if (animator != null)
-        {
-            animator.SetTrigger(AnimationParams.JumpTrigger);
-        }
-
-        yield return new WaitForSeconds(jumpDelay);
-
-        playerVelocity.y = MathF.Sqrt(jumpHeight * gravity * -2.0f);
     }
 
     // THE PLAYER CAN ALSO ONLY SPRINT IF THEY ARE GROUNDED
@@ -154,7 +224,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (PauseMenu.isGamePause) return;
 
-        if (isSprinting)
+        if (isSprinting )
         {
             // Only allow STARTING a sprint if grounded and not crouching
             if (isGrounded && !isCrouching)
@@ -169,6 +239,24 @@ public class PlayerMovement : MonoBehaviour
             speed = isCrouching ? sneakSpeed : walkSpeed;
             if (animator != null) animator.SetBool(AnimationParams.IsSprinting, false);
         }
+    }
+
+    public void ApplyTemporarySpeedBoost(float multiplier, float duration)
+    {
+        if (speedBoostRoutine != null)
+        {
+            StopCoroutine(speedBoostRoutine);
+        }
+
+        speedBoostRoutine = StartCoroutine(SpeedBoostRoutine(multiplier, duration));
+    }
+
+    private IEnumerator SpeedBoostRoutine(float multiplier, float duration)
+    {
+        speedMultiplier = multiplier;
+        yield return new WaitForSeconds(duration);
+        speedMultiplier = 1f;
+        speedBoostRoutine = null;
     }
 
     public void playerCrouch()

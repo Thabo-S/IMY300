@@ -8,6 +8,8 @@ public class PatrolState : BaseState
 
     public override void Enter()
     {
+        guard.SetVocalState(Guard.GuardVocalState.Patrolling);
+
         if (!guard.Agent.isOnNavMesh)
         {
             Debug.LogWarning($"[PATROL] {guard.gameObject.name}'s NavMeshAgent is not on a baked NavMesh " +
@@ -39,25 +41,32 @@ public class PatrolState : BaseState
             return;
         }
 
-        //if (guard.TickDetection())
-        //{
+        if (guard.TickDetection())
+        {
 
-        //    if (PlayerPrefs.GetInt("LevelIndex", 0) == 0 && !Object.FindAnyObjectByType<Step4Trigger>().isTriggered)
-        //    {
-        //        TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
-        //        if (tutorial != null)
-        //        {
-        //            tutorial.PlayerFailedStep3();
-        //            Debug.Log("[PATROL] Heard player during tutorial, calling PlayerFailedStep3");
-        //        }
-        //        return;
-        //    }
+            if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0 && Object.FindAnyObjectByType<Step3Trigger>() != null && !Object.FindAnyObjectByType<Step3Trigger>().isTriggered)
+            //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+            {
+                TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
+                if (tutorial != null)
+                {
+                    //tutorial.PlayerWarning.SetActive(true);
 
-        //    AlertState alert = new AlertState();
-        //    alert.lastKnownPosition = guard.LastKnownPlayerPosition;
-        //    stateMachine.ChangeState(alert);
-        //    Debug.Log("[PATROL] Heard player, changing to ALERT State");
-        //}
+                    tutorial.PlayerFailedStep2();
+
+                    Debug.Log("[PATROL] Heard player during tutorial, failed Sound Awareness Test!");
+                }
+                return;
+            }
+
+            if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0 && !Object.FindAnyObjectByType<Step3Trigger_2>().isTriggered)
+                return;
+
+            AlertState alert = new AlertState();
+            alert.lastKnownPosition = guard.LastKnownPlayerPosition;
+            stateMachine.ChangeState(alert);
+            Debug.Log("[PATROL] Heard player, changing to ALERT State");
+        }
     }
 
     public override void Exit() { }

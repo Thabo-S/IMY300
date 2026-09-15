@@ -6,13 +6,25 @@ public class AttackState : BaseState
     public float waitbeforeSearchTime = 5f;
     public float rotationSpeed = 10f;
 
+    [Header("Chase")]
+    [Tooltip("Guard closes distance while chasing at this speed.")]
+    public float chaseSpeed = 4.5f;
+    [Tooltip("Guard stops advancing once within this distance and just shoots.")]
+    public float attackRange = 4f;
+
     [Header("Fire Rate")]
     public float shotsPerSecond = 1.5f;
     private float fireTimer;
 
     public override void Enter()
     {
-        guard.Agent.isStopped = true;
+        guard.SetVocalState(Guard.GuardVocalState.Spotted);
+        if (GuardSpeechManager.Instance != null)
+            GuardSpeechManager.Instance.PlaySpottedBark(guard);
+
+
+        guard.Agent.isStopped = false;
+        guard.Agent.speed = chaseSpeed;
         losePlayerTimer = 0f;
         fireTimer = 0f;
 
@@ -39,6 +51,20 @@ public class AttackState : BaseState
 
             LookAtPlayer();
 
+            float distanceToPlayer = Vector3.Distance(guard.transform.position, guard.PlayerTransform.position);
+
+            if (distanceToPlayer > attackRange)
+            {
+                // Close the gap while still shooting on the way in.
+                guard.Agent.isStopped = false;
+                guard.Agent.SetDestination(guard.PlayerTransform.position);
+            }
+            else
+            {
+                // Close enough — plant and shoot instead of walking into the player.
+                guard.Agent.isStopped = true;
+            }
+
             guard.UpdateAnimationParameters(false, false, true);
 
             guard.SetGunActive(true);
@@ -54,26 +80,11 @@ public class AttackState : BaseState
                 fireTimer = 1f / shotsPerSecond;
                 guard.PlayShootAnimation();
 
-
                 ShootAtPlayer();
-
-                //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
-                //{
-                //    TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
-
-                //    if (tutorial != null)
-                //    {
-                //        tutorial.playerSpottedByGuard();
-                //    }
-                //}
             }
         }
         else
         {
-            //guard.UpdateAnimationParameters(false, true, false);
-
-            //guard.SetGunActive(false);
-
             losePlayerTimer += Time.deltaTime;
 
             if (losePlayerTimer > waitbeforeSearchTime)
@@ -91,8 +102,6 @@ public class AttackState : BaseState
                 }
 
                 stateMachine.ChangeState(alert);
-
-                //guard.SetSliderColor(Color.yellow);
 
                 guard.UpdateAnimationParameters(false, true, false);
 
@@ -117,31 +126,25 @@ public class AttackState : BaseState
         );
     }
 
-    //public void ShootAtPlayer()
-    //{
-    //    Transform gunBarrel = guard.gunBarrel;
-
-    //    GameObject bullet = GameObject.Instantiate(
-    //        Resources.Load("Prefabs/Bullet") as GameObject,gunBarrel.position,Quaternion.LookRotation((guard.player.transform.position - gunBarrel.position).normalized)
-    //    );
-
-    //    Vector3 shootDirection = ((guard.player.transform.position + (Vector3.up * 10f)) - gunBarrel.position).normalized;
-
-    //    bullet.GetComponent<Rigidbody>().linearVelocity = Quaternion.AngleAxis(Random.Range(-10f, 10f), Vector3.up) * shootDirection * 40;
-
-    //    Debug.Log("Shoot");
-
-    //    fireTimer = 0f;
-    //}
-
     public void ShootAtPlayer()
     {
         Transform gunBarrel = guard.gunBarrel;
 
-        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * 7f);
+        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * guard.eyeHeight);
         Vector3 shootDirection = (baseTargetPoint - gunBarrel.position).normalized;
 
-        Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-5f, 5f), Vector3.up) * shootDirection;
+        float shotRange = 0;
+
+        //if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
+        //{
+        //    shotRange = 0;
+        //}
+        //else
+        //{
+        //    shotRange = 2f;
+        //}
+
+        Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-shotRange, shotRange), Vector3.up) * shootDirection;
 
         GameObject bullet = GameObject.Instantiate(
             Resources.Load("Prefabs/Bullet") as GameObject,
@@ -149,12 +152,12 @@ public class AttackState : BaseState
             Quaternion.LookRotation(finalDirection)
         );
 
+        bullet.GetComponent<Bullet>().SetShooter(guard.gameObject);
+
         bullet.GetComponent<Rigidbody>().linearVelocity = finalDirection * guard.bulletSpeed;
 
         Debug.Log("Shoot");
 
         fireTimer = 0f;
     }
-
-
 }

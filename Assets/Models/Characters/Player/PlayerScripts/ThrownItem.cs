@@ -15,6 +15,8 @@ public class ThrownItem : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("[THROWN ITEMS] - Item was thrown");
+
         if (hasLanded) return;
 
         // Ignore the player who threw it - items are often spawned close
@@ -27,6 +29,8 @@ public class ThrownItem : MonoBehaviour
         }
 
         hasLanded = true;
+
+        Debug.Log("[THROWN ITEMS] - Item hit something - " + collision.transform.name);
 
         SoundEmissionManager.EmitSound(transform.position, impactVolume, true);
 
