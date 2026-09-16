@@ -89,6 +89,9 @@ public class Inventory : MonoBehaviour
 
     public static Inventory instance;
 
+    [Tooltip("Reference to the level's objective tracker, updated whenever an item is added.")]
+    public ObjectiveTracker objectiveTracker;
+
     private void Awake()
     {
         instance = this;
@@ -542,6 +545,10 @@ public class Inventory : MonoBehaviour
         {
             progressBarController.OnItemCollected(item, amountAdded);
         }
+        if(objectiveTracker != null)
+        {
+            objectiveTracker.NotifyItemCollected(item);
+        }
     }
 
     #endregion
@@ -770,11 +777,7 @@ public class Inventory : MonoBehaviour
         {
             if (torchLight != null)
             {
-                // Toggle the GameObject's active state, not just the Light
-                // component's enabled flag - a component's enabled flag has
-                // no visible effect if the GameObject itself isn't active,
-                // which is what breaks this when the torch starts "off"
-                // via an inactive GameObject rather than an unchecked Light.
+
                 torchLight.gameObject.SetActive(!torchLight.gameObject.activeSelf);
             }
             else
@@ -800,20 +803,6 @@ public class Inventory : MonoBehaviour
             EquipHandItem();
         }
     }
-
-    //private void UpdateHotbarOpacity()
-    //{
-    //    for (int i = 0; i < hotbarSlots.Count; i++)
-    //    {
-    //        Image icon = hotbarSlots[i].GetComponent<Image>();
-    //        if (icon != null)
-    //        {
-    //            icon.color = (i == equippedHotbarIndex)
-    //                ? new Color(1f, 1f, 1f, equippedOpacity)
-    //                : new Color(1f, 1f, 1f, normalOpacity);
-    //        }
-    //    }
-    //}
 
     private void UpdateHotbarOpacity()
     {
