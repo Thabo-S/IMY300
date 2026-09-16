@@ -76,6 +76,7 @@ public class ObjectiveTracker : MonoBehaviour
     /// </summary>
     public void NotifyItemCollected(ItemSO item)
     {
+        Debug.Log($"[ObjectiveTracker] Collected '{item.name}', checking {objectives.Count} objectives.");
         if (item == null) return;
 
         for (int i = 0; i < objectives.Count; i++)

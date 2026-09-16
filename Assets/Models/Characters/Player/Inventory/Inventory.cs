@@ -549,6 +549,10 @@ public class Inventory : MonoBehaviour
         {
             objectiveTracker.NotifyItemCollected(item);
         }
+        else
+        {
+            Debug.LogError("[Inventory] objectiveTracker is NULL — assign it in the Inspector.");
+        }
     }
 
     #endregion
