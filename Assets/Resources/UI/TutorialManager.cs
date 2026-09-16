@@ -48,7 +48,6 @@ public class TutorialManager : MonoBehaviour
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        spawnPoint = GameObject.Find("SpawnPoint");
     }
 
     void Start()

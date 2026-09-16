@@ -60,6 +60,7 @@ public class Player : MonoBehaviour
 
     [Header("Toggle Controls")]
     [SerializeField] private GameObject ControlsPanel;
+    [SerializeField] private GameObject ObjectivesPanel;
 
     [Header("Damage Overlay")]
     public Image damageOverlay;
@@ -131,9 +132,27 @@ public class Player : MonoBehaviour
 
         playerMovement = GetComponent<PlayerMovement>();
 
+        deathUI = GameObject.FindGameObjectWithTag("DeathUI");
+
         damageClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/damage_grunt_male");
 
         deathClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/death_groan_male");
+    }
+
+    void Update()
+    {
+        PerformContinuousDetection();
+        UpdateStamina();
+
+        if (Input.GetKeyDown(KeyCode.H) && !PauseMenu.isGamePause)
+        {
+            ControlsPanel.SetActive(!ControlsPanel.activeSelf);
+        }
+
+        if (Input.GetKeyDown(KeyCode.T) && !PauseMenu.isGamePause)
+        {
+            ObjectivesPanel.SetActive(!ObjectivesPanel.activeSelf);
+        }
     }
     public void TakeDamage(int damage)
     {
@@ -318,17 +337,6 @@ public class Player : MonoBehaviour
     // ==========================================================
     // ======== ONLY REFERENCE THE CODE ,DON'T MODIFY ===========
 
-    void Update()
-    {
-        PerformContinuousDetection();
-        UpdateStamina();
-
-        if (Input.GetKeyDown(KeyCode.H) && !PauseMenu.isGamePause)
-        {
-            ControlsPanel.SetActive(!ControlsPanel.activeSelf);
-        }
-    }
-
     private void PerformContinuousDetection()
     {
         RaycastHit hit;
@@ -406,6 +414,8 @@ public class Player : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     KeypadDoorInteractable keypadInteractable = hitObject.GetComponent<KeypadDoorInteractable>();
+
+
 
                     if (keypadInteractable != null)
                     {
