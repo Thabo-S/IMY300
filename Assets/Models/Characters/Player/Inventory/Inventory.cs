@@ -770,7 +770,12 @@ public class Inventory : MonoBehaviour
         {
             if (torchLight != null)
             {
-                torchLight.enabled = !torchLight.enabled;
+                // Toggle the GameObject's active state, not just the Light
+                // component's enabled flag - a component's enabled flag has
+                // no visible effect if the GameObject itself isn't active,
+                // which is what breaks this when the torch starts "off"
+                // via an inactive GameObject rather than an unchecked Light.
+                torchLight.gameObject.SetActive(!torchLight.gameObject.activeSelf);
             }
             else
             {
