@@ -184,6 +184,11 @@ public class ExitZone : MonoBehaviour
 
     private bool hasTriggered = false;
 
+    private void Awake()
+    {
+        missionCompleteUI = GameObject.FindGameObjectWithTag("LevelComplete");
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (hasTriggered) return;

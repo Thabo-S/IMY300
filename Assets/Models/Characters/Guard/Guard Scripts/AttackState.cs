@@ -8,7 +8,7 @@ public class AttackState : BaseState
 
     [Header("Chase")]
     [Tooltip("Guard closes distance while chasing at this speed.")]
-    public float chaseSpeed = 4.5f;
+    public float chaseSpeed = 2.7f;
     [Tooltip("Guard stops advancing once within this distance and just shoots.")]
     public float attackRange = 4f;
 

@@ -13,7 +13,7 @@ public class Guard : MonoBehaviour
     private StateMachine stateMachine;
     private NavMeshAgent agent;
     private Animator animator;
-    public AudioSource audioSource;
+    public AudioSource footstepAudioSource;
     public AudioSource speechAudioSource;
     public NavMeshAgent Agent { get => agent; }
     public Animator Animator { get => animator; }
@@ -102,7 +102,7 @@ public class Guard : MonoBehaviour
         if (animator == null) animator = GetComponent<Animator>();
 
         stateMachine.Initialise();
-        audioSource = GetComponents<AudioSource>()[0];
+        footstepAudioSource = GetComponents<AudioSource>()[0];
         speechAudioSource = GetComponents<AudioSource>()[1];
     }
 
@@ -129,8 +129,8 @@ public class Guard : MonoBehaviour
 
     public void OnFootstep()
     {
-        audioSource.pitch = Random.Range(minPitch, maxPitch);
-        audioSource.PlayOneShot(footstepClip);
+        footstepAudioSource.pitch = Random.Range(minPitch, maxPitch);
+        footstepAudioSource.PlayOneShot(footstepClip);
     }
 
     public void PlayShootAnimation()
