@@ -132,7 +132,7 @@ public class Player : MonoBehaviour
 
         playerMovement = GetComponent<PlayerMovement>();
 
-        deathUI = GameObject.FindGameObjectWithTag("DeathUI");
+        //deathUI = GameObject.FindGameObjectWithTag("DeathUI");
 
         damageClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/damage_grunt_male");
 
@@ -472,10 +472,10 @@ public class Player : MonoBehaviour
 
                 interactionTextUI.text = "[E] Pick up " + item.name;
 
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    Inventory.instance.TryPickupItem();
-                }
+                //if (Input.GetKeyDown(KeyCode.E))
+                //{
+                //    Inventory.instance.TryPickupItem();
+                //}
             }
             else if (currentHighlightedDoor != null)
             {
