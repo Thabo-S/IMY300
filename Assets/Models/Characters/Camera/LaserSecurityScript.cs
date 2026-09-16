@@ -23,7 +23,7 @@ public class LaserSecurityScript : MonoBehaviour
 
         guardsList = GameObject.FindGameObjectsWithTag("Guard");
 
-        laserWarning = GameObject.FindGameObjectWithTag("laserWarning");
+        laserWarning = GameObject.Find("LaserWarning");
     }
 
     private void OnTriggerEnter(Collider other)
