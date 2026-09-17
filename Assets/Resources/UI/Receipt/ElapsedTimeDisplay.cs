@@ -21,4 +21,9 @@ public class ElapsedTimeDisplay : MonoBehaviour
         elapsedTimeText.text = $"{hours:00}:{minutes:00}:{seconds:00}s";
     }
 
+    public void RedoOrNext()
+    {
+
+    }
+
 }
