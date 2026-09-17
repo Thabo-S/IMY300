@@ -296,6 +296,7 @@ public class Inventory : MonoBehaviour
 
         // Instantiate world item
         GameObject thrownObj = Instantiate(itemSO.itemPrefab, spawnPosition, spawnRotation);
+        thrownObj.name = itemSO.itemName;
 
         Item itemComponent = thrownObj.GetComponent<Item>();
         if (itemComponent != null)
@@ -545,6 +546,7 @@ public class Inventory : MonoBehaviour
     }
 
     #endregion
+
     #region World Pickup & Highlight
 
     public void SetLookedAtItem(Item item)
@@ -820,6 +822,8 @@ public class Inventory : MonoBehaviour
             cam.transform.position + cam.transform.forward * 1.5f,
             Quaternion.identity
         );
+
+        dropped.name = itemSO.itemName;
 
         Item item = dropped.GetComponent<Item>();
         if (item != null)

@@ -15,9 +15,9 @@ MonoBehaviour:
   itemName: First Age Barracks
   icon: {fileID: 2027245480, guid: 5c8130594542ae84aacb927dfbd82612, type: 3}
   maxStackSize: 1
-  itemPrefab: {fileID: 919132149155446097, guid: 2f2230dfb3f98cb4390db33b5996773e, type: 3}
+  itemPrefab: {fileID: 6562164273456377258, guid: 83e59695822f09143be9586a19a49736, type: 3}
   handItemPrefab: {fileID: 0}
   value: 80
-  purchasable: 1
-  price: 60
+  purchasable: 0
+  price: 0
   description: 

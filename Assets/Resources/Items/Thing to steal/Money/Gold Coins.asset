@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Gold Coins
   icon: {fileID: 1654011054, guid: eeab4ce29a02c034dbccd34e4e5c5271, type: 3}
   maxStackSize: 2
-  itemPrefab: {fileID: 919132149155446097, guid: 3782579bb2b38ac4dab7a64e4069de63, type: 3}
+  itemPrefab: {fileID: 8297435286836856472, guid: 04750557f5af6064b8ae1c9657dc25ab, type: 3}
   handItemPrefab: {fileID: 0}
   value: 200
   purchasable: 0

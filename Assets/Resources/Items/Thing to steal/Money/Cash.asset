@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Cash
   icon: {fileID: -1037824425, guid: 23b4afae90eb2ad4b928d7ef38e088a7, type: 3}
   maxStackSize: 10
-  itemPrefab: {fileID: 919132149155446097, guid: 5b7360732a96cc34da7c724354156ea1, type: 3}
+  itemPrefab: {fileID: 557764936371141845, guid: 3ea509a89b6409e4f8b65d000ce06ac1, type: 3}
   handItemPrefab: {fileID: 0}
   value: 150
   purchasable: 0

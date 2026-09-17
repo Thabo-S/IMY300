@@ -71,6 +71,8 @@ public class Player : MonoBehaviour
     private Coroutine damageFlashCoroutine;
 
     private PlayerMovement playerMovement;
+    private PlayerLookAround playerLookAround;
+    private InputMananger inputMananger;
 
     private Camera cam;
     public List<Slot> hotbarSlots;
@@ -131,6 +133,10 @@ public class Player : MonoBehaviour
         hotbarSlots = FindAnyObjectByType<Inventory>().hotbarSlots;
 
         playerMovement = GetComponent<PlayerMovement>();
+
+        playerLookAround = GetComponent<PlayerLookAround>();
+
+        inputMananger = GetComponent<InputMananger>();
 
         //deathUI = GameObject.FindGameObjectWithTag("DeathUI");
 
@@ -194,7 +200,11 @@ public class Player : MonoBehaviour
         {
             deathUI.SetActive(true);
 
-            if (playerMovement != null) playerMovement.CalculatePlayerMovement(Vector2.zero);
+            if (playerMovement != null) playerMovement.enabled = false;
+
+            if (playerLookAround != null) playerLookAround.enabled = false;
+
+            if (inputMananger != null) inputMananger.enabled = false;
 
             if (CursorManager.instance != null) CursorManager.instance.UnlockCursor();
 

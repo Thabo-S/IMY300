@@ -130,7 +130,7 @@ public class AttackState : BaseState
     {
         Transform gunBarrel = guard.gunBarrel;
 
-        Vector3 baseTargetPoint = guard.player.transform.position + (Vector3.up * guard.eyeHeight);
+        Vector3 baseTargetPoint = guard.player.GetComponent<CharacterController>().bounds.center; ;
         Vector3 shootDirection = (baseTargetPoint - gunBarrel.position).normalized;
 
         float shotRange = 0;
