@@ -155,7 +155,7 @@ public class Inventory : MonoBehaviour
         // 2. Gameplay Controls (Only active when Inventory is CLOSED)
         if (!IsOpen)
         {
-            DetectLookedAtItem();
+            //DetectLookedAtItem();
             HandleHotbarSelection();
             HandleDropEquippedItem();
             HandleThrowingLogic();
@@ -545,35 +545,24 @@ public class Inventory : MonoBehaviour
     }
 
     #endregion
-
     #region World Pickup & Highlight
-    private void DetectLookedAtItem()
+
+    public void SetLookedAtItem(Item item)
     {
-        ClearHighlight();
+        if (item == null) return;
 
-        Camera cam = playerCamera != null ? playerCamera : Camera.main;
-        if (cam == null) return;
-
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-
-        if (Physics.SphereCast(ray, pickupSphereRadius, out RaycastHit hit, pickupRange))
+        if (lookedAtItem != item)
         {
-            //Debug.Log(hit.collider.name + " is the hit object");
-
-            Item item = hit.collider.GetComponentInParent<Item>();
-            if (item != null)
-            {
-                lookedAtItem = item;
-                ApplyItemHighlight(item.gameObject);
-                return;
-            }
-
-            doorMovement door = hit.collider.GetComponentInParent<doorMovement>();
-            if (door != null)
-            {
-                lookedAtDoor = door;
-            }
+            ClearHighlight();
+            lookedAtItem = item;
+            ApplyItemHighlight(item.gameObject);
         }
+    }
+
+    public void ClearLookedAtItem()
+    {
+        if (lookedAtItem != null)
+            ClearHighlight();
     }
 
     private void ApplyItemHighlight(GameObject obj)
@@ -595,30 +584,17 @@ public class Inventory : MonoBehaviour
 
         lookedAtItem = null;
         lookedAtDoor = null;
-
     }
 
     public void TryPickupItem()
     {
-
-
         if (lookedAtItem != null)
         {
             AddItem(lookedAtItem.item, lookedAtItem.amount);
             Destroy(lookedAtItem.gameObject);
             ClearHighlight();
             EquipHandItem();
-
-            //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
-            //{
-            //    Debug.Log("Disable Objective for Keycard");
-            //}
         }
-
-        //else if (lookedAtDoor != null)
-        //{
-        //    lookedAtDoor.ToggleDoor();
-        //}
     }
 
     #endregion

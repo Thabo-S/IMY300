@@ -471,11 +471,12 @@ public class Player : MonoBehaviour
                 }
 
                 interactionTextUI.text = "[E] Pick up " + item.name;
+                Inventory.instance.SetLookedAtItem(item);
 
-                //if (Input.GetKeyDown(KeyCode.E))
-                //{
-                //    Inventory.instance.TryPickupItem();
-                //}
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    Inventory.instance.TryPickupItem();
+                }
             }
             else if (currentHighlightedDoor != null)
             {
