@@ -2,12 +2,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// A single row in the Objectives panel (icon + description). Matches your
-/// existing "1"/"1 (1)" entries - Icon child + Text (TMP) child. Crossing an
-/// objective out toggles TMP's built-in Strikethrough style and dims both
-/// the text and icon, rather than hiding/removing the row.
-/// </summary>
 public class ObjectiveEntryUI : MonoBehaviour
 {
     public Image icon;
