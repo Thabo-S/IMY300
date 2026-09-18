@@ -89,6 +89,9 @@ public class Inventory : MonoBehaviour
 
     public static Inventory instance;
 
+    [Tooltip("Reference to the level's objective tracker, updated whenever an item is added.")]
+    public ObjectiveTracker objectiveTracker;
+
     private void Awake()
     {
         instance = this;
@@ -318,6 +321,22 @@ public class Inventory : MonoBehaviour
         if (thrownItem == null) thrownItem = thrownObj.AddComponent<ThrownItem>();
         thrownItem.Setup(thrownObj.tag);
 
+
+        // Guarantee thrown items can always alert guards on landing, even if
+        // the prefab was never set up with ThrownItem attached in the Editor.
+        if (thrownObj.CompareTag("NoiseMaker"))
+        {
+            NoiseMakerItem noiseMaker = thrownObj.GetComponent<NoiseMakerItem>();
+            if (noiseMaker == null) noiseMaker = thrownObj.AddComponent<NoiseMakerItem>();
+            noiseMaker.Setup(thrownObj.tag);
+        }
+        else
+        {
+             thrownItem = thrownObj.GetComponent<ThrownItem>();
+            if (thrownItem == null) thrownItem = thrownObj.AddComponent<ThrownItem>();
+            thrownItem.Setup(thrownObj.tag);
+        }
+
         // Deduct 1 item from slot stack
         int remaining = equippedSlot.GetAmount() - 1;
         if (remaining > 0)
@@ -542,6 +561,14 @@ public class Inventory : MonoBehaviour
         {
             progressBarController.OnItemCollected(item, amountAdded);
         }
+        if(objectiveTracker != null)
+        {
+            objectiveTracker.NotifyItemCollected(item);
+        }
+        else
+        {
+            Debug.LogError("[Inventory] objectiveTracker is NULL — assign it in the Inspector.");
+        }
     }
 
     #endregion
@@ -746,7 +773,8 @@ public class Inventory : MonoBehaviour
         {
             if (torchLight != null)
             {
-                torchLight.enabled = !torchLight.enabled;
+
+                torchLight.gameObject.SetActive(!torchLight.gameObject.activeSelf);
             }
             else
             {
@@ -771,20 +799,6 @@ public class Inventory : MonoBehaviour
             EquipHandItem();
         }
     }
-
-    //private void UpdateHotbarOpacity()
-    //{
-    //    for (int i = 0; i < hotbarSlots.Count; i++)
-    //    {
-    //        Image icon = hotbarSlots[i].GetComponent<Image>();
-    //        if (icon != null)
-    //        {
-    //            icon.color = (i == equippedHotbarIndex)
-    //                ? new Color(1f, 1f, 1f, equippedOpacity)
-    //                : new Color(1f, 1f, 1f, normalOpacity);
-    //        }
-    //    }
-    //}
 
     private void UpdateHotbarOpacity()
     {
