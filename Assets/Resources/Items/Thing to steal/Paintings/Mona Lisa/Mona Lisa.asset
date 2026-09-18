@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
-  m_Name: King's Heart
+  m_Name: Mona Lisa
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: King's Heart
-  icon: {fileID: 1053371001, guid: 24c2417bb42e6a24cb24bdc4f0011d3a, type: 3}
+  itemName: Mona Lisa
+  icon: {fileID: 1125439958, guid: 1df3ebc1c242e5044b50f5f89ef8d150, type: 3}
   maxStackSize: 1
-  itemPrefab: {fileID: 1912475169499256481, guid: 7972e0d1db41c3148a3e861b2cc9e5f9, type: 3}
+  itemPrefab: {fileID: 263195032164337546, guid: e965b570e9f5ab84d97963351e657049, type: 3}
   handItemPrefab: {fileID: 0}
   isUniqueArtifact: 1
-  priceRangeMin: 300000
-  priceRangeMax: 400000
-  value: 340000
+  priceRangeMin: 50000
+  priceRangeMax: 80000
+  value: 76000
   purchasable: 0
   price: 0
   description: 

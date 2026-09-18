@@ -480,7 +480,16 @@ public class Player : MonoBehaviour
                     ApplyDoorHighlight(currentHighlightedDoor);
                 }
 
-                interactionTextUI.text = "[E] Pick up " + item.name;
+                if (hitObject.CompareTag("Cash"))
+                {
+                    interactionTextUI.text = "[E] Pick up Cash $100";
+                }
+                else
+                { 
+                    string cleanName = item.name.Split('(')[0].Trim();
+                    interactionTextUI.text = "[E] Pick up " + cleanName;
+                }
+
                 Inventory.instance.SetLookedAtItem(item);
 
                 if (Input.GetKeyDown(KeyCode.E))
