@@ -34,9 +34,9 @@ TagManager:
   - LockedDoor
   - QTeEventsLockDoor
   - QTeEventsKepPad
-  - LaserWarning
   - QteTimer
   - DeathUI
+  - AlarmWarning
   layers:
   - Default
   - TransparentFX

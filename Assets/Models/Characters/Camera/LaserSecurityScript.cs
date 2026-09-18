@@ -4,12 +4,23 @@ using System.Collections;
 
 public class LaserSecurityScript : MonoBehaviour
 {
+    public static bool alarmOn = false;
+
     private bool isTriggered = false;
+
     public GameObject respawnPoint;
 
     public GameObject laserWarning;
 
+    public GameObject alarmIconReference;
+
+    public static GameObject alarmIcon;
+
     public GameObject[] guardsList;
+
+    public AudioSource alarm;
+
+    public AudioClip alarmSound;
 
     [Header("Alert Settings")]
     [Tooltip("Only guards within this distance of the laser will be alerted. " +
@@ -23,16 +34,22 @@ public class LaserSecurityScript : MonoBehaviour
 
         guardsList = GameObject.FindGameObjectsWithTag("Guard");
 
-        laserWarning = GameObject.Find("LaserWarning");
+        //alarmIcon = GameObject.FindGameObjectWithTag("AlarmWarning");
+
+        alarmIcon = alarmIconReference;
+
+        if (alarmIcon != null)
+            alarmIcon.SetActive(false);
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !isTriggered)
         {
-            isTriggered = true;
+            PlayAlarm();
 
-                Debug.Log("Level index : " + SceneController.Instance.GetCurrentLevelIndex());
+            Debug.Log("Level index : " + SceneController.Instance.GetCurrentLevelIndex());
 
             if (SceneController.Instance.GetCurrentLevelIndex() != 0)
             {
@@ -40,14 +57,19 @@ public class LaserSecurityScript : MonoBehaviour
                 return;
             }
 
-            Debug.Log("[LASER] Player triggered the laser, guards alerted!");
+            // =============== ONLY RUNS IN THE TUTORIAL ===============
+            // =========================================================
+
+            StartCoroutine(TurnOffAlarmRoutine(3f));
 
             if (laserWarning != null)
+            {
                 laserWarning.SetActive(true);
+            }
 
             GameObject player = other.gameObject;
-
             CharacterController cc = player.GetComponent<CharacterController>();
+
             if (cc != null) cc.enabled = false;
 
             player.transform.position = respawnPoint.transform.position;
@@ -59,6 +81,40 @@ public class LaserSecurityScript : MonoBehaviour
         }
     }
 
+    private void PlayAlarm()
+    {
+        if (alarmOn) return;
+
+        alarmOn = true;
+
+        if(alarmIcon !=null) alarmIcon.SetActive(true);
+
+        if (alarm != null)
+        {
+            if (alarmSound != null)
+            {
+                alarm.clip = alarmSound;
+            }
+            else
+            {
+                Debug.LogWarning($"{name}: 'alarmSound' AudioClip is not assigned in the inspector!");
+            }
+
+            alarm.Play();
+        }
+        else
+        {
+            Debug.LogWarning($"{name}: 'alarm' AudioSource is not assigned - nothing to play.");
+        }
+    }
+
+    public static void StopAlarm()
+    {
+        alarmOn = false;
+
+        alarmIcon.SetActive(false);
+    }
+
     private void alertGuards()
     {
         GameObject nearestGuard = null;
@@ -66,7 +122,7 @@ public class LaserSecurityScript : MonoBehaviour
 
         foreach (GameObject guard in guardsList)
         {
-            if (guard == null) continue; // guard may have been destroyed/killed
+            if (guard == null) continue;
 
             float distance = Vector3.Distance(transform.position, guard.transform.position);
             if (distance < nearestDistance && distance <= alertRadius)
@@ -79,7 +135,7 @@ public class LaserSecurityScript : MonoBehaviour
         if (nearestGuard == null)
         {
             Debug.Log("[LASER] No guard within alert radius — nothing to alert.");
-            isTriggered = false; // no guard responded, don't leave this laser stuck as "used"
+            isTriggered = false;
             return;
         }
 
@@ -104,5 +160,23 @@ public class LaserSecurityScript : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         panel.SetActive(false);
+    }
+    private IEnumerator TurnOffAlarmRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (alarm != null && alarm.isPlaying)
+        {
+            alarm.Stop();
+        }
+
+        alarmOn = false;
+
+        if (alarmIcon != null)
+        {
+            alarmIcon.SetActive(false);
+        }
+
+        Debug.Log("[LASER] Alarm silenced after 3 seconds.");
     }
 }

@@ -132,7 +132,7 @@ public class Player : MonoBehaviour
 
         playerMovement = GetComponent<PlayerMovement>();
 
-        deathUI = GameObject.FindGameObjectWithTag("DeathUI");
+        //deathUI = GameObject.FindGameObjectWithTag("DeathUI");
 
         damageClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/damage_grunt_male");
 
@@ -472,14 +472,10 @@ public class Player : MonoBehaviour
 
                 interactionTextUI.text = "[E] Pick up " + item.name;
 
-                // NOTE: The actual pickup trigger was removed from here - it
-                // was calling Inventory.instance.TryPickupItem() on E, which
-                // duplicated InputMananger's own dedicated pickup input
-                // action (also bound to E) calling the same method. Both
-                // firing on one keypress caused every item to be picked up
-                // twice. This branch now only handles highlighting/UI text;
-                // Inventory's own system (via InputMananger) is the single
-                // source of truth for actually triggering the pickup.
+                //if (Input.GetKeyDown(KeyCode.E))
+                //{
+                //    Inventory.instance.TryPickupItem();
+                //}
             }
             else if (currentHighlightedDoor != null)
             {
