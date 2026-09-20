@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Magic Vase
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Magic Vase
+  icon: {fileID: 1941922252, guid: abd127a77bc569d48a9be83cc84afd6d, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 171140364602737489, guid: e9dcf1f5a93049e41b04de5257e859ee, type: 3}
+  handItemPrefab: {fileID: 0}
+  isUniqueArtifact: 0
+  priceRangeMin: 0
+  priceRangeMax: 0
+  value: 50
+  purchasable: 0
+  price: 0
+  description: 

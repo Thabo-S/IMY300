@@ -12,6 +12,8 @@ public class ObjectiveEntryUI : MonoBehaviour
 
     public void Setup(Objective objective)
     {
+        Debug.Log($"[ObjectiveEntryUI] '{objective.description}' isComplete={objective.isComplete}");
+
         if (icon != null) icon.sprite = objective.icon;
         if (text != null) text.text = objective.description;
 
@@ -22,9 +24,7 @@ public class ObjectiveEntryUI : MonoBehaviour
     {
         if (text != null)
         {
-            text.fontStyle = completed
-                ? (text.fontStyle | FontStyles.Strikethrough)
-                : (text.fontStyle & ~FontStyles.Strikethrough);
+            text.fontStyle = completed ? FontStyles.Strikethrough : FontStyles.Normal;
 
             Color c = text.color;
             c.a = completed ? completedAlpha : 1f;
