@@ -9,6 +9,7 @@ public class SceneController : MonoBehaviour
     [SerializeField] private string mainMenuScene = "Main Menu";
     [SerializeField] private string storeScene = "Store";
     [SerializeField] private string loadoutScene = "Loadout";
+    [SerializeField] private string lobbyScene = "Lobby";
 
     // Index-mapped playable levels. Index 0 = Tutorial, 1 = Level 1, etc.
     [SerializeField] private string[] levels = { "Tutorial", "Level 1", "Level 2", "Level 3" };
@@ -82,6 +83,10 @@ public class SceneController : MonoBehaviour
     public void GoToStore()
     {
         SceneManager.LoadScene(storeScene);
+    }
+    public void GoToLobby()
+    {
+        SceneManager.LoadScene(lobbyScene);
     }
 
     /// Tutorial is playable directly from Main Menu — no Loadout step.

@@ -11,6 +11,7 @@ public class SceneButtonBridge : MonoBehaviour
 {
     public void GoToMainMenu() => SceneController.Instance?.GoToMainMenu();
     public void GoToStore() => SceneController.Instance?.GoToStore();
+    public void GoToLobby() => SceneController.Instance?.GoToLobby();
     public void GoToTutorial() => SceneController.Instance?.GoToTutorial();
     public void StartSelectedLevel() => SceneController.Instance?.StartSelectedLevel();
     public void RestartLevel() => SceneController.Instance?.RestartLevel();
