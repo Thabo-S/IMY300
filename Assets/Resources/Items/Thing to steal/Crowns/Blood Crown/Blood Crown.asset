@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Blood Crown
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Blood Crown
+  icon: {fileID: -1768433814, guid: d2060d00c3002de418eccae2b9966735, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 5969923081967594249, guid: 49c4da35040dbd2449d50fa4a92faa28, type: 3}
+  handItemPrefab: {fileID: 0}
+  isUniqueArtifact: 1
+  priceRangeMin: 250000
+  priceRangeMax: 350000
+  value: 235000
+  purchasable: 0
+  price: 0
+  description: 

@@ -37,6 +37,8 @@ TagManager:
   - QteTimer
   - DeathUI
   - AlarmWarning
+  - LaserWarning
+  - Cash
   layers:
   - Default
   - TransparentFX

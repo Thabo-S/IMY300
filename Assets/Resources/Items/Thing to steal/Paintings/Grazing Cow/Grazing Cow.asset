@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Grazing Cow
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Grazing Cow
+  icon: {fileID: -1506842619, guid: 604d208b272d2a14cb415e182440810e, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 5110144424278336178, guid: f882a28460ebe2c4ab14f9d1a169ad52, type: 3}
+  handItemPrefab: {fileID: 0}
+  value: 300
+  purchasable: 0
+  price: 0
+  description: 

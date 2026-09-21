@@ -101,6 +101,8 @@ public class GuardSpeechManager : MonoBehaviour
 
     private void PlayClipOnGuard(Guard guard, AudioClip clip, float volume)
     {
+        if (PauseMenu.isGamePause) return;
+
         if (guard == null || guard.speechAudioSource == null || clip == null) return;
 
         guard.speechAudioSource.PlayOneShot(clip, volume);

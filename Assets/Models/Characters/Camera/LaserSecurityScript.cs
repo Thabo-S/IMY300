@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using UnityEngine.UI;
 
 public class LaserSecurityScript : MonoBehaviour
 {
@@ -11,8 +12,6 @@ public class LaserSecurityScript : MonoBehaviour
     public GameObject respawnPoint;
 
     public GameObject laserWarning;
-
-    public GameObject alarmIconReference;
 
     public static GameObject alarmIcon;
 
@@ -34,12 +33,10 @@ public class LaserSecurityScript : MonoBehaviour
 
         guardsList = GameObject.FindGameObjectsWithTag("Guard");
 
-        //alarmIcon = GameObject.FindGameObjectWithTag("AlarmWarning");
+        alarmIcon = GameObject.FindGameObjectWithTag("AlarmWarning");
 
-        alarmIcon = alarmIconReference;
-
-        if (alarmIcon != null)
-            alarmIcon.SetActive(false);
+        alarmIcon.GetComponent<Image>().enabled = alarmOn;
+        alarmIcon.GetComponent<Animator>().enabled = alarmOn;
 
     }
 
@@ -87,7 +84,11 @@ public class LaserSecurityScript : MonoBehaviour
 
         alarmOn = true;
 
-        if(alarmIcon !=null) alarmIcon.SetActive(true);
+        if (alarmIcon != null)
+        {
+            alarmIcon.GetComponent<Image>().enabled = alarmOn;
+            alarmIcon.GetComponent<Animator>().enabled = alarmOn;
+        }
 
         if (alarm != null)
         {
@@ -112,7 +113,8 @@ public class LaserSecurityScript : MonoBehaviour
     {
         alarmOn = false;
 
-        alarmIcon.SetActive(false);
+        alarmIcon.GetComponent<Image>().enabled = alarmOn;
+        alarmIcon.GetComponent<Animator>().enabled = alarmOn;
     }
 
     private void alertGuards()

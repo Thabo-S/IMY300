@@ -20,7 +20,7 @@ public class Objective
              "moment the player picks up this exact item.")]
     public ItemSO targetItem;
 
-    [HideInInspector] public bool isComplete;
+    public bool isComplete = false;
 }
 
 /// <summary>

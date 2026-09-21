@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
+using TMPro;
 using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class Inventory : MonoBehaviour
@@ -25,6 +27,12 @@ public class Inventory : MonoBehaviour
     [Header("Progress UI")]
     [Tooltip("Reference to the level's progress bar, updated whenever an item is added.")]
     public ProgressBarController progressBarController;
+
+    [Header("Notifications")]
+    [Tooltip("Text UI element used for temporary on-screen messages (e.g. 'Inventory full', MedKit health restriction).")]
+    public TextMeshProUGUI notificationText;
+    public float notificationDuration = 2f;
+    private Coroutine notificationCoroutine;
 
     public static bool IsOpen { get; private set; }
 
@@ -62,6 +70,10 @@ public class Inventory : MonoBehaviour
     public int adrenalineHealthIncrease = 20;
     public float adrenalineSpeedMultiplier = 1.5f;
     public float adrenalineDuration = 5f;
+
+    [Header("MedKit Restriction")]
+    [Tooltip("Player can't use a MedKit once their health is at or above this value - only enforced outside the tutorial (currentLevelPrefKey != 0).")]
+    public float medkitHealthThreshold = 55f;
 
     [Header("Throwing System")]
     public Transform throwPoint;
@@ -139,6 +151,9 @@ public class Inventory : MonoBehaviour
 
         if (dragIcon != null)
             dragIcon.raycastTarget = false;
+
+        if (notificationText != null)
+            notificationText.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -158,7 +173,7 @@ public class Inventory : MonoBehaviour
         // 2. Gameplay Controls (Only active when Inventory is CLOSED)
         if (!IsOpen)
         {
-            DetectLookedAtItem();
+            //DetectLookedAtItem();
             HandleHotbarSelection();
             HandleDropEquippedItem();
             HandleThrowingLogic();
@@ -179,6 +194,34 @@ public class Inventory : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
             useSelectedItem();
     }
+
+    #region Notifications
+
+    public void ShowNotification(string message)
+    {
+        if (notificationText == null)
+        {
+            Debug.LogWarning($"[Inventory] notificationText is not assigned - cannot show message: {message}");
+            return;
+        }
+
+        if (notificationCoroutine != null) StopCoroutine(notificationCoroutine);
+        notificationCoroutine = StartCoroutine(NotificationRoutine(message));
+    }
+
+    private IEnumerator NotificationRoutine(string message)
+    {
+        notificationText.text = message;
+        notificationText.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(notificationDuration);
+
+        notificationText.text = "";
+        notificationText.gameObject.SetActive(false);
+        notificationCoroutine = null;
+    }
+
+    #endregion
 
     #region Inventory Toggle Logic
 
@@ -299,6 +342,7 @@ public class Inventory : MonoBehaviour
 
         // Instantiate world item
         GameObject thrownObj = Instantiate(itemSO.itemPrefab, spawnPosition, spawnRotation);
+        thrownObj.name = itemSO.itemName;
 
         Item itemComponent = thrownObj.GetComponent<Item>();
         if (itemComponent != null)
@@ -425,66 +469,6 @@ public class Inventory : MonoBehaviour
 
     #region Add Item Logic
 
-    //public void AddItem(ItemSO itemToAdd, int amount = 1)
-    //{
-    //    if (itemToAdd == null) return;
-
-    //    int remaining = amount;
-
-    //    foreach (Slot slot in allSlots)
-    //    {
-    //        if (slot.HasItem() && slot.GetItem() == itemToAdd)
-    //        {
-    //            int currentAmount = slot.GetAmount();
-    //            int maxStack = itemToAdd.maxStackSize;
-
-    //            if (currentAmount < maxStack)
-    //            {
-    //                int spaceLeft = maxStack - currentAmount;
-    //                int amountToAdd = Mathf.Min(spaceLeft, remaining);
-
-    //                slot.SetItem(itemToAdd, currentAmount + amountToAdd);
-    //                remaining -= amountToAdd;
-
-    //                if (remaining <= 0)
-    //                {
-    //                    ReportItemsCollected(itemToAdd, amount - remaining);
-    //                    return;
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    foreach (Slot slot in allSlots)
-    //    {
-    //        if (!slot.HasItem())
-    //        {
-    //            int amountToPlace = Mathf.Min(itemToAdd.maxStackSize, remaining);
-    //            slot.SetItem(itemToAdd, amountToPlace);
-    //            remaining -= amountToPlace;
-
-    //            if (remaining <= 0)
-    //            {
-    //                ReportItemsCollected(itemToAdd, amount - remaining);
-    //                return;
-    //            }
-    //        }
-    //    }
-
-    //    if (remaining > 0)
-    //    {
-    //        Debug.LogWarning($"Inventory is full! Could not add {remaining} of {itemToAdd.itemName}");
-    //    }
-
-    //    // Report whatever partial amount did make it in, even if the
-    //    // inventory filled up before placing everything.
-    //    int amountActuallyAdded = amount - remaining;
-    //    if (amountActuallyAdded > 0)
-    //    {
-    //        ReportItemsCollected(itemToAdd, amountActuallyAdded);
-    //    }
-    //}
-
     public void AddItem(ItemSO itemToAdd, int amount = 1)
     {
         if (itemToAdd == null)
@@ -555,6 +539,44 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Mirrors AddItem()'s two-pass logic (stack onto existing slots first,
+    /// then empty slots) WITHOUT actually placing anything - used to check
+    /// before a pickup whether the full amount would actually fit, so
+    /// TryPickupItem() can refuse the pickup instead of silently losing
+    /// items when AddItem() can't fit everything.
+    /// </summary>
+    private bool HasRoomForItem(ItemSO itemToAdd, int amount)
+    {
+        if (itemToAdd == null) return false;
+
+        int remaining = amount;
+
+        foreach (Slot slot in allSlots)
+        {
+            if (slot.HasItem() && slot.GetItem() == itemToAdd)
+            {
+                int spaceLeft = itemToAdd.maxStackSize - slot.GetAmount();
+                if (spaceLeft > 0)
+                {
+                    remaining -= spaceLeft;
+                    if (remaining <= 0) return true;
+                }
+            }
+        }
+
+        foreach (Slot slot in allSlots)
+        {
+            if (!slot.HasItem())
+            {
+                remaining -= itemToAdd.maxStackSize;
+                if (remaining <= 0) return true;
+            }
+        }
+
+        return remaining <= 0;
+    }
+
     private void ReportItemsCollected(ItemSO item, int amountAdded)
     {
         if (progressBarController != null)
@@ -574,33 +596,23 @@ public class Inventory : MonoBehaviour
     #endregion
 
     #region World Pickup & Highlight
-    private void DetectLookedAtItem()
+
+    public void SetLookedAtItem(Item item)
     {
-        ClearHighlight();
+        if (item == null) return;
 
-        Camera cam = playerCamera != null ? playerCamera : Camera.main;
-        if (cam == null) return;
-
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-
-        if (Physics.SphereCast(ray, pickupSphereRadius, out RaycastHit hit, pickupRange))
+        if (lookedAtItem != item)
         {
-            //Debug.Log(hit.collider.name + " is the hit object");
-
-            Item item = hit.collider.GetComponentInParent<Item>();
-            if (item != null)
-            {
-                lookedAtItem = item;
-                ApplyItemHighlight(item.gameObject);
-                return;
-            }
-
-            doorMovement door = hit.collider.GetComponentInParent<doorMovement>();
-            if (door != null)
-            {
-                lookedAtDoor = door;
-            }
+            ClearHighlight();
+            lookedAtItem = item;
+            ApplyItemHighlight(item.gameObject);
         }
+    }
+
+    public void ClearLookedAtItem()
+    {
+        if (lookedAtItem != null)
+            ClearHighlight();
     }
 
     private void ApplyItemHighlight(GameObject obj)
@@ -622,30 +634,22 @@ public class Inventory : MonoBehaviour
 
         lookedAtItem = null;
         lookedAtDoor = null;
-
     }
 
     public void TryPickupItem()
     {
+        if (lookedAtItem == null) return;
 
-
-        if (lookedAtItem != null)
+        if (!HasRoomForItem(lookedAtItem.item, lookedAtItem.amount))
         {
-            AddItem(lookedAtItem.item, lookedAtItem.amount);
-            Destroy(lookedAtItem.gameObject);
-            ClearHighlight();
-            EquipHandItem();
-
-            //if (PlayerPrefs.GetInt("LevelIndex", 0) == 0)
-            //{
-            //    Debug.Log("Disable Objective for Keycard");
-            //}
+            ShowNotification("Inventory full!");
+            return; // item stays in the world - not destroyed, not added
         }
 
-        //else if (lookedAtDoor != null)
-        //{
-        //    lookedAtDoor.ToggleDoor();
-        //}
+        AddItem(lookedAtItem.item, lookedAtItem.amount);
+        Destroy(lookedAtItem.gameObject);
+        ClearHighlight();
+        EquipHandItem();
     }
 
     #endregion
@@ -783,6 +787,14 @@ public class Inventory : MonoBehaviour
 
         if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("MedKit"))
         {
+            bool restrictionActive = PlayerPrefs.GetInt("currentLevelPrefKey", 0) != 0;
+
+            if (restrictionActive && player != null && player.PlayerHealth >= medkitHealthThreshold)
+            {
+                ShowNotification("Health too high to use a MedKit.");
+                return;
+            }
+
             Debug.Log("MedKit found");
 
             int healthIncrease = 40;
@@ -858,6 +870,8 @@ public class Inventory : MonoBehaviour
             cam.transform.position + cam.transform.forward * 1.5f,
             Quaternion.identity
         );
+
+        dropped.name = itemSO.itemName;
 
         Item item = dropped.GetComponent<Item>();
         if (item != null)

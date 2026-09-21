@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Boat House
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Boat House
+  icon: {fileID: -1989519331, guid: 9875af447fe45d84ebf9aefaf0b38503, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 3371875874674790663, guid: 10e87e90aaa4827469864a71cb0baaa6, type: 3}
+  handItemPrefab: {fileID: 0}
+  value: 75
+  purchasable: 0
+  price: 0
+  description: 

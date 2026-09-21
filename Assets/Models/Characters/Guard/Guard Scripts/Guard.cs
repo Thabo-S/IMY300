@@ -263,7 +263,7 @@ public class Guard : MonoBehaviour
         if (distance > warningSightDistance) return false;
 
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.transform.position + (Vector3.up * 1.6f);
+        Vector3 targetPoint = player.GetComponent<CharacterController>().bounds.center;
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
 
@@ -280,7 +280,7 @@ public class Guard : MonoBehaviour
         if (!IsPlayerInFieldOfViewCone()) return false;
 
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.transform.position + (Vector3.up * eyeHeight);
+        Vector3 targetPoint = player.GetComponent<CharacterController>().bounds.center;
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
         Ray ray = new Ray(rayOrigin, targetDirection);
