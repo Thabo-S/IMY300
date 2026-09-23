@@ -85,10 +85,19 @@ public class Player : MonoBehaviour
     [Tooltip("Radius of the SphereCast used for item/door detection.")]
     public float detectionSphereRadius = 0.4f;
 
+    [Header("Navigation Buttons")]
+    public Button PauseMenuRestart;
+    public Button PauseMenuLobby; 
+    public Button DeathUILobby; 
+    public Button DeathUILRestart; 
+    public Button DeathUIStore;
+
 
     //================= List Of PlayerPrefs ===================
-    // LevelIndex : Use to determine game level
-    // currentLevelPrefKey : Use for the currentlevel being played
+    // LevelIndex : Used to determine game level
+    // currentLevelPrefKey : Used for the currentlevel being played
+    // MobDebtRemaining : Used for debt being owed
+    // PlayerCurrency : Used for how much a player has
     //=========================================================
 
     private void Awake()
@@ -143,6 +152,8 @@ public class Player : MonoBehaviour
         damageClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/damage_grunt_male");
 
         deathClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/death_groan_male");
+
+        WireNavigationButtons();
     }
 
     void Update()
@@ -159,6 +170,27 @@ public class Player : MonoBehaviour
         {
             ObjectivesPanel.SetActive(!ObjectivesPanel.activeSelf);
         }
+    }
+
+    private void WireNavigationButtons()
+    {
+        BindButton(PauseMenuRestart, bridge => bridge.RestartLevel());
+        BindButton(PauseMenuLobby, bridge => bridge.GoToLobby());
+        BindButton(DeathUILobby, bridge => bridge.GoToLobby());
+        BindButton(DeathUILRestart, bridge => bridge.RestartLevel());
+        BindButton(DeathUIStore, bridge => bridge.GoToStore());
+    }
+
+    private void BindButton(Button button, System.Action<SceneButtonBridge> action)
+    {
+        if (button == null) return;
+
+        SceneButtonBridge bridge = button.GetComponent<SceneButtonBridge>();
+        if (bridge == null)
+            bridge = button.gameObject.AddComponent<SceneButtonBridge>();
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => action(bridge));
     }
     public void TakeDamage(int damage)
     {
@@ -216,6 +248,13 @@ public class Player : MonoBehaviour
                 {
                     guard.SetActive(false);
                 }
+            }
+
+            AudioSource[] allPlayerAudio = GetComponents<AudioSource>();
+            foreach (AudioSource source in allPlayerAudio)
+            {
+                source.Stop();
+                source.enabled = false;
             }
         }
     }

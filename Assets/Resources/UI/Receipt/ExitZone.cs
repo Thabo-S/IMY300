@@ -114,10 +114,20 @@ public class ExitZone : MonoBehaviour
         if (nextLevelButton != null) nextLevelButton.SetActive(hasRequiredItems);
         if (restartButton != null) restartButton.SetActive(!hasRequiredItems);
 
-        if (hasRequiredItems && SceneController.Instance != null)
+        if (hasRequiredItems)
         {
-            int completedLevelIndex = SceneController.Instance.GetCurrentLevelIndex();
-            SceneController.Instance.UnlockNextLevel(completedLevelIndex);
+            // Mark every required artifact as retrieved for THIS playthrough -
+            // this is what BlackMarketEntryUI checks before allowing a sale.
+            foreach (ItemSO required in requiredItems)
+            {
+                ArtifactRetrievalTracker.MarkRetrieved(required);
+            }
+
+            if (SceneController.Instance != null)
+            {
+                int completedLevelIndex = SceneController.Instance.GetCurrentLevelIndex();
+                SceneController.Instance.UnlockNextLevel(completedLevelIndex);
+            }
         }
 
         // Side loot pays out now, known values, no reveal needed.
@@ -133,8 +143,6 @@ public class ExitZone : MonoBehaviour
 
         if (missionStarsController != null)
         {
-            // Star evaluation now uses only the KNOWN cash (side loot) since
-            // the artifact's real value isn't revealed yet at this screen.
             missionStarsController.EvaluateAndAwardStars(sideLootCash, elapsedSeconds, itemsCollected, wasDetected);
         }
 
