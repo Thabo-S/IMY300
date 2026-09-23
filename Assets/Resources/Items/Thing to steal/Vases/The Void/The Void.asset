@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: The Void
   icon: {fileID: 750716688, guid: f0f18e49a955ba244adf22a4de00b979, type: 3}
   maxStackSize: 1
-  itemPrefab: {fileID: 548047992088657895, guid: a5904fc13db9b5947a1cc279c51c374e, type: 3}
+  itemPrefab: {fileID: 8484636582391051287, guid: 6a9d54b82cb4aec45a87ba9263cc6c15, type: 3}
   handItemPrefab: {fileID: 0}
   isUniqueArtifact: 0
   priceRangeMin: 0

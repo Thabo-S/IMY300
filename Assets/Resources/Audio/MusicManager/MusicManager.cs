@@ -71,6 +71,16 @@ public class MusicManager : MonoBehaviour
 
     private void HandleSceneMusic(string sceneName)
     {
+        // --- NEW: Check if the scene is a gameplay scene ---
+        string lowerSceneName = sceneName.ToLower();
+        if (lowerSceneName.Contains("tutorial") || lowerSceneName.Contains("level"))
+        {
+            currentIndex = -1; // Stop the playlist from advancing
+            FadeOutMusic();
+            return;
+        }
+
+        // Original logic for menus/non-gameplay scenes
         foreach (var track in sceneTracks)
         {
             if (track.sceneName == sceneName && track.clip != null)
@@ -86,6 +96,33 @@ public class MusicManager : MonoBehaviour
         {
             PlayNext();
         }
+    }
+
+    // --- NEW: Smoothly fade out music when entering a level ---
+    private void FadeOutMusic()
+    {
+        if (!audioSource.isPlaying) return;
+
+        if (fadeCoroutine != null)
+            StopCoroutine(fadeCoroutine);
+
+        fadeCoroutine = StartCoroutine(FadeOutRoutine());
+    }
+
+    private IEnumerator FadeOutRoutine()
+    {
+        float startVolume = audioSource.volume;
+        float t = 0f;
+        while (t < fadeDuration)
+        {
+            t += Time.deltaTime;
+            audioSource.volume = Mathf.Lerp(startVolume, 0f, t / fadeDuration);
+            yield return null;
+        }
+        audioSource.Stop();
+
+        audioSource.volume = volume;
+        fadeCoroutine = null;
     }
 
     private void Update()

@@ -7,6 +7,8 @@ using System;
 
 public class TutorialManager : MonoBehaviour
 {
+    public static TutorialManager Instance { get; private set; }
+
     public GameObject startTutorialOverlay;
     public GameObject player;
     public Player playerScript;
@@ -47,13 +49,17 @@ public class TutorialManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+
         player = GameObject.FindGameObjectWithTag("Player");
     }
-
     void Start()
     {
         startTutorialOverlay.SetActive(true);
-        player.SetActive(false);
+        //player.SetActive(false);
         playerScript = player.GetComponent<Player>();
         InputMananger = player.GetComponent<InputMananger>();
 
@@ -82,8 +88,8 @@ public class TutorialManager : MonoBehaviour
 
     public void hideOverlay()
     {
-        startTutorialOverlay.SetActive(false);
-        player.SetActive(true);
+        //startTutorialOverlay.SetActive(false);
+        //player.SetActive(true);
         //WelcomeCam.SetActive(false);
 
         CursorManager.instance.LockCursor();

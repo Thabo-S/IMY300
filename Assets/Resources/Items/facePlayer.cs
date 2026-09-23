@@ -11,28 +11,28 @@ public class facePlayer : MonoBehaviour
     {
         player = GameObject.FindWithTag("Player");
 
-        Canvas canvasComponent = GetComponentInChildren<Canvas>(true);
+        //Canvas canvasComponent = GetComponentInChildren<Canvas>(true);
 
-        if (canvasComponent != null)
-        {
-            canvas = canvasComponent.gameObject;
+        //if (canvasComponent != null)
+        //{
+        //    canvas = canvasComponent.gameObject;
 
-            PositionCanvasAboveObject();
+        //    PositionCanvasAboveObject();
 
-            nameText = canvas.GetComponentInChildren<TextMeshProUGUI>();
-            if (nameText != null)
-            {
-                nameText.text = gameObject.name;
-            }
-            else
-            {
-                Debug.LogWarning($"{name}: No TextMeshProUGUI found in the children of the Canvas.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"{name}: No Canvas found in the children of facePlayer script dude.");
-        }
+        //    nameText = canvas.GetComponentInChildren<TextMeshProUGUI>();
+        //    if (nameText != null)
+        //    {
+        //        nameText.text = gameObject.name;
+        //    }
+        //    else
+        //    {
+        //        Debug.LogWarning($"{name}: No TextMeshProUGUI found in the children of the Canvas.");
+        //    }
+        //}
+        //else
+        //{
+        //    Debug.LogWarning($"{name}: No Canvas found in the children of facePlayer script dude.");
+        //}
     }
 
     void PositionCanvasAboveObject()

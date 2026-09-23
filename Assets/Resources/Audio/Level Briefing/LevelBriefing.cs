@@ -168,6 +168,14 @@ public class LevelBriefing : MonoBehaviour
         if (inputManager != null) inputManager.enabled = true;
         if (playerMovement != null) playerMovement.enabled = true;
 
+        if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
+        {
+            if (TutorialManager.Instance != null)
+            {
+                TutorialManager.Instance.hideOverlay();
+            }
+        }
+
         if (CursorManager.instance != null)
             CursorManager.instance.LockCursor();
     }
