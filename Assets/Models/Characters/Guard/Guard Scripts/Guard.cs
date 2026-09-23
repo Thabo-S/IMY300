@@ -15,6 +15,7 @@ public class Guard : MonoBehaviour
     private Animator animator;
     public AudioSource footstepAudioSource;
     public AudioSource speechAudioSource;
+    public AudioSource gunshotAudioSource;
     public NavMeshAgent Agent { get => agent; }
     public Animator Animator { get => animator; }
 
@@ -45,6 +46,7 @@ public class Guard : MonoBehaviour
     [SerializeField] private float minPitch = 0.9f;
     [SerializeField] private float maxPitch = 1.1f;
     public AudioClip footstepClip;
+    public AudioClip gunshotAudioClip;
 
     [Header("Detection Meter (sound only)")]
     public float detection = 0f;
@@ -104,6 +106,7 @@ public class Guard : MonoBehaviour
         stateMachine.Initialise();
         footstepAudioSource = GetComponents<AudioSource>()[0];
         speechAudioSource = GetComponents<AudioSource>()[1];
+        gunshotAudioSource = GetComponents<AudioSource>()[1];
     }
 
     private void Update()
@@ -122,6 +125,12 @@ public class Guard : MonoBehaviour
             animator.SetBool("isShooting", isShooting);
         }
 
+    }
+
+    public void GunshotAudio()
+    {
+        gunshotAudioSource.pitch = Random.Range(minPitch, maxPitch);
+        gunshotAudioSource.PlayOneShot(gunshotAudioClip);
     }
 
 

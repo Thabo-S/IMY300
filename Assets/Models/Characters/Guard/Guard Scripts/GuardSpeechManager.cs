@@ -25,6 +25,14 @@ public class GuardSpeechManager : MonoBehaviour
 
     private Guard lastSpeaker;
 
+    /// <summary>
+    /// Ambient patrol chatter can be interrupted by a Bark (Alert/Spotted),
+    /// but a Bark in progress is never interrupted by anything - not even
+    /// another Bark, so the more urgent line always finishes playing cleanly.
+    /// </summary>
+    private enum SpeechPriority { Ambient, Bark }
+    private SpeechPriority currentPriority = SpeechPriority.Ambient;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -75,7 +83,7 @@ public class GuardSpeechManager : MonoBehaviour
         if (speaker == null) return;
 
         AudioClip clip = patrolClips[Random.Range(0, patrolClips.Length)];
-        PlayClipOnGuard(speaker, clip, chatterVolume);
+        PlayClipOnGuard(speaker, clip, chatterVolume, SpeechPriority.Ambient);
         lastSpeaker = speaker;
     }
 
@@ -85,7 +93,7 @@ public class GuardSpeechManager : MonoBehaviour
         if (alertClips.Length == 0 || guard == null) return;
 
         AudioClip clip = alertClips[Random.Range(0, alertClips.Length)];
-        PlayClipOnGuard(guard, clip, barkVolume);
+        PlayClipOnGuard(guard, clip, barkVolume, SpeechPriority.Bark);
         lastSpeaker = guard;
     }
 
@@ -95,17 +103,32 @@ public class GuardSpeechManager : MonoBehaviour
         if (attackClips.Length == 0 || guard == null) return;
 
         AudioClip clip = attackClips[Random.Range(0, attackClips.Length)];
-        PlayClipOnGuard(guard, clip, barkVolume);
+        PlayClipOnGuard(guard, clip, barkVolume, SpeechPriority.Bark);
         lastSpeaker = guard;
     }
 
-    private void PlayClipOnGuard(Guard guard, AudioClip clip, float volume)
+    private void PlayClipOnGuard(Guard guard, AudioClip clip, float volume, SpeechPriority priority)
     {
         if (PauseMenu.isGamePause) return;
 
         if (guard == null || guard.speechAudioSource == null || clip == null) return;
 
+        bool somethingPlaying = guard.speechAudioSource.isPlaying;
+
+        if (somethingPlaying)
+        {
+            // A Bark in progress is never interrupted, by anything.
+            if (currentPriority == SpeechPriority.Bark) return;
+
+            // Ambient chatter in progress can only be interrupted by a Bark,
+            // never by more ambient chatter.
+            if (priority == SpeechPriority.Ambient) return;
+        }
+
+        guard.speechAudioSource.Stop(); // clear any lingering ambient clip before playing
         guard.speechAudioSource.PlayOneShot(clip, volume);
+        currentPriority = priority;
+
         Debug.Log($"[GuardSpeech] {guard.gameObject.name} played '{clip.name}'");
     }
 

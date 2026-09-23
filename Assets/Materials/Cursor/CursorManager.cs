@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CursorManager : MonoBehaviour
@@ -12,6 +13,10 @@ public class CursorManager : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip clickSound;
 
+    [Header("Debug - New Game Reset")]
+    public List<ItemSO> allArtifactsForReset = new List<ItemSO>();
+
+    public bool resetProgressOnStart = false;
     private void Awake()
     {
         instance = this;
@@ -25,6 +30,11 @@ public class CursorManager : MonoBehaviour
 
     private void Start()
     {
+        if (resetProgressOnStart)
+        {
+            ResetPlayerProgress();
+        }
+
         ApplyCursorTexture();
     }
 
@@ -36,6 +46,31 @@ public class CursorManager : MonoBehaviour
             PlayClickSound();
         }
     }
+
+    public void ResetPlayerProgress()
+    {
+        foreach (ItemSO artifact in allArtifactsForReset)
+        {
+            if (artifact == null) continue;
+
+            PlayerPrefs.DeleteKey("ArtifactRetrieved_" + artifact.itemName);
+            PlayerPrefs.DeleteKey("ItemSold_" + artifact.itemName);
+        }
+
+        // Debt owed to the boss
+        PlayerPrefs.DeleteKey("MobDebtRemaining");
+
+        // Player's cash balance
+        PlayerPrefs.DeleteKey("PlayerCurrency");
+
+        PlayerPrefs.DeleteKey("LevelIndex");
+        PlayerPrefs.DeleteKey("currentLevelPrefKey");
+
+        PlayerPrefs.Save();
+
+        Debug.Log("[CursorManager] Player progress reset - PlayerPrefs cleared for a fresh start.");
+    }
+
 
     private void PlayClickSound()
     {

@@ -70,7 +70,7 @@ public class BlackMarketEntryUI : MonoBehaviour
     {
         if (estimatedValueText != null) estimatedValueText.gameObject.SetActive(false);
         if (soldForRow != null) soldForRow.SetActive(true);
-        if (soldForText != null) soldForText.text = $"Sold For: ${amount:N0}";
+        if (soldForText != null) soldForText.text = $"${amount:N0}";
         if (sellButton != null) sellButton.interactable = false;
     }
 }
