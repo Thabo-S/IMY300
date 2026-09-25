@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.adjoint.editor": {
+      "version": "https://github.com/adjointdev/adjoint-beta-dist.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "hash": "1c3975c682a0da7ac737baa740f9c23d494b7a3d"
+    },
     "com.autodesk.fbx": {
       "version": "5.1.3",
       "depth": 1,

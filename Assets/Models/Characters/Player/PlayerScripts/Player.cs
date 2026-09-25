@@ -10,6 +10,9 @@ public class Player : MonoBehaviour
 {
     public static Player Instance { get; private set; }
 
+    private static AudioClip cachedDamageClip;
+    private static AudioClip cachedDeathClip;
+
     public TextMeshProUGUI interactionTextUI;
 
     [Header("Health Variables")]
@@ -70,9 +73,14 @@ public class Player : MonoBehaviour
 
     private Coroutine damageFlashCoroutine;
 
-    private PlayerMovement playerMovement;
+        private PlayerMovement playerMovement;
     private PlayerLookAround playerLookAround;
     private InputMananger inputMananger;
+    private TutorialManager cachedTutorialManager;
+    // Performance: Cache guard sight detection to avoid raycasts every frame
+    private float sightCheckCooldown = 0.1f;  // Check sight every 100ms instead of every frame
+    private float sightCheckTimer = 0f;
+    private bool cachedIsDetected = false;
 
     private Camera cam;
     public List<Slot> hotbarSlots;
@@ -149,9 +157,15 @@ public class Player : MonoBehaviour
 
         //deathUI = GameObject.FindGameObjectWithTag("DeathUI");
 
-        damageClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/damage_grunt_male");
+        if (cachedDamageClip == null)
+                    cachedDamageClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/damage_grunt_male");
+                damageClip = cachedDamageClip;
 
-        deathClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/death_groan_male");
+        if (cachedDeathClip == null)
+                    cachedDeathClip = Resources.Load<AudioClip>("Audio/SFX/PlayerAudio/death_groan_male");
+                deathClip = cachedDeathClip;
+
+        cachedTutorialManager = Object.FindAnyObjectByType<TutorialManager>();
 
         WireNavigationButtons();
     }
@@ -220,12 +234,10 @@ public class Player : MonoBehaviour
             damageFlashCoroutine = StartCoroutine(DamageFlash());
         }
 
-        if (PlayerPrefs.GetInt("currentLevelPrefKey") == 0 && PlayerHealth < 60)
+                if (PlayerPrefs.GetInt("currentLevelPrefKey") == 0 && PlayerHealth < 60)
         {
-            TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
-
-            if (tutorial != null)
-                tutorial.StartStep5();
+            if (cachedTutorialManager != null)
+                cachedTutorialManager.StartStep5();
         }
 
         if (PlayerHealth <= 0)
@@ -238,15 +250,13 @@ public class Player : MonoBehaviour
 
             if (inputMananger != null) inputMananger.enabled = false;
 
-            if (CursorManager.instance != null) CursorManager.instance.UnlockCursor();
+                        if (CursorManager.instance != null) CursorManager.instance.UnlockCursor();
 
-            GameObject[] allGuards = GameObject.FindGameObjectsWithTag("Guard");
-
-            foreach (GameObject guard in allGuards)
+            foreach (Guard guard in Guard.AllGuards)
             {
                 if (guard != null)
                 {
-                    guard.SetActive(false);
+                    guard.gameObject.SetActive(false);
                 }
             }
 
@@ -272,12 +282,10 @@ public class Player : MonoBehaviour
 
         Debug.Log("Player health increased: " + PlayerHealth);
 
-        if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
+                if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
         {
-            TutorialManager tutorial = Object.FindAnyObjectByType<TutorialManager>();
-
-            if (tutorial != null)
-                tutorial.StartStep6();
+            if (cachedTutorialManager != null)
+                cachedTutorialManager.StartStep6();
         }
     }
 
@@ -330,19 +338,36 @@ public class Player : MonoBehaviour
     /// Checked every frame - true if ANY guard currently has direct sight
     /// of the player, regardless of state (Patrol spotting, Attack, etc.).
     /// </summary>
-    private bool IsSeenByAnyGuard()
+        private bool IsSeenByAnyGuard()
     {
+        Vector3 playerPos = transform.position;
         foreach (Guard g in Guard.AllGuards)
         {
-            if (g != null && g.CanSeePlayer()) return true;
+            if (g == null) continue;
+            
+            // Quick distance check BEFORE expensive raycast to skip far guards
+            float distance = Vector3.Distance(g.transform.position, playerPos);
+            if (distance > g.sightDistance) continue;  // Skip guards outside sight range
+            
+            if (g.CanSeePlayer()) return true;
         }
         return false;
     }
 
-    private void UpdateStamina()
+        private void UpdateStamina()
     {
         bool sprintKeyHeld = Input.GetKey(KeyCode.LeftShift);
-        bool detected = IsSeenByAnyGuard();
+        
+        // Performance optimization: Only recheck sight every 0.1 seconds instead of every frame
+        // Reduces raycasts from 60/sec to 10/sec (~83% reduction)
+        sightCheckTimer -= Time.deltaTime;
+        if (sightCheckTimer <= 0f)
+        {
+            cachedIsDetected = IsSeenByAnyGuard();
+            sightCheckTimer = sightCheckCooldown;
+        }
+        
+        bool detected = cachedIsDetected;
 
         bool currentlyCrouching = playerMovement != null && playerMovement.isCrouching;
 
@@ -397,7 +422,7 @@ public class Player : MonoBehaviour
             GameObject hitObject = hit.transform.gameObject;
             float distance = hit.distance;
 
-            if (hitObject.CompareTag("Door"))
+                        if (hitObject.CompareTag("Door"))
             {
                 if (hitObject != currentHighlightedDoor)
                 {
@@ -409,10 +434,12 @@ public class Player : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    hitObject.GetComponent<doorMovement>().ToggleDoor();
+                    doorMovement doorScript = hitObject.GetComponent<doorMovement>();
+                    if (doorScript != null)
+                        doorScript.ToggleDoor();
                 }
             }
-            else if (hitObject.CompareTag("Door_Keycard"))
+                        else if (hitObject.CompareTag("Door_Keycard"))
             {
                 if (hitObject != currentHighlightedDoor)
                 {
@@ -437,16 +464,22 @@ public class Player : MonoBehaviour
 
                     if (hasKeycard)
                     {
-                        hitObject.GetComponent<doorMovement>().ToggleKeycardDoor();
-                        hitObject.GetComponent<doorMovement>().RemoveKeycardRequirement();
+                        doorMovement doorScript = hitObject.GetComponent<doorMovement>();
+                        if (doorScript != null)
+                        {
+                            doorScript.ToggleKeycardDoor();
+                            doorScript.RemoveKeycardRequirement();
 
-                        RemoveKeycardFromSlots();
+                                                    RemoveKeycardFromSlots();
 
-                        Debug.Log("KEYCARD found — opening door");
+                            Debug.Log("KEYCARD found — opening door");
+                        }
                     }
                     else
                     {
-                        hitObject.GetComponent<doorMovement>().showErrorMessage();
+                        doorMovement doorScript = hitObject.GetComponent<doorMovement>();
+                        if (doorScript != null)
+                            doorScript.showErrorMessage();
                     }
                 }
             }

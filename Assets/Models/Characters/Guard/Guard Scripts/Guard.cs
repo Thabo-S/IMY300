@@ -26,6 +26,13 @@ public class Guard : MonoBehaviour
     public Transform PlayerTransform => player.transform;
     public Vector3 LastKnownPlayerPosition { get; private set; }
 
+    // Cached once in Start() instead of via GetComponent<CharacterController>()
+    // on every sight check - CanSeePlayer() runs every frame for every guard
+    // in every state (Patrol/Alert/Attack), so this was previously the
+    // single hottest GetComponent call in the whole game.
+    private CharacterController playerController;
+    public CharacterController PlayerController => playerController;
+
     public int currentWaypointIndex = 0;
 
     [Header("Sight")]
@@ -66,11 +73,26 @@ public class Guard : MonoBehaviour
     [Range(0.1f, 10f)]
     public float fireRate;
 
-    private float soundMemoryTimer = 0f;
+        private float soundMemoryTimer = 0f;
     private float currentSoundStrength = 0f;
     private bool currentSoundIsRunning = false;
 
     public float idleFacingYRotation = 90f;
+
+    // Sight checks (CanSeePlayer / IsPlayerInFieldOfViewCone) fire from
+    // every state's Perform() every single frame and each one performs a
+    // Physics.Raycast on the hot path. With one guard that's a few raycasts
+    // a frame; with several guards (multi-guard levels) it adds up fast.
+    // The player's position doesn't meaningfully change within ~100ms, so
+    // we throttle the expensive checks to ~10 Hz and reuse the cached
+    // result for any other query in the same window. The first call still
+    // returns immediately so state transitions (spot the player) feel
+    // instant on the frame they happen.
+    private const float SightCheckInterval = 0.1f;
+    private float nextSightCheckTime;
+    private bool hasCachedSightResult;
+    private bool cachedSeesPlayer;
+    private bool cachedInWarningCone;
 
     public static class AnimationParams
     {
@@ -98,20 +120,36 @@ public class Guard : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null) playerController = player.GetComponent<CharacterController>();
+
         stateMachine = GetComponent<StateMachine>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
         if (animator == null) animator = GetComponent<Animator>();
 
         stateMachine.Initialise();
-        footstepAudioSource = GetComponents<AudioSource>()[0];
-        speechAudioSource = GetComponents<AudioSource>()[1];
-        gunshotAudioSource = GetComponents<AudioSource>()[1];
+
+        // GetComponents<AudioSource>() allocates a new array each call -
+        // fetch it once and reuse instead of calling it three times.
+        AudioSource[] audioSources = GetComponents<AudioSource>();
+        footstepAudioSource = audioSources[0];
+        speechAudioSource = audioSources[1];
+        gunshotAudioSource = audioSources[1];
     }
+
+    private BaseState lastLoggedState;
 
     private void Update()
     {
-        currentState = stateMachine.activeState.ToString();
+        // ToString() on the active state allocated a new string every single
+        // frame for every guard, purely to feed the inspector-only debug
+        // field below. Only recompute it when the state actually changes.
+        if (stateMachine.activeState != lastLoggedState)
+        {
+            lastLoggedState = stateMachine.activeState;
+            currentState = lastLoggedState != null ? lastLoggedState.ToString() : "None";
+        }
+
         UpdateSliderUI();
         UpdateEyeIcon();
     }
@@ -175,23 +213,32 @@ public class Guard : MonoBehaviour
         return false;
     }
 
-    private bool UpdateSoundDetection()
+            private bool UpdateSoundDetection()
     {
         if (soundMemoryTimer <= 0f) return false;
 
         soundMemoryTimer -= Time.deltaTime;
+        if (soundMemoryTimer <= 0f)
+        {
+            // Sound fully faded — clear the strength so the next emission
+            // starts from zero and doesn't leak a stale fill rate.
+            currentSoundStrength = 0f;
+            return false;
+        }
+
         float rate = currentSoundIsRunning ? runningFillRate : walkingFillRate;
         detection = Mathf.Clamp(detection + rate * currentSoundStrength * Time.deltaTime, 0f, maxDetection);
         SetSliderColor(Color.yellow);
-
-        if (soundMemoryTimer <= 0f) currentSoundStrength = 0f;
         return true;
     }
 
     private void HandleSound(Vector3 soundPos, float volume, bool instantAlert)
     {
-        float distance = Vector3.Distance(transform.position, soundPos);
-        if (distance > volume) return;
+        // sqrMagnitude avoids a sqrt for what is purely a threshold check -
+        // this runs on every player footstep / thrown item / noise-maker.
+        float sqrDistance = (transform.position - soundPos).sqrMagnitude;
+        if (sqrDistance > volume * volume) return;
+        float distance = Mathf.Sqrt(sqrDistance);
 
         if (instantAlert)
         {
@@ -239,11 +286,24 @@ public class Guard : MonoBehaviour
         }
     }
 
+        // World Space Canvases force a mesh rebuild every time you assign a
+    // new value to a Slider / toggle a UI Image's active state, and this
+    // Canvas is parented to the guard's head every level. Setting the
+    // slider value once per frame (even with the same number) was the
+    // largest single frame-time cost in playtests - it spiked the world
+    // canvas rebuild from "on change" to "60 Hz". Only push the new
+    // value when it actually moved, and round to the renderer's pixel
+    // grid so the slider doesn't dirty itself on floating point drift.
+    private float lastSliderValueSent = -1f;
     public void UpdateSliderUI()
     {
-        if (detectionSlider != null)
-            detectionSlider.value = detection / maxDetection;
-
+        if (detectionSlider == null) return;
+        float normalized = detection / maxDetection;
+        if (!Mathf.Approximately(normalized, lastSliderValueSent))
+        {
+            detectionSlider.value = normalized;
+            lastSliderValueSent = normalized;
+        }
     }
 
     public void SetSliderColor(Color color)
@@ -254,60 +314,123 @@ public class Guard : MonoBehaviour
 
     // ---------------- EYE ICON (warning indicator) ----------------
 
-    private void UpdateEyeIcon()
+        private void UpdateEyeIcon()
     {
         if (eyeIcon == null) return;
 
+        // Same reason as UpdateSliderUI: SetActive on a World Space Canvas
+        // child forces a rebuild. Skip the call when the desired state
+        // already matches.
         bool inWarningCone = IsPlayerInFieldOfViewCone();
-        eyeIcon.gameObject.SetActive(inWarningCone);
+        if (eyeIcon.gameObject.activeSelf != inWarningCone)
+        {
+            eyeIcon.gameObject.SetActive(inWarningCone);
+        }
 
         //Debug.Log($"warningDist:{warningSightDistance} warningFOV:{warningFieldOfView} | sightDist:{sightDistance} FOV:{fieldOfView} | inWarningCone:{inWarningCone}");
     }
 
-    public bool IsPlayerInFieldOfViewCone()
+        public bool IsPlayerInFieldOfViewCone()
     {
         if (player == null) return false;
 
-        float distance = Vector3.Distance(transform.position, player.transform.position);
-        if (distance > warningSightDistance) return false;
+        // Throttle: sight checks (cone + raycast) are called from every state's
+        // Perform() each frame and each raycast is one of the more expensive
+        // physics calls. The player doesn't meaningfully move within ~100ms,
+        // so reuse the cached cone result for any other query in the same
+        // window. The first call still runs immediately so the very first
+        // frame after entering a state sees fresh data.
+        if (hasCachedSightResult && Time.time < nextSightCheckTime)
+        {
+            return cachedInWarningCone;
+        }
+
+        // sqrMagnitude avoids a sqrt for what's just a threshold check -
+        // this runs every frame per guard, in every state.
+        float sqrDistance = (player.transform.position - transform.position).sqrMagnitude;
+        if (sqrDistance > warningSightDistance * warningSightDistance)
+        {
+            CacheSightResult(false, false);
+            return false;
+        }
 
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.GetComponent<CharacterController>().bounds.center;
+        Vector3 targetPoint = PlayerBoundsCenter();
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
-
         float angleToPlayer = Vector3.Angle(targetDirection, transform.forward);
-
-        //Debug.Log("[Angle to the player is - " + angleToPlayer);
-        return angleToPlayer <= warningFieldOfView;
+        bool inCone = angleToPlayer <= warningFieldOfView;
+        CacheSightResult(inCone, inCone ? cachedSeesPlayer : false);
+        return inCone;
     }
+
+    private void CacheSightResult(bool inCone, bool sees)
+    {
+        hasCachedSightResult = true;
+        cachedInWarningCone = inCone;
+        cachedSeesPlayer = sees;
+        nextSightCheckTime = Time.time + SightCheckInterval;
+    }
+
+    private void InvalidateSightCache() => hasCachedSightResult = false;
 
     // ---------------- SIGHT RAYCAST (used for instant Attack trigger) ----------------
 
-    public bool CanSeePlayer()
+        public bool CanSeePlayer()
     {
         if (!IsPlayerInFieldOfViewCone()) return false;
 
+        // Reuse the cached result if the throttled cone check ran this window
+        // and we already have a confirmed sight result. A missed check still
+        // gets the raycast, but a confirmed sight check skips the physics
+        // raycast on subsequent calls inside the same window.
+        if (hasCachedSightResult && Time.time < nextSightCheckTime)
+        {
+            if (cachedSeesPlayer)
+            {
+                LastKnownPlayerPosition = player.transform.position;
+                return true;
+            }
+            return false;
+        }
+
         Vector3 rayOrigin = transform.position + (Vector3.up * eyeHeight);
-        Vector3 targetPoint = player.GetComponent<CharacterController>().bounds.center;
+        Vector3 targetPoint = PlayerBoundsCenter();
         Vector3 targetDirection = (targetPoint - rayOrigin).normalized;
 
         Ray ray = new Ray(rayOrigin, targetDirection);
         RaycastHit hitInfo;
 
+#if UNITY_EDITOR
         Debug.DrawRay(rayOrigin, targetDirection * sightDistance, Color.red);
+#endif
 
+        bool seesPlayer = false;
         if (Physics.Raycast(ray, out hitInfo, sightDistance))
         {
-            if (hitInfo.transform.gameObject.tag == "Player"|| hitInfo.transform.root.gameObject == player)
+            if (hitInfo.transform.CompareTag("Player") || hitInfo.transform.root.gameObject == player)
             {
-                Debug.Log("[SIGHT TEST] Player was seen");
                 LastKnownPlayerPosition = player.transform.position;
-                return true;
+                seesPlayer = true;
             }
         }
 
-        return false;
+        // Cache the combined cone+sight result so other sight queries in the
+        // same throttle window skip the raycast entirely.
+        CacheSightResult(cachedInWarningCone, seesPlayer);
+        return seesPlayer;
+    }
+
+    // Anything that changes the guard's perception of the player should
+    // invalidate the throttle cache so the next sight query re-evaluates
+    // immediately instead of waiting up to SightCheckInterval.
+    public void NotifyPlayerStateChanged() => InvalidateSightCache();
+
+    // Cached CharacterController instead of a fresh GetComponent<CharacterController>()
+    // call on every sight check.
+    private Vector3 PlayerBoundsCenter()
+    {
+        return playerController != null ? playerController.bounds.center : player.transform.position;
     }
 
 

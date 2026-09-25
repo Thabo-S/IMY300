@@ -1,4 +1,4 @@
-﻿//
+//
 //  Outline.cs
 //  QuickOutline
 //
@@ -74,9 +74,10 @@ public class Outline : MonoBehaviour {
   [SerializeField, HideInInspector]
   private List<ListVector3> bakeValues = new List<ListVector3>();
 
-  private Renderer[] renderers;
+    private Renderer[] renderers;
   private Material outlineMaskMaterial;
   private Material outlineFillMaterial;
+  private Material[][] baseMaterials;
 
   private bool needsUpdate;
 
@@ -92,6 +93,13 @@ public class Outline : MonoBehaviour {
     outlineMaskMaterial.name = "OutlineMask (Instance)";
     outlineFillMaterial.name = "OutlineFill (Instance)";
 
+        // Cache base materials so OnEnable/OnDisable don't allocate each toggle
+    baseMaterials = new Material[renderers.Length][];
+    for (int i = 0; i < renderers.Length; i++)
+    {
+      baseMaterials[i] = renderers[i].sharedMaterials;
+    }
+
     // Retrieve or generate smooth normals
     LoadSmoothNormals();
 
@@ -99,16 +107,17 @@ public class Outline : MonoBehaviour {
     needsUpdate = true;
   }
 
-  void OnEnable() {
-    foreach (var renderer in renderers) {
+    void OnEnable() {
+    for (int i = 0; i < renderers.Length; i++) {
 
-      // Append outline shaders
-      var materials = renderer.sharedMaterials.ToList();
+      // Reuse cached base materials + add outline shaders
+      var baseMats = baseMaterials[i];
+      var materials = new Material[baseMats.Length + 2];
+      System.Array.Copy(baseMats, materials, baseMats.Length);
+      materials[baseMats.Length] = outlineMaskMaterial;
+      materials[baseMats.Length + 1] = outlineFillMaterial;
 
-      materials.Add(outlineMaskMaterial);
-      materials.Add(outlineFillMaterial);
-
-      renderer.materials = materials.ToArray();
+      renderers[i].materials = materials;
     }
   }
 
@@ -137,16 +146,11 @@ public class Outline : MonoBehaviour {
     }
   }
 
-  void OnDisable() {
-    foreach (var renderer in renderers) {
+    void OnDisable() {
+    for (int i = 0; i < renderers.Length; i++) {
 
-      // Remove outline shaders
-      var materials = renderer.sharedMaterials.ToList();
-
-      materials.Remove(outlineMaskMaterial);
-      materials.Remove(outlineFillMaterial);
-
-      renderer.materials = materials.ToArray();
+      // Restore cached base materials
+      renderers[i].materials = baseMaterials[i];
     }
   }
 

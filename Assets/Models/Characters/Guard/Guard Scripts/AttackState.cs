@@ -16,6 +16,11 @@ public class AttackState : BaseState
     public float shotsPerSecond = 1.5f;
     private float fireTimer;
 
+    // Resources.Load() was being called on every single shot from every
+    // guard - it hits the asset database each time. Loaded once and shared
+    // across every AttackState instance instead.
+    private static GameObject bulletPrefab;
+
     public override void Enter()
     {
         guard.SetVocalState(Guard.GuardVocalState.Spotted);
@@ -51,9 +56,11 @@ public class AttackState : BaseState
 
             LookAtPlayer();
 
-            float distanceToPlayer = Vector3.Distance(guard.transform.position, guard.PlayerTransform.position);
+            // Threshold check only - sqrMagnitude avoids a sqrt every frame
+            // while the guard is attacking.
+            float sqrDistanceToPlayer = (guard.PlayerTransform.position - guard.transform.position).sqrMagnitude;
 
-            if (distanceToPlayer > attackRange)
+            if (sqrDistanceToPlayer > attackRange * attackRange)
             {
                 // Close the gap while still shooting on the way in.
                 guard.Agent.isStopped = false;
@@ -132,33 +139,30 @@ public class AttackState : BaseState
     {
         Transform gunBarrel = guard.gunBarrel;
 
-        Vector3 baseTargetPoint = guard.player.GetComponent<CharacterController>().bounds.center; ;
+        CharacterController playerController = guard.PlayerController;
+        Vector3 baseTargetPoint = playerController != null ? playerController.bounds.center : guard.player.transform.position;
         Vector3 shootDirection = (baseTargetPoint - gunBarrel.position).normalized;
 
         float shotRange = 0;
 
-        //if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
-        //{
-        //    shotRange = 0;
-        //}
-        //else
-        //{
-        //    shotRange = 2f;
-        //}
-
         Vector3 finalDirection = Quaternion.AngleAxis(Random.Range(-shotRange, shotRange), Vector3.up) * shootDirection;
 
+        if (bulletPrefab == null)
+        {
+            bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
+        }
+
         GameObject bullet = GameObject.Instantiate(
-            Resources.Load("Prefabs/Bullet") as GameObject,
+            bulletPrefab,
             gunBarrel.position,
             Quaternion.LookRotation(finalDirection)
         );
 
+        // One GetComponent<Rigidbody>() call instead of two GetComponent calls
+        // (Bullet + Rigidbody) that each walked the component list.
+        Rigidbody bulletBody = bullet.GetComponent<Rigidbody>();
+        bulletBody.linearVelocity = finalDirection * guard.bulletSpeed;
         bullet.GetComponent<Bullet>().SetShooter(guard.gameObject);
-
-        bullet.GetComponent<Rigidbody>().linearVelocity = finalDirection * guard.bulletSpeed;
-
-        Debug.Log("Shoot");
 
         fireTimer = 0f;
     }
