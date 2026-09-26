@@ -89,6 +89,16 @@ public class KepPadQTE : MonoBehaviour
         hackingCoroutine = StartCoroutine(PlayHackingBar());
     }
 
+        /// <summary>
+    /// Per-keypad override of the countdown. Called by KeypadDoorInteractable
+    /// just before StartQTE() so each keypad can have its own timer without
+    /// permanently mutating the shared UI's serialized value.
+    /// </summary>
+    public void SetQteTimeLimit(float seconds)
+    {
+        qteTimeLimit = Mathf.Max(0.1f, seconds);
+    }
+
     /// <summary>
     /// Call this explicitly to halt/reset the QTE (cancel, success, timeout,
     /// or whenever the canvas is being hidden).
