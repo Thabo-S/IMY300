@@ -37,6 +37,15 @@ public class KepPadQTE : MonoBehaviour
     private TextMeshProUGUI qteTimerText;
     private Coroutine timeoutCoroutine;
 
+    [Header("Fail Cooldown")]
+    [Tooltip("Seconds the player must wait after a failed attempt (wrong key or timeout) before this keypad can be started again.")]
+    public float failCooldown = 5f;
+    private bool isOnCooldown = false;
+    private float cooldownEndTime;
+
+    /// <summary>Whether this keypad is currently locked out after a recent failure.</summary>
+    public bool IsOnCooldown => isOnCooldown;
+
     [Header("Sequence Settings")]
     [SerializeField] private int sequenceLength = 4;
     [SerializeField] private bool allowRepeatKeys = false;
@@ -76,9 +85,18 @@ public class KepPadQTE : MonoBehaviour
     /// <summary>
     /// Call this explicitly (e.g. from KeypadDoorInteractable) when the player
     /// presses E to actually begin hacking. Does NOT run automatically.
+    /// Refuses to start (and shows a notification) if still on cooldown from
+    /// a recent failure - callers should check IsOnCooldown BEFORE showing
+    /// the canvas, since this only guards the internal state, not visibility.
     /// </summary>
     public void StartQTE()
     {
+        if (isOnCooldown)
+        {
+            NotifyCooldownActive();
+            return;
+        }
+
         acceptingKeypadInput = false;
 
         SetKeypadUIActive(false);
@@ -105,6 +123,33 @@ public class KepPadQTE : MonoBehaviour
 
         acceptingKeypadInput = false;
         sequence = null;
+    }
+
+    /// <summary>
+    /// Shows a notification with time remaining if a caller tries to
+    /// interact with this keypad while it's on cooldown. Exposed publicly
+    /// so KeypadDoorInteractable can call it BEFORE showing the canvas
+    /// (StartQTE() alone can't prevent the canvas from having already been
+    /// made visible by the caller).
+    /// </summary>
+    public void NotifyCooldownActive()
+    {
+        float remaining = Mathf.Max(0f, cooldownEndTime - Time.time);
+        Inventory.instance?.ShowNotification($"Keypad locked out - try again in {Mathf.CeilToInt(remaining)}s.");
+    }
+
+    private void TriggerFailCooldown()
+    {
+        StopQTE();
+        isOnCooldown = true;
+        cooldownEndTime = Time.time + failCooldown;
+        StartCoroutine(FailCooldownRoutine());
+    }
+
+    private IEnumerator FailCooldownRoutine()
+    {
+        yield return new WaitForSeconds(failCooldown);
+        isOnCooldown = false;
     }
 
     private IEnumerator PlayHackingBar()
@@ -177,6 +222,7 @@ public class KepPadQTE : MonoBehaviour
         timeoutCoroutine = null;
         Debug.Log("ALARM SET OFF - player failed to hack the keypad in time.");
         OnQteTimeout?.Invoke();
+        TriggerFailCooldown();
     }
 
     private void SetKeypadUIActive(bool active)
@@ -299,6 +345,7 @@ public class KepPadQTE : MonoBehaviour
             if (currentIndex < sequence.Length)
             {
                 OnQteFail?.Invoke();
+                TriggerFailCooldown();
             }
         }
     }
