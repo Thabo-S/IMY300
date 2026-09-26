@@ -3,16 +3,21 @@ using TMPro;
 
 public class facePlayer : MonoBehaviour
 {
-        private GameObject player;
+    private GameObject player;
     private GameObject canvas;
     private TextMeshProUGUI nameText;
     private float cachedPickUpRange;
     private bool hasCachedRange;
+    private bool playerCached = false;
 
     void Start()
     {
         player = GameObject.FindWithTag("Player");
-        CachePickUpRange();
+        if (player != null)
+        {
+            playerCached = true;
+            CachePickUpRange();
+        }
 
         //Canvas canvasComponent = GetComponentInChildren<Canvas>(true);
 
@@ -66,7 +71,12 @@ public class facePlayer : MonoBehaviour
 
     void Update()
     {
-        if (player == null) findPlayerObject();
+        // Only retry finding player if we haven't cached it yet
+        if (!playerCached && player == null)
+        {
+            findPlayerObject();
+        }
+        
         if (player == null || canvas == null) return;
 
         lookAtPlayer();
@@ -78,10 +88,14 @@ public class facePlayer : MonoBehaviour
         }
     }
 
-        void findPlayerObject()
+    void findPlayerObject()
     {
         player = GameObject.FindWithTag("Player");
-        CachePickUpRange();
+        if (player != null)
+        {
+            playerCached = true;
+            CachePickUpRange();
+        }
     }
 
     void CachePickUpRange()
@@ -101,7 +115,7 @@ public class facePlayer : MonoBehaviour
         canvas.transform.rotation = Quaternion.LookRotation(directionToPlayer);
     }
 
-        private bool isPlayerClose(GameObject player)
+    private bool isPlayerClose(GameObject player)
     {
         if (player == null || !hasCachedRange) return false;
 

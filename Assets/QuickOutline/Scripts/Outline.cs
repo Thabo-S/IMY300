@@ -15,6 +15,7 @@ using UnityEngine;
 
 public class Outline : MonoBehaviour {
   private static HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
+  private static Dictionary<Mesh, List<Vector3>> globalSmoothNormalsCache = new Dictionary<Mesh, List<Vector3>>();
 
   public enum Mode {
     OutlineAll,
@@ -173,11 +174,17 @@ public class Outline : MonoBehaviour {
         continue;
       }
 
+      // Check if already in global cache
+      if (globalSmoothNormalsCache.ContainsKey(meshFilter.sharedMesh)) {
+        continue;
+      }
+
       // Serialize smooth normals
       var smoothNormals = SmoothNormals(meshFilter.sharedMesh);
 
       bakeKeys.Add(meshFilter.sharedMesh);
       bakeValues.Add(new ListVector3() { data = smoothNormals });
+      globalSmoothNormalsCache[meshFilter.sharedMesh] = smoothNormals;
     }
   }
 
@@ -191,9 +198,16 @@ public class Outline : MonoBehaviour {
         continue;
       }
 
-      // Retrieve or generate smooth normals
-      var index = bakeKeys.IndexOf(meshFilter.sharedMesh);
-      var smoothNormals = (index >= 0) ? bakeValues[index].data : SmoothNormals(meshFilter.sharedMesh);
+      // Check global cache first to avoid recalculation
+      List<Vector3> smoothNormals;
+      if (globalSmoothNormalsCache.TryGetValue(meshFilter.sharedMesh, out var cached)) {
+        smoothNormals = cached;
+      } else {
+        // Retrieve from baked data or generate
+        var index = bakeKeys.IndexOf(meshFilter.sharedMesh);
+        smoothNormals = (index >= 0) ? bakeValues[index].data : SmoothNormals(meshFilter.sharedMesh);
+        globalSmoothNormalsCache[meshFilter.sharedMesh] = smoothNormals;
+      }
 
       // Store smooth normals in UV3
       meshFilter.sharedMesh.SetUVs(3, smoothNormals);
