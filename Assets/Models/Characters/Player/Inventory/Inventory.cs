@@ -71,6 +71,10 @@ public class Inventory : MonoBehaviour
     public float adrenalineSpeedMultiplier = 1.5f;
     public float adrenalineDuration = 5f;
 
+    [Header("Adrenaline Upgrades")]
+    public ItemSO adrenalineGreenSO;
+    public ItemSO adrenalineBlueSO;
+
     [Header("MedKit Restriction")]
     [Tooltip("Player can't use a MedKit once their health is at or above this value - only enforced outside the tutorial (currentLevelPrefKey != 0).")]
     public float medkitHealthThreshold = 55f;
@@ -819,21 +823,66 @@ public class Inventory : MonoBehaviour
         }
         else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))
         {
-            player.RecoupHealth(adrenalineHealthIncrease);
+            float healthIncrease = adrenalineHealthIncrease;
+            float speedMultiplier = adrenalineSpeedMultiplier;
+            float duration = adrenalineDuration;
 
+            // Green Adrenaline
+            if (equippedItem == adrenalineGreenSO)
+            {
+                healthIncrease = 30f;
+                speedMultiplier = 1.75f;
+                duration = 7f;
+            }
+
+            // Blue Adrenaline
+            else if (equippedItem == adrenalineBlueSO)
+            {
+                healthIncrease = 40f;
+                speedMultiplier = 2f;
+                duration = 10f;
+            }
+
+            // Apply health
+            player.RecoupHealth(Mathf.RoundToInt(healthIncrease));
+
+            // Apply speed boost
             if (playerMovement != null)
             {
-                playerMovement.ApplyTemporarySpeedBoost(adrenalineSpeedMultiplier, adrenalineDuration);
+                playerMovement.ApplyTemporarySpeedBoost(
+                    speedMultiplier,
+                    duration
+                );
             }
             else
             {
                 Debug.LogWarning("[Inventory] Adrenaline used but Player Movement is not assigned.");
             }
 
+            // Consume one Adrenaline
             equippedSlot.RemoveAmount(1);
 
             EquipHandItem();
         }
+
+        //else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))
+        //{
+        //    player.RecoupHealth(adrenalineHealthIncrease);
+
+        //    if (playerMovement != null)
+        //    {
+        //        playerMovement.ApplyTemporarySpeedBoost(adrenalineSpeedMultiplier, adrenalineDuration);
+        //    }
+        //    else
+        //    {
+        //        Debug.LogWarning("[Inventory] Adrenaline used but Player Movement is not assigned.");
+        //    }
+
+        //    equippedSlot.RemoveAmount(1);
+
+        //    EquipHandItem();
+        //}
+
     }
 
     private void UpdateHotbarOpacity()
