@@ -17,7 +17,10 @@ MonoBehaviour:
   maxStackSize: 1
   itemPrefab: {fileID: 386817010620559591, guid: 8edee58da220efd45b9c6b69847b2960, type: 3}
   handItemPrefab: {fileID: 0}
+  isUniqueArtifact: 0
+  priceRangeMin: 0
+  priceRangeMax: 0
   value: 0
-  purchasable: 1
+  purchasable: 0
   price: 10
   description: 'Crown meant for royalty '
