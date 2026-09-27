@@ -18,9 +18,9 @@ MonoBehaviour:
   itemPrefab: {fileID: 1696468038294020858, guid: 777a4c208d2555249b991da6b073e0a8, type: 3}
   handItemPrefab: {fileID: 0}
   isUniqueArtifact: 1
-  priceRangeMin: 80000
-  priceRangeMax: 120000
-  value: 95000
+  priceRangeMin: 280000
+  priceRangeMax: 400000
+  value: 340000
   purchasable: 0
   price: 0
   description: 
