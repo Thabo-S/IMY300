@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Frostbite Sapphire
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Frostbite Sapphire
+  icon: {fileID: -1645383215, guid: 1cc4a278a9c81be43b69560a021a6300, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 493227465950164187, guid: 57e53e2e78551624886766d7264764c6, type: 3}
+  handItemPrefab: {fileID: 0}
+  isUniqueArtifact: 0
+  priceRangeMin: 0
+  priceRangeMax: 0
+  value: 260
+  purchasable: 0
+  price: 0
+  description: 

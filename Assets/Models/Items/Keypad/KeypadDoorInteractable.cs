@@ -20,6 +20,8 @@ public class KeypadDoorInteractable : MonoBehaviour
     [Tooltip("The KepPadQTE component, usually on the object holding the Slot_1..4 images.")]
     [SerializeField] private KepPadQTE qteScript;
 
+    private bool isSubscribed = false;
+
     private void Awake()
     {
         if (door == null)
@@ -42,22 +44,11 @@ public class KeypadDoorInteractable : MonoBehaviour
             Debug.LogWarning($"{name}: No Canvas component found on '{qteUI.name}'.");
     }
 
-    private void OnEnable()
-    {
-        if (qteScript == null) return;
-
-        qteScript.OnQteSuccess.AddListener(HandleQteSuccess);
-        qteScript.OnQteFail.AddListener(HandleQteFail);
-        qteScript.OnQteCancel.AddListener(HandleQteCancel);
-    }
-
     private void OnDisable()
     {
-        if (qteScript == null) return;
-
-        qteScript.OnQteSuccess.RemoveListener(HandleQteSuccess);
-        qteScript.OnQteFail.RemoveListener(HandleQteFail);
-        qteScript.OnQteCancel.RemoveListener(HandleQteCancel);
+        // Safety net - if this door gets disabled mid-QTE for any reason,
+        // make sure it doesn't stay subscribed to the shared QTE instance.
+        Unsubscribe();
     }
 
     /// <summary>
@@ -86,13 +77,51 @@ public class KeypadDoorInteractable : MonoBehaviour
             return;
         }
 
+        // Check cooldown BEFORE showing the canvas - otherwise the canvas
+        // would flash open even though StartQTE() internally refuses to run.
+        if (qteScript.IsOnCooldown)
+        {
+            qteScript.NotifyCooldownActive();
+            return;
+        }
+
+        // This is the critical fix: only the door that's actually starting
+        // a QTE subscribes to the shared instance's events. With multiple
+        // keypads in a level all sharing ONE KepPadQTE, subscribing in
+        // OnEnable() (old behavior) meant every door listened forever, so
+        // ANY keypad succeeding fired every door's success handler at once.
+        Subscribe();
+
         qteCanvas.enabled = true;
         qteScript.StartQTE(); // hacking bar + sequence generation only begin NOW, on E press
         //SetPlayerControlsEnabled(false);
     }
 
+    private void Subscribe()
+    {
+        if (isSubscribed || qteScript == null) return;
+
+        qteScript.OnQteSuccess.AddListener(HandleQteSuccess);
+        qteScript.OnQteFail.AddListener(HandleQteFail);
+        qteScript.OnQteCancel.AddListener(HandleQteCancel);
+        qteScript.OnQteTimeout.AddListener(HandleQteTimeout);
+        isSubscribed = true;
+    }
+
+    private void Unsubscribe()
+    {
+        if (!isSubscribed || qteScript == null) return;
+
+        qteScript.OnQteSuccess.RemoveListener(HandleQteSuccess);
+        qteScript.OnQteFail.RemoveListener(HandleQteFail);
+        qteScript.OnQteCancel.RemoveListener(HandleQteCancel);
+        qteScript.OnQteTimeout.RemoveListener(HandleQteTimeout);
+        isSubscribed = false;
+    }
+
     private void HandleQteSuccess()
     {
+        Unsubscribe();
         isLocked = false;
         HideQte();
         //SetPlayerControlsEnabled(true);
@@ -109,14 +138,25 @@ public class KeypadDoorInteractable : MonoBehaviour
 
     private void HandleQteFail()
     {
-        // Door stays locked. Give the player another shot immediately by
-        // restarting the hacking sequence directly (no more relying on
-        // toggling component.enabled to re-trigger OnEnable).
-        qteScript.StartQTE();
+        Unsubscribe();
+        // Door stays locked. Cooldown has already been started inside
+        // KepPadQTE itself - just close the UI, the player has to
+        // re-interact (and wait out the cooldown) to try again.
+        HideQte();
+    }
+
+    private void HandleQteTimeout()
+    {
+        Unsubscribe();
+        // Ran out of time on the sequence - cooldown already started inside
+        // KepPadQTE. Close the UI here; wire the alarm/guard alert to
+        // OnQteTimeout in the Inspector if you haven't already.
+        HideQte();
     }
 
     private void HandleQteCancel()
     {
+        Unsubscribe();
         HideQte();
         //SetPlayerControlsEnabled(true);
         // isLocked is left untouched - door stays locked.

@@ -21,8 +21,12 @@ public class LockDoorQte : MonoBehaviour
 
     [Header("Fail Behavior")]
     [Tooltip("Seconds the QTE is disabled after a failed attempt before it can be retried.")]
-    public float failCooldown = 1.5f;
+    public float failCooldown = 3.5f;
     private bool isOnCooldown = false;
+    private float cooldownEndTime;
+
+    /// <summary>Whether this lock is currently locked out after a recent failure.</summary>
+    public bool IsOnCooldown => isOnCooldown;
 
     [Header("Player Freeze (auto-found, no need to assign)")]
     private MonoBehaviour playerMovementToDisable;
@@ -90,7 +94,11 @@ public class LockDoorQte : MonoBehaviour
             return;
         }
 
-        if (isOnCooldown) return;
+        if (isOnCooldown)
+        {
+            NotifyCooldownActive();
+            return;
+        }
 
         isActive = true;
         enabled = true;
@@ -118,6 +126,16 @@ public class LockDoorQte : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Shows a notification with time remaining if a caller tries to
+    /// interact with this lock while it's on cooldown.
+    /// </summary>
+    public void NotifyCooldownActive()
+    {
+        float remaining = Mathf.Max(0f, cooldownEndTime - Time.time);
+        Inventory.instance?.ShowNotification($"Lock jammed - try again in {Mathf.CeilToInt(remaining)}s.");
+    }
+
     void Update()
     {
         if (!isActive) return;
@@ -141,15 +159,22 @@ public class LockDoorQte : MonoBehaviour
 
     void CheckSuccess()
     {
-
         Debug.Log("[LockDoorQte] CheckSuccess() was called — button click WAS received.");
 
-        Vector2 localPoint = safeZone.InverseTransformPoint(pointerTransform.position);
-        bool isInSafeZone = safeZone.rect.Contains(localPoint);
+        // 1. Calculate the true visual half-widths by multiplying the base width by the inspector scale
+        float safeZoneHalfWidth = (safeZone.rect.width * safeZone.localScale.x) / 2f;
+        float pointerHalfWidth = (pointerTransform.rect.width * pointerTransform.localScale.x) / 2f;
+
+        // 2. Find the exact horizontal distance between the centers of both objects
+        // (Since both are children of the QTE UI Root, we can safely compare their local X positions)
+        float horizontalDistance = Mathf.Abs(pointerTransform.localPosition.x - safeZone.localPosition.x);
+
+        // 3. If the distance is less than their combined half-widths, they are visually overlapping!
+        bool isInSafeZone = horizontalDistance <= (safeZoneHalfWidth + pointerHalfWidth);
 
         if (isInSafeZone)
         {
-            Debug.Log("[LockDoorQte] Success! Pointer is in the safe zone.");
+            Debug.Log("[LockDoorQte] Success! Pointer is overlapping the safe zone.");
             EndQte();
 
             doorMovement door = GetComponent<doorMovement>();
@@ -164,7 +189,7 @@ public class LockDoorQte : MonoBehaviour
         }
         else
         {
-            Debug.Log("[LockDoorQte] Failure! Pointer is not in the safe zone.");
+            Debug.Log("[LockDoorQte] Failure! Pointer is outside the safe zone.");
             HandleFail();
         }
     }
@@ -179,6 +204,7 @@ public class LockDoorQte : MonoBehaviour
     private System.Collections.IEnumerator FailCooldownRoutine()
     {
         isOnCooldown = true;
+        cooldownEndTime = Time.time + failCooldown;
         yield return new WaitForSeconds(failCooldown);
         isOnCooldown = false;
     }
