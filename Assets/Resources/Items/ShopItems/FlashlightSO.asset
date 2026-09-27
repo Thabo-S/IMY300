@@ -17,8 +17,11 @@ MonoBehaviour:
   maxStackSize: 1
   itemPrefab: {fileID: 6622833613734824988, guid: a4af52b6b73318d4fb137ca819ac1d8d, type: 3}
   handItemPrefab: {fileID: 6622833613734824988, guid: a4af52b6b73318d4fb137ca819ac1d8d, type: 3}
+  isUniqueArtifact: 0
+  priceRangeMin: 0
+  priceRangeMax: 0
   value: 0
-  purchasable: 1
+  purchasable: 0
   price: 150
   description: 'This item allows a player to shine light in dark areas
 

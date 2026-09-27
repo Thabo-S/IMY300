@@ -10,17 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
-  m_Name: NoiseMakerSO
+  m_Name: AdrenalineGreenSO
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
-  itemName: NoiseMaker
-  icon: {fileID: 21300000, guid: b2a17ef6608d0844397e6e5ba4f5b8c2, type: 3}
-  maxStackSize: 2
-  itemPrefab: {fileID: 6138334984551783603, guid: a858ea6a4217cc3418458e5899159514, type: 3}
+  itemName: AdrenalineGreen
+  icon: {fileID: 21300000, guid: 40bcf3734ae8b744ca68a15097c85c95, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 2250461976585000878, guid: 1302f24128f9f3845919ffd65d34c8e8, type: 3}
   handItemPrefab: {fileID: 0}
   isUniqueArtifact: 0
   priceRangeMin: 0
   priceRangeMax: 0
   value: 0
   purchasable: 1
-  price: 14000
-  description: Makes noise to destract guards
+  price: 16000
+  description: Player does not take damage for a short period and is granted a speed
+    boost
