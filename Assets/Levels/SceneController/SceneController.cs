@@ -154,7 +154,8 @@ public class SceneController : MonoBehaviour
         }
 
         PlayerPrefs.SetInt(CURRENT_LEVEL_KEY, nextIndex);
-        LoadLevelByIndex(nextIndex);
+        SceneManager.LoadScene(loadoutScene);
+        //LoadLevelByIndex(nextIndex);
     }
 
     // ---------- Helpers ----------
