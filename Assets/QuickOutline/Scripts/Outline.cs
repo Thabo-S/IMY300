@@ -1,4 +1,4 @@
-﻿//
+//
 //  Outline.cs
 //  QuickOutline
 //
@@ -15,6 +15,7 @@ using UnityEngine;
 
 public class Outline : MonoBehaviour {
   private static HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
+  private static Dictionary<Mesh, List<Vector3>> globalSmoothNormalsCache = new Dictionary<Mesh, List<Vector3>>();
 
   public enum Mode {
     OutlineAll,
@@ -74,9 +75,10 @@ public class Outline : MonoBehaviour {
   [SerializeField, HideInInspector]
   private List<ListVector3> bakeValues = new List<ListVector3>();
 
-  private Renderer[] renderers;
+    private Renderer[] renderers;
   private Material outlineMaskMaterial;
   private Material outlineFillMaterial;
+  private Material[][] baseMaterials;
 
   private bool needsUpdate;
 
@@ -92,6 +94,13 @@ public class Outline : MonoBehaviour {
     outlineMaskMaterial.name = "OutlineMask (Instance)";
     outlineFillMaterial.name = "OutlineFill (Instance)";
 
+        // Cache base materials so OnEnable/OnDisable don't allocate each toggle
+    baseMaterials = new Material[renderers.Length][];
+    for (int i = 0; i < renderers.Length; i++)
+    {
+      baseMaterials[i] = renderers[i].sharedMaterials;
+    }
+
     // Retrieve or generate smooth normals
     LoadSmoothNormals();
 
@@ -99,16 +108,17 @@ public class Outline : MonoBehaviour {
     needsUpdate = true;
   }
 
-  void OnEnable() {
-    foreach (var renderer in renderers) {
+    void OnEnable() {
+    for (int i = 0; i < renderers.Length; i++) {
 
-      // Append outline shaders
-      var materials = renderer.sharedMaterials.ToList();
+      // Reuse cached base materials + add outline shaders
+      var baseMats = baseMaterials[i];
+      var materials = new Material[baseMats.Length + 2];
+      System.Array.Copy(baseMats, materials, baseMats.Length);
+      materials[baseMats.Length] = outlineMaskMaterial;
+      materials[baseMats.Length + 1] = outlineFillMaterial;
 
-      materials.Add(outlineMaskMaterial);
-      materials.Add(outlineFillMaterial);
-
-      renderer.materials = materials.ToArray();
+      renderers[i].materials = materials;
     }
   }
 
@@ -137,16 +147,11 @@ public class Outline : MonoBehaviour {
     }
   }
 
-  void OnDisable() {
-    foreach (var renderer in renderers) {
+    void OnDisable() {
+    for (int i = 0; i < renderers.Length; i++) {
 
-      // Remove outline shaders
-      var materials = renderer.sharedMaterials.ToList();
-
-      materials.Remove(outlineMaskMaterial);
-      materials.Remove(outlineFillMaterial);
-
-      renderer.materials = materials.ToArray();
+      // Restore cached base materials
+      renderers[i].materials = baseMaterials[i];
     }
   }
 
@@ -169,11 +174,17 @@ public class Outline : MonoBehaviour {
         continue;
       }
 
+      // Check if already in global cache
+      if (globalSmoothNormalsCache.ContainsKey(meshFilter.sharedMesh)) {
+        continue;
+      }
+
       // Serialize smooth normals
       var smoothNormals = SmoothNormals(meshFilter.sharedMesh);
 
       bakeKeys.Add(meshFilter.sharedMesh);
       bakeValues.Add(new ListVector3() { data = smoothNormals });
+      globalSmoothNormalsCache[meshFilter.sharedMesh] = smoothNormals;
     }
   }
 
@@ -187,9 +198,16 @@ public class Outline : MonoBehaviour {
         continue;
       }
 
-      // Retrieve or generate smooth normals
-      var index = bakeKeys.IndexOf(meshFilter.sharedMesh);
-      var smoothNormals = (index >= 0) ? bakeValues[index].data : SmoothNormals(meshFilter.sharedMesh);
+      // Check global cache first to avoid recalculation
+      List<Vector3> smoothNormals;
+      if (globalSmoothNormalsCache.TryGetValue(meshFilter.sharedMesh, out var cached)) {
+        smoothNormals = cached;
+      } else {
+        // Retrieve from baked data or generate
+        var index = bakeKeys.IndexOf(meshFilter.sharedMesh);
+        smoothNormals = (index >= 0) ? bakeValues[index].data : SmoothNormals(meshFilter.sharedMesh);
+        globalSmoothNormalsCache[meshFilter.sharedMesh] = smoothNormals;
+      }
 
       // Store smooth normals in UV3
       meshFilter.sharedMesh.SetUVs(3, smoothNormals);

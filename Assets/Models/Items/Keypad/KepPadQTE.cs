@@ -10,7 +10,7 @@ public class KepPadQTE : MonoBehaviour
 {
     [Header("Key Pool")]
     [Tooltip("Every letter that can appear in the generated sequence.")]
-    public string keyPool = "tyuiopghjklzxcvbnm";
+    public string keyPool = "yuiopgjklzxcvbnm";
 
     [Tooltip("Path under a Resources folder where key sprites live (e.g. Assets/Resources/Keyboard keys -> 'Keyboard keys'). Sprites must be named in all caps, e.g. A.png, B.png.")]
     [SerializeField] private string keySpriteResourcePath = "Keyboard keys";
@@ -105,6 +105,16 @@ public class KepPadQTE : MonoBehaviour
 
         if (hackingCoroutine != null) StopCoroutine(hackingCoroutine);
         hackingCoroutine = StartCoroutine(PlayHackingBar());
+    }
+
+        /// <summary>
+    /// Per-keypad override of the countdown. Called by KeypadDoorInteractable
+    /// just before StartQTE() so each keypad can have its own timer without
+    /// permanently mutating the shared UI's serialized value.
+    /// </summary>
+    public void SetQteTimeLimit(float seconds)
+    {
+        qteTimeLimit = Mathf.Max(0.1f, seconds);
     }
 
     /// <summary>

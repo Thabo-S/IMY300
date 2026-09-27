@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+guid: d31089d39c6e65a45a5fc580f644cb9a
+=======
 guid: c0a10b5c7bf15194aa500d3b66390c48
+>>>>>>> Alpha
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []

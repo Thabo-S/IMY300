@@ -6,10 +6,18 @@ public class facePlayer : MonoBehaviour
     private GameObject player;
     private GameObject canvas;
     private TextMeshProUGUI nameText;
+    private float cachedPickUpRange;
+    private bool hasCachedRange;
+    private bool playerCached = false;
 
     void Start()
     {
         player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            playerCached = true;
+            CachePickUpRange();
+        }
 
         //Canvas canvasComponent = GetComponentInChildren<Canvas>(true);
 
@@ -63,7 +71,12 @@ public class facePlayer : MonoBehaviour
 
     void Update()
     {
-        if (player == null) findPlayerObject();
+        // Only retry finding player if we haven't cached it yet
+        if (!playerCached && player == null)
+        {
+            findPlayerObject();
+        }
+        
         if (player == null || canvas == null) return;
 
         lookAtPlayer();
@@ -78,6 +91,22 @@ public class facePlayer : MonoBehaviour
     void findPlayerObject()
     {
         player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            playerCached = true;
+            CachePickUpRange();
+        }
+    }
+
+    void CachePickUpRange()
+    {
+        if (player == null) return;
+        var p = player.GetComponent<Player>();
+        if (p != null)
+        {
+            cachedPickUpRange = p.pickUpRange;
+            hasCachedRange = true;
+        }
     }
 
     void lookAtPlayer()
@@ -88,9 +117,9 @@ public class facePlayer : MonoBehaviour
 
     private bool isPlayerClose(GameObject player)
     {
-        if (player == null) return false;
+        if (player == null || !hasCachedRange) return false;
 
         float distance = Vector3.Distance(transform.position, player.transform.position);
-        return distance <= player.GetComponent<Player>().pickUpRange;
+        return distance <= cachedPickUpRange;
     }
 }
