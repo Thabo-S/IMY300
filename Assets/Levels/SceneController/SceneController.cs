@@ -158,6 +158,15 @@ public class SceneController : MonoBehaviour
         //LoadLevelByIndex(nextIndex);
     }
 
+    public void LoadIntro()
+    {
+        SceneManager.LoadScene("Intro");
+    }
+    public void SkipIntro()
+    {
+        SceneManager.LoadScene(lobbyScene);
+    }
+
     // ---------- Helpers ----------
 
     private void LoadLevelByIndex(int levelIndex)

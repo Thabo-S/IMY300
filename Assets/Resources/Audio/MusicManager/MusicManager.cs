@@ -73,7 +73,7 @@ public class MusicManager : MonoBehaviour
     {
         // --- NEW: Check if the scene is a gameplay scene ---
         string lowerSceneName = sceneName.ToLower();
-        if (lowerSceneName.Contains("tutorial") || lowerSceneName.Contains("level"))
+        if (lowerSceneName.Contains("tutorial") || lowerSceneName.Contains("level") || lowerSceneName.Contains("intro"))
         {
             currentIndex = -1; // Stop the playlist from advancing
             FadeOutMusic();
