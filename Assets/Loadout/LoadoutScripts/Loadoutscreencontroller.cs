@@ -90,6 +90,17 @@ public class LoadoutScreenController : MonoBehaviour
         }
     }
 
+    public void OnBackToLobbyClicked()
+    {
+        if (SceneController.Instance == null)
+        {
+            Debug.LogWarning("[LoadoutScreenController] SceneController.Instance is null - make sure it exists in a persistent scene.");
+            return;
+        }
+
+        SceneController.Instance.GoToLobby();
+    }
+
     public void OnStartMissionClicked()
     {
         if (SceneController.Instance == null)
