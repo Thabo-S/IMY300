@@ -39,6 +39,7 @@ TagManager:
   - AlarmWarning
   - LaserWarning
   - Cash
+  - notificationTextUI
   layers:
   - Default
   - TransparentFX

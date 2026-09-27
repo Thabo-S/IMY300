@@ -17,11 +17,10 @@ public class KeypadDoorInteractable : MonoBehaviour
     [Tooltip("The parent panel that holds the whole keypad QTE UI (e.g. 'QTeEventsKepPad'). Found via tag at runtime - keep its GameObject active in the scene and gate visibility via the Canvas instead, or tag lookup will fail.")]
     [SerializeField] private GameObject qteUI;
     [SerializeField] private Canvas qteCanvas;
-        [Tooltip("The KepPadQTE component, usually on the object holding the Slot_1..4 images.")]
+    [Tooltip("The KepPadQTE component, usually on the object holding the Slot_1..4 images.")]
     [SerializeField] private KepPadQTE qteScript;
 
-    [Tooltip("Per-keypad override for the QTE countdown in seconds. Leave at 0 to use the value configured on the QTE UI itself (KepPadQTE.qteTimeLimit).")]
-    [SerializeField] private float qteTimeLimitOverride = 0f;
+    private bool isSubscribed = false;
 
     private void Awake()
     {
@@ -45,32 +44,12 @@ public class KeypadDoorInteractable : MonoBehaviour
             Debug.LogWarning($"{name}: No Canvas component found on '{qteUI.name}'.");
     }
 
-    private void OnEnable()
-    {
-        if (qteScript == null) return;
-
-                qteScript.OnQteSuccess.AddListener(HandleQteSuccess);
-        qteScript.OnQteFail.AddListener(HandleQteFail);
-        qteScript.OnQteCancel.AddListener(HandleQteCancel);
-        qteScript.OnQteTimeout.AddListener(HandleQteTimeout);
-    }
-
     private void OnDisable()
     {
-        if (qteScript == null) return;
-
-                qteScript.OnQteSuccess.RemoveListener(HandleQteSuccess);
-        qteScript.OnQteFail.RemoveListener(HandleQteFail);
-        qteScript.OnQteCancel.RemoveListener(HandleQteCancel);
-        qteScript.OnQteTimeout.RemoveListener(HandleQteTimeout);
+        // Safety net - if this door gets disabled mid-QTE for any reason,
+        // make sure it doesn't stay subscribed to the shared QTE instance.
+        Unsubscribe();
     }
-
-        // True only while this keypad's own QTE is the one on screen.
-    // Set in StartQte(), cleared in HideQte(). Used to filter the
-    // shared KepPadQTE singleton's events so multiple keypads in the
-    // scene (which all bind to the same QTeEventsKepPad UI by tag) don't
-    // open every door when just one is hacked.
-    private bool qteIsActive;
 
     /// <summary>
     /// Call this from your existing interact system (e.g. the raycast + "Interact" action
@@ -98,24 +77,51 @@ public class KeypadDoorInteractable : MonoBehaviour
             return;
         }
 
-        qteCanvas.enabled = true;
-        qteIsActive = true;
-
-        // Per-keypad timer override: if this keypad specifies one, push it onto
-        // the shared QTE UI right before starting. (Done via a tiny shim field
-        // on KepPadQTE so we don't have to change its serialized state.)
-        if (qteTimeLimitOverride > 0f)
+        // Check cooldown BEFORE showing the canvas - otherwise the canvas
+        // would flash open even though StartQTE() internally refuses to run.
+        if (qteScript.IsOnCooldown)
         {
-            qteScript.SetQteTimeLimit(qteTimeLimitOverride);
+            qteScript.NotifyCooldownActive();
+            return;
         }
 
+        // This is the critical fix: only the door that's actually starting
+        // a QTE subscribes to the shared instance's events. With multiple
+        // keypads in a level all sharing ONE KepPadQTE, subscribing in
+        // OnEnable() (old behavior) meant every door listened forever, so
+        // ANY keypad succeeding fired every door's success handler at once.
+        Subscribe();
+
+        qteCanvas.enabled = true;
         qteScript.StartQTE(); // hacking bar + sequence generation only begin NOW, on E press
         //SetPlayerControlsEnabled(false);
     }
 
+    private void Subscribe()
+    {
+        if (isSubscribed || qteScript == null) return;
+
+        qteScript.OnQteSuccess.AddListener(HandleQteSuccess);
+        qteScript.OnQteFail.AddListener(HandleQteFail);
+        qteScript.OnQteCancel.AddListener(HandleQteCancel);
+        qteScript.OnQteTimeout.AddListener(HandleQteTimeout);
+        isSubscribed = true;
+    }
+
+    private void Unsubscribe()
+    {
+        if (!isSubscribed || qteScript == null) return;
+
+        qteScript.OnQteSuccess.RemoveListener(HandleQteSuccess);
+        qteScript.OnQteFail.RemoveListener(HandleQteFail);
+        qteScript.OnQteCancel.RemoveListener(HandleQteCancel);
+        qteScript.OnQteTimeout.RemoveListener(HandleQteTimeout);
+        isSubscribed = false;
+    }
+
     private void HandleQteSuccess()
     {
-        if (!qteIsActive) return; // another keypad's QTE just succeeded - ignore
+        Unsubscribe();
         isLocked = false;
         HideQte();
         //SetPlayerControlsEnabled(true);
@@ -130,34 +136,34 @@ public class KeypadDoorInteractable : MonoBehaviour
             door.ToggleDoor();
     }
 
-        private void HandleQteFail()
+    private void HandleQteFail()
     {
-        if (!qteIsActive) return; // ignore failures from other keypads
-        // Door stays locked. Give the player another shot immediately by
-        // restarting the hacking sequence directly (no more relying on
-        // toggling component.enabled to re-trigger OnEnable).
-        qteScript.StartQTE();
+        Unsubscribe();
+        // Door stays locked. Cooldown has already been started inside
+        // KepPadQTE itself - just close the UI, the player has to
+        // re-interact (and wait out the cooldown) to try again.
+        HideQte();
+    }
+
+    private void HandleQteTimeout()
+    {
+        Unsubscribe();
+        // Ran out of time on the sequence - cooldown already started inside
+        // KepPadQTE. Close the UI here; wire the alarm/guard alert to
+        // OnQteTimeout in the Inspector if you haven't already.
+        HideQte();
     }
 
     private void HandleQteCancel()
     {
-        if (!qteIsActive) return; // ignore cancels from other keypads
+        Unsubscribe();
         HideQte();
         //SetPlayerControlsEnabled(true);
         // isLocked is left untouched - door stays locked.
     }
 
-    private void HandleQteTimeout()
-    {
-        if (!qteIsActive) return; // ignore timeouts from other keypads
-        // Timer ran out - dismiss the keypad UI so it doesn't linger on screen.
-        // Door stays locked. Player can re-interact to try again (same as a fail).
-        HideQte();
-    }
-
     private void HideQte()
     {
-        qteIsActive = false;
         if (qteCanvas != null) qteCanvas.enabled = false;
         if (qteScript != null) qteScript.StopQTE();
     }

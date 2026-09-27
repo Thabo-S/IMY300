@@ -141,12 +141,34 @@ public class ExitZone : MonoBehaviour
         float elapsedSeconds = elapsedTimeDisplay != null ? elapsedTimeDisplay.ElapsedSeconds : Time.timeSinceLevelLoad;
         bool wasDetected = MissionStats.WasDetected;
 
+        if (hasRequiredItems)
+        {
+            // Check and override best money
+            int savedMoney = PlayerPrefs.GetInt("BestMoney", 0);
+            if (sideLootCash > savedMoney)
+            {
+                PlayerPrefs.SetInt("BestMoney", sideLootCash);
+            }
+
+            // Check and override fastest time (default is 999999 so the first completion always saves)
+            float savedTime = PlayerPrefs.GetFloat("FastestTime", 999999f);
+            if (elapsedSeconds < savedTime)
+            {
+                PlayerPrefs.SetFloat("FastestTime", elapsedSeconds);
+            }
+
+            PlayerPrefs.Save();
+        }
+
         if (missionStarsController != null)
+
+            if (missionStarsController != null)
         {
             missionStarsController.EvaluateAndAwardStars(sideLootCash, elapsedSeconds, itemsCollected, wasDetected);
         }
 
         UpdateMissionCompleteText(hasRequiredItems, sideLootCash);
+
 
         Time.timeScale = 0f;
     }

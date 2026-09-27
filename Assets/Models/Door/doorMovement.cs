@@ -41,8 +41,16 @@ public class doorMovement : MonoBehaviour
         player = GameObject.FindWithTag("Player");
 
         if (audioSource == null)
+        {
             audioSource = GetComponent<AudioSource>();
 
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.playOnAwake = false;
+                audioSource.spatialBlend = 1f;
+            }
+        }
 
         if (outline == null)
             outline = GetComponent<Outline>();
@@ -63,7 +71,6 @@ public class doorMovement : MonoBehaviour
         }
 
         LoadDoorSounds();
-
     }
 
     private void LoadDoorSounds()

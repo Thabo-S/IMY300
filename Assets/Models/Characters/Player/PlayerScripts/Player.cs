@@ -106,6 +106,8 @@ public class Player : MonoBehaviour
     // currentLevelPrefKey : Used for the currentlevel being played
     // MobDebtRemaining : Used for debt being owed
     // PlayerCurrency : Used for how much a player has
+    // BestMoney : Most loot collectied in a run
+    // FastestTime : Fastest time to complete a level
     //=========================================================
 
     private void Awake()
