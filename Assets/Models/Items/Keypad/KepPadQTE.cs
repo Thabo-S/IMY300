@@ -10,7 +10,7 @@ public class KepPadQTE : MonoBehaviour
 {
     [Header("Key Pool")]
     [Tooltip("Every letter that can appear in the generated sequence.")]
-    public string keyPool = "tyuiopghjklzxcvbnm";
+    public string keyPool = "yuiopgjklzxcvbnm";
 
     [Tooltip("Path under a Resources folder where key sprites live (e.g. Assets/Resources/Keyboard keys -> 'Keyboard keys'). Sprites must be named in all caps, e.g. A.png, B.png.")]
     [SerializeField] private string keySpriteResourcePath = "Keyboard keys";
