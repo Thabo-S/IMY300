@@ -167,6 +167,16 @@ public class SceneController : MonoBehaviour
         SceneManager.LoadScene(lobbyScene);
     }
 
+    public void ResetGameData()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+
+        Time.timeScale = 1f;
+        //SceneManager.LoadScene(0);
+    }
+
+
     // ---------- Helpers ----------
 
     private void LoadLevelByIndex(int levelIndex)

@@ -19,4 +19,5 @@ public class SceneButtonBridge : MonoBehaviour
     public void SelectLevel(int levelIndex) => SceneController.Instance?.SelectLevel(levelIndex);
     public void LoadIntro(int levelIndex) => SceneController.Instance?.LoadIntro();
     public void SkipIntro(int levelIndex) => SceneController.Instance?.SkipIntro();
+    public void ResetGameData() => SceneController.Instance.ResetGameData();
 }
