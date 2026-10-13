@@ -16,7 +16,7 @@ public class ShopManager : MonoBehaviour
 
     [Header("Leave Button")]
     [Tooltip("Scene to load when the Leave button is clicked.")]
-    public string leaveSceneName = "Main Menu";
+    public string leaveSceneName = "Lobby";
 
     private readonly List<ShopSlotUI> spawnedSlots = new List<ShopSlotUI>();
 
@@ -83,7 +83,7 @@ public class ShopManager : MonoBehaviour
     {
         if (balanceText != null)
         {
-            balanceText.text = $"Balance: ${balance}";
+            balanceText.text = $"${balance}";
         }
     }
 

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Cash
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Cash
+  icon: {fileID: -1037824425, guid: 23b4afae90eb2ad4b928d7ef38e088a7, type: 3}
+  maxStackSize: 10
+  itemPrefab: {fileID: 557764936371141845, guid: 3ea509a89b6409e4f8b65d000ce06ac1, type: 3}
+  handItemPrefab: {fileID: 0}
+  isUniqueArtifact: 0
+  value: 100
+  purchasable: 0
+  price: 0
+  description: 

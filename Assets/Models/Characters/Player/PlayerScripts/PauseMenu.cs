@@ -36,6 +36,8 @@ public class PauseMenu : MonoBehaviour
             CursorManager.instance.LockCursor();
 
         Debug.Log("Resuming game play");
+
+        AudioListener.pause = false;
     }
 
     public void PauseGamePlay()
@@ -46,6 +48,8 @@ public class PauseMenu : MonoBehaviour
 
         if (CursorManager.instance != null)
             CursorManager.instance.UnlockCursor();
+
+        AudioListener.pause = true;
     }
 
 

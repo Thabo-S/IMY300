@@ -14,12 +14,12 @@ public class ProgressBarController : MonoBehaviour
     [Tooltip("Drag the 'TotalAmount' TMP text object here. Shows the cash " +
              "value ('Takeaway Total') of everything collected so far - NOT " +
              "the item count.")]
-    public TextMeshProUGUI totalAmount;
+    //public TextMeshProUGUI totalAmount;
 
-    [Header("Item Count Progress")]
-    [Tooltip("Total collectible items in this level. Set via SetTotalItems() " +
-             "from a level manager, or just set this in the Inspector if the " +
-             "count is fixed per-scene.")]
+    //[Header("Item Count Progress")]
+    //[Tooltip("Total collectible items in this level. Set via SetTotalItems() " +
+    //         "from a level manager, or just set this in the Inspector if the " +
+    //         "count is fixed per-scene.")]
     [SerializeField] private int totalItems = 8;
 
     [SerializeField] private int collectedItems = 0;
@@ -64,7 +64,7 @@ public class ProgressBarController : MonoBehaviour
     {
         collectedItems = Mathf.Clamp(collectedItems + amount, 0, totalItems);
 
-        if (item != null)
+        if (item != null && !item.isUniqueArtifact)
             cashCollected += item.value * amount;
 
         RefreshDisplay();
@@ -86,7 +86,7 @@ public class ProgressBarController : MonoBehaviour
         if (itemsCollected != null)
             itemsCollected.text = $"{collectedItems}/{totalItems}";
 
-        if (totalAmount != null)
-            totalAmount.text = "$" + cashCollected.ToString();
+        //if (totalAmount != null)
+        //    totalAmount.text = "$" + cashCollected.ToString();
     }
 }

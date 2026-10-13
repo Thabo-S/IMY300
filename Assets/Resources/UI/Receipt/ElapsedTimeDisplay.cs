@@ -9,6 +9,7 @@ public class ElapsedTimeDisplay : MonoBehaviour
 
     public float ElapsedSeconds => Time.timeSinceLevelLoad;
 
+
     private void Update()
     {
         if (elapsedTimeText == null) return;
@@ -20,5 +21,4 @@ public class ElapsedTimeDisplay : MonoBehaviour
 
         elapsedTimeText.text = $"{hours:00}:{minutes:00}:{seconds:00}s";
     }
-
 }

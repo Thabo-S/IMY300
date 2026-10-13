@@ -32,12 +32,12 @@ public class InputMananger : MonoBehaviour
         walking.Crouch.performed += ctx => movement.playerCrouch();
 
         // Bind New Input System PickUp action (Key: E)
-        pickUp.PickUpObject.performed += ctx => {
-            if (inventory != null)
-            {
-                inventory.TryPickupItem();
-            }
-        };
+        //pickUp.PickUpObject.performed += ctx => {
+        //    if (inventory != null)
+        //    {
+        //        inventory.TryPickupItem();
+        //    }
+        //};
     }
 
     private void FixedUpdate()

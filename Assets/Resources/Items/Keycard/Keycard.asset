@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: Keycard
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   itemName: Keycard
-  icon: {fileID: -877601879, guid: 55de1f2b43703c9418b5e63eaff182f3, type: 3}
+  icon: {fileID: 2088640289, guid: bd09a764b8dfdee4384c4f760861ce6e, type: 3}
   maxStackSize: 1
-  itemPrefab: {fileID: 1328132586000978693, guid: 4e4860bd30cd8b643aa53d92771f7cc6, type: 3}
+  itemPrefab: {fileID: 3501327205902965425, guid: e40798efb2c6c5e4292ce128059f03bc, type: 3}
   handItemPrefab: {fileID: 0}
+  value: 0
+  purchasable: 0
+  price: 0
+  description: 

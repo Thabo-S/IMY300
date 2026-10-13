@@ -7,6 +7,8 @@ using System;
 
 public class TutorialManager : MonoBehaviour
 {
+    public static TutorialManager Instance { get; private set; }
+
     public GameObject startTutorialOverlay;
     public GameObject player;
     public Player playerScript;
@@ -47,14 +49,17 @@ public class TutorialManager : MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-        spawnPoint = GameObject.Find("SpawnPoint");
-    }
+        if (Instance == null)
+        {
+            Instance = this;
+        }
 
+        player = GameObject.FindGameObjectWithTag("Player");
+    }
     void Start()
     {
         startTutorialOverlay.SetActive(true);
-        player.SetActive(false);
+        //player.SetActive(false);
         playerScript = player.GetComponent<Player>();
         InputMananger = player.GetComponent<InputMananger>();
 
@@ -64,6 +69,15 @@ public class TutorialManager : MonoBehaviour
         step3Panel.SetActive(false);
         step4Panel.SetActive(false);
         step5Panel.SetActive(false);
+
+        if (CursorManager.instance != null)
+            CursorManager.instance.UnlockCursor();
+
+        int progress = PlayerPrefs.GetInt("LevelIndex" );
+        int currentLevelPrefKey = PlayerPrefs.GetInt("currentLevelPrefKey" );
+
+        Debug.Log("HIghest Level Complete is : " + progress);
+        Debug.Log("Current Level Being played is : " + currentLevelPrefKey);
     }
 
     void Update()
@@ -74,19 +88,13 @@ public class TutorialManager : MonoBehaviour
 
     public void hideOverlay()
     {
-        startTutorialOverlay.SetActive(false);
-        player.SetActive(true);
+        //startTutorialOverlay.SetActive(false);
+        //player.SetActive(true);
         //WelcomeCam.SetActive(false);
 
-        LockCursor();
+        CursorManager.instance.LockCursor();
 
         RunDelayed(StartStep1, 3f);
-    }
-
-    public void LockCursor()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     // ---------------- DELAYED CALL HELPER ----------------

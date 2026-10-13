@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: AdrenalineBlueSO
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: AdrenalineBlue
+  icon: {fileID: 21300000, guid: 9c076c39928cdd8408953cdff69c5341, type: 3}
+  maxStackSize: 1
+  itemPrefab: {fileID: 6171129177888997741, guid: bccfbb4b5c16da74b81698722df8514a, type: 3}
+  handItemPrefab: {fileID: 0}
+  isUniqueArtifact: 0
+  priceRangeMin: 0
+  priceRangeMax: 0
+  value: 0
+  purchasable: 1
+  price: 14000
+  description: Gives the player a temporary health and large speed boost

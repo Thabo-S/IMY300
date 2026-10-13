@@ -17,7 +17,10 @@ MonoBehaviour:
   maxStackSize: 1
   itemPrefab: {fileID: 9042866111714286651, guid: 420bd8ceb1d336944b324bb0e77e8f1b, type: 3}
   handItemPrefab: {fileID: 0}
+  isUniqueArtifact: 0
+  priceRangeMin: 0
+  priceRangeMax: 0
   value: 0
   purchasable: 1
-  price: 40
+  price: 7000
   description: Gives the player a temporary health and speed boost

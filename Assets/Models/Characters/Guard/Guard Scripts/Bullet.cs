@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public int bulletDamage = 10;
+    public int bulletDamage = 15;
     public int bulletDamageTutorial = 25;
 
     private GameObject shooter; // the guard that fired this bullet
@@ -30,7 +30,7 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        if (hitObject.CompareTag("Player") && PlayerPrefs.GetInt("LevelIndex", 0) == 0)
+        if (hitObject.CompareTag("Player") && PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
         {
             hitObject.GetComponent<Player>().TakeDamage(bulletDamageTutorial);
 

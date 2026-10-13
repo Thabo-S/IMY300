@@ -10,6 +10,15 @@ public class ItemSO : ScriptableObject
     public GameObject itemPrefab;
     public GameObject handItemPrefab;
 
+    [Header("Black Market")]
+    [Tooltip("Check for unique named artifact only (Mona Lisa, Crown of Thorns, Heart of the Amazon, Blood Crown, King's Heart, Queen's Halo)")]
+    public bool isUniqueArtifact;
+
+    [Tooltip("Shown to the player BEFORE selling a unique artifact, instead of the real value. Only relevant if isUniqueArtifact is checked.")]
+    public int priceRangeMin;
+    public int priceRangeMax;
+
+    [Header("Market Value")]
     [Tooltip("Cash value of a single unit of this item, used for the Takeaway " +
              "Total on the progress UI.")]
     public int value;

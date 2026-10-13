@@ -14,9 +14,17 @@ public class closeToItem : MonoBehaviour
         canvasToToggle = GetComponent<Canvas>();
     }
 
+        private float checkTimer;
+    private const float CheckInterval = 0.2f;
+
     private void Update()
     {
-        CheckPlayerDistance();
+        checkTimer -= Time.deltaTime;
+        if (checkTimer <= 0f)
+        {
+            checkTimer = CheckInterval;
+            CheckPlayerDistance();
+        }
     }
 
     private void CheckPlayerDistance()

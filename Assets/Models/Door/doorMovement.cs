@@ -16,10 +16,13 @@ public class doorMovement : MonoBehaviour
     [Header("Door State")]
     public DoorState currentState = DoorState.Closed;
 
-    [Header("Animation Settings")]
+        [Header("Animation Settings")]
     [SerializeField] private float animationDuration = 0.5f;
     [SerializeField] private float garageDoorAnimationDuration = 2f;
     [SerializeField] private float garageDoorHeight = 1.8f;
+
+    [Tooltip("Y-axis rotation delta applied when opening. Negative opens one way, positive opens the other. Set per-door.")]
+    [SerializeField] private float openRotationY = -90f;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
@@ -38,8 +41,16 @@ public class doorMovement : MonoBehaviour
         player = GameObject.FindWithTag("Player");
 
         if (audioSource == null)
+        {
             audioSource = GetComponent<AudioSource>();
 
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.playOnAwake = false;
+                audioSource.spatialBlend = 1f;
+            }
+        }
 
         if (outline == null)
             outline = GetComponent<Outline>();
@@ -60,7 +71,6 @@ public class doorMovement : MonoBehaviour
         }
 
         LoadDoorSounds();
-
     }
 
     private void LoadDoorSounds()
@@ -179,9 +189,9 @@ public class doorMovement : MonoBehaviour
         }
     }
 
-    private float GetRotationDelta()
+        private float GetRotationDelta()
     {
-        return -90f;
+        return openRotationY;
     }
 
     private IEnumerator RotateDoor(float yDelta)

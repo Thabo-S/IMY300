@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3aac4db386755c49aa1f04d2bc34743, type: 3}
+  m_Name: Gold Coins
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSO
+  itemName: Gold Coins
+  icon: {fileID: 1654011054, guid: eeab4ce29a02c034dbccd34e4e5c5271, type: 3}
+  maxStackSize: 2
+  itemPrefab: {fileID: 8297435286836856472, guid: 04750557f5af6064b8ae1c9657dc25ab, type: 3}
+  handItemPrefab: {fileID: 0}
+  value: 200
+  purchasable: 0
+  price: 0
+  description: 

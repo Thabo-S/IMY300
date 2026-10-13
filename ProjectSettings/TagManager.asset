@@ -31,6 +31,15 @@ TagManager:
   - Inventory
   - Torch
   - Adrenaline
+  - LockedDoor
+  - QTeEventsLockDoor
+  - QTeEventsKepPad
+  - QteTimer
+  - DeathUI
+  - AlarmWarning
+  - LaserWarning
+  - Cash
+  - notificationTextUI
   layers:
   - Default
   - TransparentFX
