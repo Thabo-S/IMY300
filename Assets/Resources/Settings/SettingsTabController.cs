@@ -21,16 +21,22 @@ public class SettingsTabController : MonoBehaviour
     [Header("Default")]
     [SerializeField] private int defaultTabIndex = 0;
 
-    private void OnEnable()
+    private void Awake()
     {
-        // Hook up click listeners
+        // Hook up click listeners once in Awake to avoid closure duplication issues
         for (int i = 0; i < tabs.Count; i++)
         {
             int index = i; // capture for closure
-            tabs[i].button.onClick.RemoveListener(() => SelectTab(index));
-            tabs[i].button.onClick.AddListener(() => SelectTab(index));
+            if (tabs[i].button != null)
+            {
+                tabs[i].button.onClick.AddListener(() => SelectTab(index));
+            }
         }
+    }
 
+    private void OnEnable()
+    {
+        // Select the default tab every time the settings menu is opened
         SelectTab(defaultTabIndex);
     }
 
@@ -41,12 +47,20 @@ public class SettingsTabController : MonoBehaviour
             bool isSelected = (i == selectedIndex);
 
             // Toggle panel visibility
-            tabs[i].panel.SetActive(isSelected);
+            if (tabs[i].panel != null)
+            {
+                tabs[i].panel.SetActive(isSelected);
+            }
 
             // Toggle button color
-            var image = tabs[i].button.GetComponent<Image>();
-            if (image != null)
-                image.color = isSelected ? selectedColor : normalColor;
+            if (tabs[i].button != null)
+            {
+                var image = tabs[i].button.GetComponent<Image>();
+                if (image != null)
+                {
+                    image.color = isSelected ? selectedColor : normalColor;
+                }
+            }
         }
     }
 }
