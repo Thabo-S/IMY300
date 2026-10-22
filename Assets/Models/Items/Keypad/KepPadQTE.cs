@@ -98,6 +98,8 @@ public class KepPadQTE : MonoBehaviour
         }
 
         acceptingKeypadInput = false;
+        QteState.Keypad = true;
+
 
         SetKeypadUIActive(false);
         if (hackingBarObject != null) hackingBarObject.SetActive(true);
@@ -133,6 +135,12 @@ public class KepPadQTE : MonoBehaviour
 
         acceptingKeypadInput = false;
         sequence = null;
+        QteState.Keypad = false;
+    }
+
+    private void OnDisable()
+    {
+        QteState.Keypad = false;
     }
 
     /// <summary>

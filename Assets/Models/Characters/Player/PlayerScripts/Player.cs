@@ -78,6 +78,14 @@ public class Player : MonoBehaviour
     private InputMananger inputMananger;
     private TutorialManager cachedTutorialManager;
     // Performance: Cache guard sight detection to avoid raycasts every frame
+
+    private bool isDead;
+
+    [Header("Death Sequence")]
+    public float deathScreenDelay = 1.5f;
+    public float deathFadeTime = 0.6f;
+    private bool tutorialStep5Shown;
+    private bool tutorialStep6Shown;
     private float sightCheckCooldown = 0.1f;  // Check sight every 100ms instead of every frame
     private float sightCheckTimer = 0f;
     private bool cachedIsDetected = false;
@@ -177,15 +185,34 @@ public class Player : MonoBehaviour
         PerformContinuousDetection();
         UpdateStamina();
 
-        if (Input.GetKeyDown(KeyCode.H) && !PauseMenu.isGamePause)
+        if (Input.GetKeyDown(KeyCode.H) && !PauseMenu.isGamePause && !QteState.IsActive)
         {
             ControlsPanel.SetActive(!ControlsPanel.activeSelf);
         }
 
-        if (Input.GetKeyDown(KeyCode.T) && !PauseMenu.isGamePause)
+        if (Input.GetKeyDown(KeyCode.T) && !PauseMenu.isGamePause && !QteState.IsActive)
         {
             ObjectivesPanel.SetActive(!ObjectivesPanel.activeSelf);
         }
+    }
+
+    public bool CloseOpenPanels()
+    {
+        bool closedAny = false;
+
+        if (ControlsPanel != null && ControlsPanel.activeSelf)
+        {
+            ControlsPanel.SetActive(false);
+            closedAny = true;
+        }
+
+        if (ObjectivesPanel != null && ObjectivesPanel.activeSelf)
+        {
+            ObjectivesPanel.SetActive(false);
+            closedAny = true;
+        }
+
+        return closedAny;
     }
 
     private void WireNavigationButtons()
@@ -208,8 +235,75 @@ public class Player : MonoBehaviour
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => action(bridge));
     }
+    //public void TakeDamage(int damage)
+    //{
+    //    if (isDead) return;
+
+    //    PlayerHealth -= damage;
+
+    //    HealthBarSlider.value = PlayerHealth;
+
+    //    fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
+
+    //    Debug.Log("Player took damage: " + PlayerHealth);
+
+    //    AudioClip clipToPlay = (PlayerHealth > 0) ? damageClip : deathClip;
+
+    //    if (damageAudioSource != null && clipToPlay != null)
+    //    {
+    //        damageAudioSource.PlayOneShot(clipToPlay);
+    //    }
+
+    //    PlayerStamina = Mathf.Clamp(PlayerStamina - damageStaminaPenalty, 0f, MaxStamina);
+    //    UpdateStaminaUI();
+
+    //    if (damageOverlay != null)
+    //    {
+    //        if (damageFlashCoroutine != null)
+    //            StopCoroutine(damageFlashCoroutine);
+
+    //        damageFlashCoroutine = StartCoroutine(DamageFlash());
+    //    }
+
+    //            if (PlayerPrefs.GetInt("currentLevelPrefKey") == 0 && PlayerHealth < 60)
+    //    {
+    //        if (cachedTutorialManager != null)
+    //            cachedTutorialManager.StartStep5();
+    //    }
+
+    //    if (PlayerHealth <= 0)
+    //    {
+    //        deathUI.SetActive(true);
+
+    //        if (playerMovement != null) playerMovement.enabled = false;
+
+    //        if (playerLookAround != null) playerLookAround.enabled = false;
+
+    //        if (inputMananger != null) inputMananger.enabled = false;
+
+    //                    if (CursorManager.instance != null) CursorManager.instance.UnlockCursor();
+
+    //        foreach (Guard guard in Guard.AllGuards)
+    //        {
+    //            if (guard != null)
+    //            {
+    //                guard.gameObject.SetActive(false);
+    //            }
+    //        }
+
+    //        AudioSource[] allPlayerAudio = GetComponents<AudioSource>();
+    //        foreach (AudioSource source in allPlayerAudio)
+    //        {
+    //            source.Stop();
+    //            source.enabled = false;
+    //        }
+    //    }
+    //}
+
     public void TakeDamage(int damage)
     {
+        if (isDead) return;
+
         PlayerHealth -= damage;
 
         HealthBarSlider.value = PlayerHealth;
@@ -236,40 +330,87 @@ public class Player : MonoBehaviour
             damageFlashCoroutine = StartCoroutine(DamageFlash());
         }
 
-                if (PlayerPrefs.GetInt("currentLevelPrefKey") == 0 && PlayerHealth < 60)
+        // Tutorial step 5 only shows once, and never on the killing blow
+        if (!tutorialStep5Shown && PlayerHealth > 0 && PlayerPrefs.GetInt("currentLevelPrefKey") == 0 && PlayerHealth < 60)
         {
             if (cachedTutorialManager != null)
+            {
+                tutorialStep5Shown = true;
                 cachedTutorialManager.StartStep5();
+            }
         }
 
-        if (PlayerHealth <= 0)
+        if (PlayerHealth <= 0 && !isDead)
         {
-            deathUI.SetActive(true);
-
-            if (playerMovement != null) playerMovement.enabled = false;
-
-            if (playerLookAround != null) playerLookAround.enabled = false;
-
-            if (inputMananger != null) inputMananger.enabled = false;
-
-                        if (CursorManager.instance != null) CursorManager.instance.UnlockCursor();
-
-            foreach (Guard guard in Guard.AllGuards)
-            {
-                if (guard != null)
-                {
-                    guard.gameObject.SetActive(false);
-                }
-            }
-
-            AudioSource[] allPlayerAudio = GetComponents<AudioSource>();
-            foreach (AudioSource source in allPlayerAudio)
-            {
-                source.Stop();
-                source.enabled = false;
-            }
+            isDead = true;
+            StartCoroutine(DeathSequence());
         }
     }
+
+    private IEnumerator DeathSequence()
+    {
+        if (playerMovement != null) playerMovement.enabled = false;
+        if (playerLookAround != null) playerLookAround.enabled = false;
+        if (inputMananger != null) inputMananger.enabled = false;
+
+        yield return new WaitForSecondsRealtime(deathScreenDelay);
+
+        if (CursorManager.instance != null) CursorManager.instance.UnlockCursor();
+
+        foreach (Guard guard in Guard.AllGuards)
+        {
+            if (guard != null)
+            {
+                guard.gameObject.SetActive(false);
+            }
+        }
+
+        AudioSource[] allPlayerAudio = GetComponents<AudioSource>();
+        foreach (AudioSource source in allPlayerAudio)
+        {
+            source.Stop();
+            source.enabled = false;
+        }
+
+        if (deathUI != null)
+        {
+            CanvasGroup group = deathUI.GetComponent<CanvasGroup>();
+            if (group == null) group = deathUI.AddComponent<CanvasGroup>();
+
+            group.alpha = 0f;
+            deathUI.SetActive(true);
+
+            float t = 0f;
+            while (t < deathFadeTime)
+            {
+                t += Time.unscaledDeltaTime;
+                group.alpha = Mathf.Clamp01(t / deathFadeTime);
+                yield return null;
+            }
+
+            group.alpha = 1f;
+        }
+    }
+
+    //public void RecoupHealth(int increaseHealtj)
+    //{
+    //    PlayerHealth += increaseHealtj;
+
+    //    if (PlayerHealth > 100)
+    //        PlayerHealth = 100;
+
+    //    HealthBarSlider.value = PlayerHealth;
+
+    //    fill.color = gradient.Evaluate(HealthBarSlider.normalizedValue);
+
+    //    Debug.Log("Player health increased: " + PlayerHealth);
+
+    //            if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
+    //    {
+    //        if (cachedTutorialManager != null)
+    //            cachedTutorialManager.StartStep6();
+    //    }
+    //}
 
     public void RecoupHealth(int increaseHealtj)
     {
@@ -284,10 +425,14 @@ public class Player : MonoBehaviour
 
         Debug.Log("Player health increased: " + PlayerHealth);
 
-                if (PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
+        // Tutorial step 6 (keypad) only starts once, not on every heal
+        if (!tutorialStep6Shown && PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
         {
             if (cachedTutorialManager != null)
+            {
+                tutorialStep6Shown = true;
                 cachedTutorialManager.StartStep6();
+            }
         }
     }
 

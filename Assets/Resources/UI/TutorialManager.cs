@@ -14,7 +14,7 @@ public class TutorialManager : MonoBehaviour
     public Player playerScript;
     public InputMananger InputMananger;
 
-    [Header("Lights References")]
+    [Header("Player Warning")]
     public GameObject PlayerWarning;
     public GameObject spawnPoint;
 
@@ -67,14 +67,17 @@ public class TutorialManager : MonoBehaviour
         step1Panel.SetActive(false);
         step2Panel.SetActive(false);
         step3Panel.SetActive(false);
+        step3Panel_2.SetActive(false);
         step4Panel.SetActive(false);
         step5Panel.SetActive(false);
+        step6Panel.SetActive(false);
+        step7Panel.SetActive(false);
 
         if (CursorManager.instance != null)
             CursorManager.instance.UnlockCursor();
 
-        int progress = PlayerPrefs.GetInt("LevelIndex" );
-        int currentLevelPrefKey = PlayerPrefs.GetInt("currentLevelPrefKey" );
+        int progress = PlayerPrefs.GetInt("LevelIndex");
+        int currentLevelPrefKey = PlayerPrefs.GetInt("currentLevelPrefKey");
 
         Debug.Log("HIghest Level Complete is : " + progress);
         Debug.Log("Current Level Being played is : " + currentLevelPrefKey);
@@ -227,7 +230,10 @@ public class TutorialManager : MonoBehaviour
     {
         ShowPanel(step5Panel);
 
-        GameObject.FindAnyObjectByType<Step4Trigger>().guard2.SetActive(false);
+        //GameObject.FindAnyObjectByType<Step4Trigger>().guard2.SetActive(false);
+        Step4Trigger step4 = GameObject.FindAnyObjectByType<Step4Trigger>();
+        if (step4 != null && step4.guard2 != null)
+            step4.guard2.SetActive(false);
     }
 
     public void hideStep5()
@@ -236,7 +242,9 @@ public class TutorialManager : MonoBehaviour
 
         TargetTrigger targetTrigger = GameObject.FindAnyObjectByType<TargetTrigger>();
 
-        targetTrigger.enableInputs();
+        //targetTrigger.enableInputs();
+        if (targetTrigger != null)
+            targetTrigger.enableInputs();
     }
 
     // ---------------- STEP 6: Keypad Iteraction ----------------

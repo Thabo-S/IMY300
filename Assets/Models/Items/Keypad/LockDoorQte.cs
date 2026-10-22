@@ -102,7 +102,7 @@ public class LockDoorQte : MonoBehaviour
 
         isActive = true;
         enabled = true;
-
+        QteState.Lockpick = true;
         qteCanvas.enabled = true;
 
         pointerTransform.position = pointA.position;
@@ -220,7 +220,7 @@ public class LockDoorQte : MonoBehaviour
     {
         isActive = false;
         enabled = false;
-
+        QteState.Lockpick = false;
         qteCanvas.enabled = false;
 
         if (playerMovementToDisable != null) playerMovementToDisable.enabled = true;

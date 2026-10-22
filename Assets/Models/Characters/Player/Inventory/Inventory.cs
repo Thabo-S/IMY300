@@ -163,7 +163,7 @@ public class Inventory : MonoBehaviour
     private void Update()
     {
         // 1. Toggle Inventory UI (Tab Key)
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if ((Input.GetKeyDown(KeyCode.Tab) && !PauseMenu.isGamePause && !QteState.IsActive))
         {
             ToggleInventory();
         }
@@ -177,9 +177,11 @@ public class Inventory : MonoBehaviour
         // 2. Gameplay Controls (Only active when Inventory is CLOSED)
         if (!IsOpen)
         {
-            //DetectLookedAtItem();
-            HandleHotbarSelection();
-            HandleDropEquippedItem();
+            if (!QteState.IsActive)
+            {
+                HandleHotbarSelection();
+                HandleDropEquippedItem();
+            }
             HandleThrowingLogic();
         }
         else
@@ -195,7 +197,7 @@ public class Inventory : MonoBehaviour
 
         UpdateHotbarOpacity();
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F) && !QteState.IsActive)
             useSelectedItem();
     }
 
