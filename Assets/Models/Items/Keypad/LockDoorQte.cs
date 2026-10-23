@@ -38,10 +38,13 @@ public class LockDoorQte : MonoBehaviour
     public UnityEvent OnQteFail;
     public UnityEvent OnQteCancel;
 
-    private Vector3 targetPosition;
+    private float targetX;
+    private bool isMovingToPointB = true;
+    private bool waitForInteractKeyRelease;
     private bool isActive = false;
     private bool isSetupValid = false;
     private bool hasLockCracked = false;
+    private string previousInteractionPrompt;
 
     void Start()
     {
@@ -58,8 +61,9 @@ public class LockDoorQte : MonoBehaviour
         safeZone = qteUIRoot.transform.Find("SafeZone")?.GetComponent<RectTransform>();
         pointerTransform = qteUIRoot.transform.Find("Pointer")?.GetComponent<RectTransform>();
 
-        pickLockButton.onClick.AddListener(CheckSuccess);
-        cancelButton.onClick.AddListener(CancelQte);
+        // The lock-pick QTE is controlled from the keyboard, not by clicking UI.
+        if (pickLockButton != null) pickLockButton.enabled = false;
+        if (cancelButton != null) cancelButton.enabled = false;
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
@@ -73,7 +77,7 @@ public class LockDoorQte : MonoBehaviour
                 Debug.LogWarning($"[LockDoorQte] ({gameObject.name}) Player object found, but has no InputMananger component - player input will NOT be frozen during this QTE.");
         }
 
-        targetPosition = pointB.position;
+        targetX = pointB.localPosition.x;
 
         isSetupValid = true;
         enabled = false;
@@ -112,6 +116,12 @@ public class LockDoorQte : MonoBehaviour
         QteState.Lockpick = true;
         qteCanvas.enabled = true;
 
+        if (Player.Instance != null && Player.Instance.interactionTextUI != null)
+        {
+            previousInteractionPrompt = Player.Instance.interactionTextUI.text;
+            Player.Instance.interactionTextUI.text = "Press [E] to pick the lock  |  [C] to cancel";
+        }
+
         if (playerInputToDisable != null)
         {
             playerInputWasEnabledBeforeQte = playerInputToDisable.enabled;
@@ -119,9 +129,13 @@ public class LockDoorQte : MonoBehaviour
             isPlayerInputBlocked = true;
         }
 
-        pointerTransform.position = pointA.position;
-        targetPosition = pointB.position;
-        direction = 1f;
+        Vector3 pointerPosition = pointerTransform.localPosition;
+        pointerPosition.x = pointA.localPosition.x;
+        pointerTransform.localPosition = pointerPosition;
+        targetX = pointB.localPosition.x;
+        isMovingToPointB = true;
+        waitForInteractKeyRelease = Input.GetKey(KeyCode.E);
+        direction = Mathf.Sign(targetX - pointerPosition.x);
 
         if (CursorManager.instance != null)
         {
@@ -148,26 +162,36 @@ public class LockDoorQte : MonoBehaviour
     {
         if (!isActive) return;
 
-        pointerTransform.position = Vector3.MoveTowards(pointerTransform.position, targetPosition, moveSpeed * Time.deltaTime);
+        Vector3 pointerPosition = pointerTransform.localPosition;
+        pointerPosition.x = Mathf.MoveTowards(pointerPosition.x, targetX, moveSpeed * Time.deltaTime);
 
-        if (Vector3.Distance(pointerTransform.position, pointA.position) < 0.1f)
+        if (Mathf.Abs(pointerPosition.x - targetX) <= 0.01f)
         {
-            targetPosition = pointB.position;
-            direction = 1f;
-        }
-        else if (Vector3.Distance(pointerTransform.position, pointB.position) < 0.1f)
-        {
-            targetPosition = pointA.position;
-            direction = -1f;
+            pointerPosition.x = targetX;
+            isMovingToPointB = !isMovingToPointB;
+            targetX = isMovingToPointB ? pointB.localPosition.x : pointA.localPosition.x;
+            direction = Mathf.Sign(targetX - pointerPosition.x);
         }
 
-        // Success/Cancel are now driven entirely by the button OnClick
-        // listeners wired in Start() - no keyboard polling needed here.
+        pointerTransform.localPosition = pointerPosition;
+
+        // The E press that opened the lock must not also count as a pick attempt.
+        if (waitForInteractKeyRelease)
+        {
+            if (!Input.GetKey(KeyCode.E))
+                waitForInteractKeyRelease = false;
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+            CheckSuccess();
+        else if (Input.GetKeyDown(KeyCode.C))
+            CancelQte();
     }
 
     void CheckSuccess()
     {
-        Debug.Log("[LockDoorQte] CheckSuccess() was called — button click WAS received.");
+        Debug.Log("[LockDoorQte] Pick attempt triggered by the E key.");
 
         // 1. Calculate the true visual half-widths by multiplying the base width by the inspector scale
         float safeZoneHalfWidth = (safeZone.rect.width * safeZone.localScale.x) / 2f;
@@ -230,6 +254,10 @@ public class LockDoorQte : MonoBehaviour
         enabled = false;
         QteState.Lockpick = false;
         qteCanvas.enabled = false;
+
+        if (Player.Instance != null && Player.Instance.interactionTextUI != null)
+            Player.Instance.interactionTextUI.text = previousInteractionPrompt ?? string.Empty;
+        previousInteractionPrompt = null;
 
         if (isPlayerInputBlocked && playerInputToDisable != null)
             playerInputToDisable.enabled = playerInputWasEnabledBeforeQte;

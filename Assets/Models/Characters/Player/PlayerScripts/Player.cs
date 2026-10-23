@@ -182,7 +182,8 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        PerformContinuousDetection();
+        if (!QteState.IsActive)
+            PerformContinuousDetection();
         UpdateStamina();
 
         if (Input.GetKeyDown(KeyCode.H) && !PauseMenu.isGamePause && !QteState.IsActive)
