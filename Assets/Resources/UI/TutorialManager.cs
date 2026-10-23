@@ -73,8 +73,8 @@ public class TutorialManager : MonoBehaviour
         if (CursorManager.instance != null)
             CursorManager.instance.UnlockCursor();
 
-        int progress = PlayerPrefs.GetInt("LevelIndex" );
-        int currentLevelPrefKey = PlayerPrefs.GetInt("currentLevelPrefKey" );
+        int progress = PlayerPrefs.GetInt("LevelIndex");
+        int currentLevelPrefKey = PlayerPrefs.GetInt("currentLevelPrefKey");
 
         Debug.Log("HIghest Level Complete is : " + progress);
         Debug.Log("Current Level Being played is : " + currentLevelPrefKey);

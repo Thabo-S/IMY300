@@ -25,6 +25,9 @@ public class KepPadQTE : MonoBehaviour
     [SerializeField] private float hackDuration = 3f;
     private bool acceptingKeypadInput;
     private Coroutine hackingCoroutine;
+    private InputMananger playerInputToDisable;
+    private bool playerInputWasEnabledBeforeQte;
+    private bool isPlayerInputBlocked;
 
     [Header("Keypad UI (hidden during hacking, shown once it's done)")]
     [Tooltip("The 'Background' panel behind the slots.")]
@@ -68,6 +71,10 @@ public class KepPadQTE : MonoBehaviour
     {
         BuildSpriteLookup();
 
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+            playerInputToDisable = player.GetComponent<InputMananger>();
+
         GameObject timerObj = GameObject.FindGameObjectWithTag("QteTimer");
         if (timerObj != null)
         {
@@ -97,7 +104,17 @@ public class KepPadQTE : MonoBehaviour
             return;
         }
 
+        // Close other player panels before opening the hacking UI so the H/T
+        // panels cannot remain stacked behind the keypad.
+        if (Inventory.IsOpen && Inventory.instance != null)
+            Inventory.instance.ToggleInventory();
+        if (Player.Instance != null)
+            Player.Instance.CloseOpenPanels();
+
+        BlockPlayerInput();
         acceptingKeypadInput = false;
+        QteState.Keypad = true;
+
 
         SetKeypadUIActive(false);
         if (hackingBarObject != null) hackingBarObject.SetActive(true);
@@ -133,6 +150,42 @@ public class KepPadQTE : MonoBehaviour
 
         acceptingKeypadInput = false;
         sequence = null;
+        QteState.Keypad = false;
+        RestorePlayerInput();
+    }
+
+    private void OnDisable()
+    {
+        QteState.Keypad = false;
+        RestorePlayerInput();
+    }
+
+    private void BlockPlayerInput()
+    {
+        if (playerInputToDisable == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+                playerInputToDisable = player.GetComponent<InputMananger>();
+        }
+
+        if (playerInputToDisable == null || isPlayerInputBlocked)
+            return;
+
+        playerInputWasEnabledBeforeQte = playerInputToDisable.enabled;
+        playerInputToDisable.enabled = false;
+        isPlayerInputBlocked = true;
+    }
+
+    private void RestorePlayerInput()
+    {
+        if (!isPlayerInputBlocked)
+            return;
+
+        if (playerInputToDisable != null)
+            playerInputToDisable.enabled = playerInputWasEnabledBeforeQte;
+
+        isPlayerInputBlocked = false;
     }
 
     /// <summary>

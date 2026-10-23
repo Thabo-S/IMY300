@@ -19,11 +19,28 @@ public class PauseMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (!isGamePause && TryCloseOpenPanels())
+                return;
+
             if (isGamePause)
                 ResumeGamePlay();
             else
                 PauseGamePlay();
         }
+    }
+
+    private bool TryCloseOpenPanels()
+    {
+        if (Inventory.IsOpen && Inventory.instance != null)
+        {
+            Inventory.instance.ToggleInventory();
+            return true;
+        }
+
+        if (Player.Instance != null && Player.Instance.CloseOpenPanels())
+            return true;
+
+        return false;
     }
 
     public void ResumeGamePlay()
