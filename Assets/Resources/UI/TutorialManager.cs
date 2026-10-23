@@ -14,7 +14,7 @@ public class TutorialManager : MonoBehaviour
     public Player playerScript;
     public InputMananger InputMananger;
 
-    [Header("Player Warning")]
+    [Header("Lights References")]
     public GameObject PlayerWarning;
     public GameObject spawnPoint;
 
@@ -42,8 +42,7 @@ public class TutorialManager : MonoBehaviour
     public GameObject step6Panel;
     public GameObject step7Panel;
 
-    private Coroutine step2FailureRoutine;
-    private bool inputWasEnabledBeforeStep2Failure;
+
 
     // ----------- Reference and Variables -------------
     // -------------------------------------------------
@@ -68,11 +67,8 @@ public class TutorialManager : MonoBehaviour
         step1Panel.SetActive(false);
         step2Panel.SetActive(false);
         step3Panel.SetActive(false);
-        step3Panel_2.SetActive(false);
         step4Panel.SetActive(false);
         step5Panel.SetActive(false);
-        step6Panel.SetActive(false);
-        step7Panel.SetActive(false);
 
         if (CursorManager.instance != null)
             CursorManager.instance.UnlockCursor();
@@ -92,11 +88,11 @@ public class TutorialManager : MonoBehaviour
 
     public void hideOverlay()
     {
-        if (startTutorialOverlay != null)
-            startTutorialOverlay.SetActive(false);
+        //startTutorialOverlay.SetActive(false);
+        //player.SetActive(true);
+        //WelcomeCam.SetActive(false);
 
-        if (CursorManager.instance != null)
-            CursorManager.instance.LockCursor();
+        CursorManager.instance.LockCursor();
 
         RunDelayed(StartStep1, 3f);
     }
@@ -178,41 +174,17 @@ public class TutorialManager : MonoBehaviour
 
     public void PlayerFailedStep2()
     {
-        if (step2FailureRoutine != null)
-            return;
+        PlayerWarning.SetActive(true);
 
-        if (PlayerWarning != null)
-            PlayerWarning.SetActive(true);
+        CharacterController cc = player.GetComponent<CharacterController>();
 
-        inputWasEnabledBeforeStep2Failure = InputMananger != null && InputMananger.enabled;
-        if (InputMananger != null)
-            InputMananger.enabled = false;
+        if (cc != null) cc.enabled = false;
 
-        step2FailureRoutine = StartCoroutine(ResetAfterStep2Failure());
-    }
+        player.transform.position = spawnPoint.transform.position;
 
-    private IEnumerator ResetAfterStep2Failure()
-    {
-        // Let the warning register before moving the player back to the checkpoint.
-        yield return new WaitForSeconds(1.25f);
+        if (cc != null) cc.enabled = true;
 
-        if (player != null && spawnPoint != null)
-        {
-            CharacterController cc = player.GetComponent<CharacterController>();
-            if (cc != null) cc.enabled = false;
-            player.transform.position = spawnPoint.transform.position;
-            if (cc != null) cc.enabled = true;
-        }
-
-        yield return new WaitForSeconds(2.75f);
-
-        if (PlayerWarning != null)
-            PlayerWarning.SetActive(false);
-
-        if (InputMananger != null)
-            InputMananger.enabled = inputWasEnabledBeforeStep2Failure;
-
-        step2FailureRoutine = null;
+        StartCoroutine(TimeWait(4f, PlayerWarning));
     }
 
     // ---------------- STEP 3: Picking Up ----------------
@@ -255,10 +227,7 @@ public class TutorialManager : MonoBehaviour
     {
         ShowPanel(step5Panel);
 
-        //GameObject.FindAnyObjectByType<Step4Trigger>().guard2.SetActive(false);
-        Step4Trigger step4 = GameObject.FindAnyObjectByType<Step4Trigger>();
-        if (step4 != null && step4.guard2 != null)
-            step4.guard2.SetActive(false);
+        GameObject.FindAnyObjectByType<Step4Trigger>().guard2.SetActive(false);
     }
 
     public void hideStep5()
@@ -267,9 +236,7 @@ public class TutorialManager : MonoBehaviour
 
         TargetTrigger targetTrigger = GameObject.FindAnyObjectByType<TargetTrigger>();
 
-        //targetTrigger.enableInputs();
-        if (targetTrigger != null)
-            targetTrigger.enableInputs();
+        targetTrigger.enableInputs();
     }
 
     // ---------------- STEP 6: Keypad Iteraction ----------------
