@@ -42,6 +42,8 @@ public class TutorialManager : MonoBehaviour
     public GameObject step6Panel;
     public GameObject step7Panel;
 
+    public GameObject target;
+
 
 
     // ----------- Reference and Variables -------------
@@ -228,6 +230,9 @@ public class TutorialManager : MonoBehaviour
         ShowPanel(step5Panel);
 
         GameObject.FindAnyObjectByType<Step4Trigger>().guard2.SetActive(false);
+        target.SetActive(false);
+
+
     }
 
     public void hideStep5()
