@@ -28,8 +28,10 @@ public class LockDoorQte : MonoBehaviour
     /// <summary>Whether this lock is currently locked out after a recent failure.</summary>
     public bool IsOnCooldown => isOnCooldown;
 
-    [Header("Player Freeze (auto-found, no need to assign)")]
-    private MonoBehaviour playerMovementToDisable;
+    [Header("Player Input (auto-found, no need to assign)")]
+    private InputMananger playerInputToDisable;
+    private bool playerInputWasEnabledBeforeQte;
+    private bool isPlayerInputBlocked;
 
     [Header("Events")]
     public UnityEvent OnQteSuccess;
@@ -66,9 +68,9 @@ public class LockDoorQte : MonoBehaviour
         }
         else
         {
-            playerMovementToDisable = player.GetComponent<PlayerMovement>();
-            if (playerMovementToDisable == null)
-                Debug.LogWarning($"[LockDoorQte] ({gameObject.name}) Player object found, but has no PlayerMovement component - player will NOT be frozen during this QTE.");
+            playerInputToDisable = player.GetComponent<InputMananger>();
+            if (playerInputToDisable == null)
+                Debug.LogWarning($"[LockDoorQte] ({gameObject.name}) Player object found, but has no InputMananger component - player input will NOT be frozen during this QTE.");
         }
 
         targetPosition = pointB.position;
@@ -100,20 +102,26 @@ public class LockDoorQte : MonoBehaviour
             return;
         }
 
+        if (Inventory.IsOpen && Inventory.instance != null)
+            Inventory.instance.ToggleInventory();
+        if (Player.Instance != null)
+            Player.Instance.CloseOpenPanels();
+
         isActive = true;
         enabled = true;
         QteState.Lockpick = true;
         qteCanvas.enabled = true;
 
+        if (playerInputToDisable != null)
+        {
+            playerInputWasEnabledBeforeQte = playerInputToDisable.enabled;
+            playerInputToDisable.enabled = false;
+            isPlayerInputBlocked = true;
+        }
+
         pointerTransform.position = pointA.position;
         targetPosition = pointB.position;
         direction = 1f;
-
-        if (playerMovementToDisable != null)
-        {
-            playerMovementToDisable.enabled = false;
-            Debug.Log($"[LockDoorQte] Disabled {playerMovementToDisable.GetType().Name}. enabled is now {playerMovementToDisable.enabled}");
-        }
 
         if (CursorManager.instance != null)
         {
@@ -223,7 +231,9 @@ public class LockDoorQte : MonoBehaviour
         QteState.Lockpick = false;
         qteCanvas.enabled = false;
 
-        if (playerMovementToDisable != null) playerMovementToDisable.enabled = true;
+        if (isPlayerInputBlocked && playerInputToDisable != null)
+            playerInputToDisable.enabled = playerInputWasEnabledBeforeQte;
+        isPlayerInputBlocked = false;
         if (CursorManager.instance != null) CursorManager.instance.LockCursor();
     }
 }

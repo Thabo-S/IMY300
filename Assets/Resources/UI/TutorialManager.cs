@@ -42,7 +42,8 @@ public class TutorialManager : MonoBehaviour
     public GameObject step6Panel;
     public GameObject step7Panel;
 
-
+    private Coroutine step2FailureRoutine;
+    private bool inputWasEnabledBeforeStep2Failure;
 
     // ----------- Reference and Variables -------------
     // -------------------------------------------------
@@ -91,11 +92,11 @@ public class TutorialManager : MonoBehaviour
 
     public void hideOverlay()
     {
-        //startTutorialOverlay.SetActive(false);
-        //player.SetActive(true);
-        //WelcomeCam.SetActive(false);
+        if (startTutorialOverlay != null)
+            startTutorialOverlay.SetActive(false);
 
-        CursorManager.instance.LockCursor();
+        if (CursorManager.instance != null)
+            CursorManager.instance.LockCursor();
 
         RunDelayed(StartStep1, 3f);
     }
@@ -177,17 +178,41 @@ public class TutorialManager : MonoBehaviour
 
     public void PlayerFailedStep2()
     {
-        PlayerWarning.SetActive(true);
+        if (step2FailureRoutine != null)
+            return;
 
-        CharacterController cc = player.GetComponent<CharacterController>();
+        if (PlayerWarning != null)
+            PlayerWarning.SetActive(true);
 
-        if (cc != null) cc.enabled = false;
+        inputWasEnabledBeforeStep2Failure = InputMananger != null && InputMananger.enabled;
+        if (InputMananger != null)
+            InputMananger.enabled = false;
 
-        player.transform.position = spawnPoint.transform.position;
+        step2FailureRoutine = StartCoroutine(ResetAfterStep2Failure());
+    }
 
-        if (cc != null) cc.enabled = true;
+    private IEnumerator ResetAfterStep2Failure()
+    {
+        // Let the warning register before moving the player back to the checkpoint.
+        yield return new WaitForSeconds(1.25f);
 
-        StartCoroutine(TimeWait(4f, PlayerWarning));
+        if (player != null && spawnPoint != null)
+        {
+            CharacterController cc = player.GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false;
+            player.transform.position = spawnPoint.transform.position;
+            if (cc != null) cc.enabled = true;
+        }
+
+        yield return new WaitForSeconds(2.75f);
+
+        if (PlayerWarning != null)
+            PlayerWarning.SetActive(false);
+
+        if (InputMananger != null)
+            InputMananger.enabled = inputWasEnabledBeforeStep2Failure;
+
+        step2FailureRoutine = null;
     }
 
     // ---------------- STEP 3: Picking Up ----------------
