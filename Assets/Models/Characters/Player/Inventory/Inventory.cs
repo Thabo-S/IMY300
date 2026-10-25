@@ -823,7 +823,7 @@ public class Inventory : MonoBehaviour
                 Debug.LogWarning("[Inventory] Torch equipped but Torch Light is not assigned in the Inspector.");
             }
         }
-        else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))
+        else if (equippedItem != null && (equippedItem == adrenalineGreenSO || equippedItem == adrenalineBlueSO || (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))))
         {
             float healthIncrease = adrenalineHealthIncrease;
             float speedMultiplier = adrenalineSpeedMultiplier;
@@ -844,6 +844,10 @@ public class Inventory : MonoBehaviour
                 speedMultiplier = 2f;
                 duration = 10f;
             }
+
+            // Green Adrenaline grants the temporary damage immunity promised by its store description.
+            if (equippedItem == adrenalineGreenSO)
+                player.ApplyTemporaryInvulnerability(duration);
 
             // Apply health
             player.RecoupHealth(Mathf.RoundToInt(healthIncrease));
@@ -867,7 +871,7 @@ public class Inventory : MonoBehaviour
             EquipHandItem();
         }
 
-        //else if (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))
+        //else if (equippedItem != null && (equippedItem == adrenalineGreenSO || equippedItem == adrenalineBlueSO || (equippedItem.itemPrefab != null && equippedItem.itemPrefab.CompareTag("Adrenaline"))))
         //{
         //    player.RecoupHealth(adrenalineHealthIncrease);
 

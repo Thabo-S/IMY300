@@ -80,6 +80,8 @@ public class Player : MonoBehaviour
     // Performance: Cache guard sight detection to avoid raycasts every frame
 
     private bool isDead;
+    private bool isTemporarilyInvulnerable;
+    private Coroutine invulnerabilityRoutine;
 
     [Header("Death Sequence")]
     public float deathScreenDelay = 1.5f;
@@ -301,9 +303,27 @@ public class Player : MonoBehaviour
     //    }
     //}
 
+    public void ApplyTemporaryInvulnerability(float duration)
+    {
+        if (duration <= 0f)
+            return;
+
+        if (invulnerabilityRoutine != null)
+            StopCoroutine(invulnerabilityRoutine);
+
+        invulnerabilityRoutine = StartCoroutine(TemporaryInvulnerabilityRoutine(duration));
+    }
+
+    private IEnumerator TemporaryInvulnerabilityRoutine(float duration)
+    {
+        isTemporarilyInvulnerable = true;
+        yield return new WaitForSeconds(duration);
+        isTemporarilyInvulnerable = false;
+        invulnerabilityRoutine = null;
+    }
     public void TakeDamage(int damage)
     {
-        if (isDead) return;
+        if (isDead || isTemporarilyInvulnerable) return;
 
         PlayerHealth -= damage;
 
