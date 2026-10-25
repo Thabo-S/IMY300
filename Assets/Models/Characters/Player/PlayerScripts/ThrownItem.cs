@@ -3,7 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class ThrownItem : MonoBehaviour
 {
-    public float impactVolume = 100f;
+    [Tooltip("Maximum guard-hearing radius in Unity world units.")]
+    public float impactRadius = 12f;
     private string originalTag;
     private bool hasLanded = false;
 
@@ -32,7 +33,7 @@ public class ThrownItem : MonoBehaviour
 
         Debug.Log("[THROWN ITEMS] - Item hit something - " + collision.transform.name);
 
-        SoundEmissionManager.EmitSound(transform.position, impactVolume, true);
+        SoundEmissionManager.EmitSound(transform.position, impactRadius, true);
 
         gameObject.tag = originalTag;
     }
