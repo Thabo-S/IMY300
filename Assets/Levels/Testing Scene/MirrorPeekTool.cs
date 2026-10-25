@@ -16,9 +16,9 @@ public class MirrorPeekTool : MonoBehaviour
 
     [Header("Fallback Corner Peek Position")]
     [Tooltip("Sideways, vertical, and forward offset from the player camera when no mirror-tip transform is assigned.")]
-    public Vector3 fallbackViewOffset = new Vector3(0.65f, -0.12f, 0.35f);
+    public Vector3 fallbackViewOffset = new Vector3(0.65f, -0.12f, 0.55f);
     [Tooltip("Yaw angle from the player view. Positive looks to the right around a corner.")]
-    [Range(-90f, 90f)] public float fallbackYawAngle = 70f;
+    [Range(-90f, 90f)] public float fallbackYawAngle = 90f;
 
     [Header("Limits")]
     [Min(0.25f)] public float maximumPeekSeconds = 3.5f;
