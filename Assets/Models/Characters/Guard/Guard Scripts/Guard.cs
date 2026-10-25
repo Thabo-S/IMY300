@@ -79,16 +79,8 @@ public class Guard : MonoBehaviour
 
     public float idleFacingYRotation = 90f;
 
-    // ------------------------------------------------------------
-    // PERFORMANCE SETTINGS
-    // ------------------------------------------------------------
-
-    // Perception does not need to run every rendered frame.
-    // One complete perception pass every 0.10 seconds is 10 checks/sec.
     private const float SightCheckInterval = 0.10f;
 
-    // The world-space detection UI also does not need to be rebuilt
-    // every rendered frame.
     private const float DetectionUIInterval = 0.10f;
 
     private float nextSightCheckTime;
@@ -125,6 +117,27 @@ public class Guard : MonoBehaviour
     }
 
     public static readonly List<Guard> AllGuards = new List<Guard>();
+    public static Guard FindClosestGuard(Vector3 position)
+    {
+        Guard closestGuard = null;
+        float closestDistanceSqr = float.PositiveInfinity;
+
+        for (int i = 0; i < AllGuards.Count; i++)
+        {
+            Guard guard = AllGuards[i];
+            if (guard == null || !guard.isActiveAndEnabled)
+                continue;
+
+            float distanceSqr = (guard.transform.position - position).sqrMagnitude;
+            if (distanceSqr < closestDistanceSqr)
+            {
+                closestDistanceSqr = distanceSqr;
+                closestGuard = guard;
+            }
+        }
+
+        return closestGuard;
+    }
 
     private void Awake()
     {

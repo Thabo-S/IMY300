@@ -110,8 +110,22 @@ public class SecurityCameraController : MonoBehaviour
         {
             if (!currentlySeen.Add(target)) continue;
             if (onDetected != null) onDetected.Invoke(target);
-            if (target.CompareTag(playerTag) && alarmClip != null && alarmAudioSource != null)
-                alarmAudioSource.PlayOneShot(alarmClip);
+            if (target.CompareTag(playerTag))
+            {
+                Guard nearestGuard = Guard.FindClosestGuard(target.transform.position);
+                if (nearestGuard != null)
+                {
+                    nearestGuard.TriggerLaserAlarm(target.transform.position);
+                    Debug.Log($"[{gameObject.name}] Alerted nearest guard '{nearestGuard.gameObject.name}' to investigate the detected player.");
+                }
+                else
+                {
+                    Debug.LogWarning($"[{gameObject.name}] Camera detected the player, but there are no active guards to investigate.");
+                }
+
+                if (alarmClip != null && alarmAudioSource != null)
+                    alarmAudioSource.PlayOneShot(alarmClip);
+            }
         }
         currentlySeen.RemoveWhere(target =>
         {
