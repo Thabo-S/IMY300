@@ -14,6 +14,12 @@ public class MirrorPeekTool : MonoBehaviour
     [Min(64)] public int textureWidth = 512;
     [Min(64)] public int textureHeight = 288;
 
+    [Header("Fallback Corner Peek Position")]
+    [Tooltip("Sideways, vertical, and forward offset from the player camera when no mirror-tip transform is assigned.")]
+    public Vector3 fallbackViewOffset = new Vector3(0.65f, -0.12f, 0.35f);
+    [Tooltip("Yaw angle from the player view. Positive looks to the right around a corner.")]
+    [Range(-90f, 90f)] public float fallbackYawAngle = 70f;
+
     [Header("Limits")]
     [Min(0.25f)] public float maximumPeekSeconds = 3.5f;
     public Vector2 panelSize = new Vector2(360f, 210f);
@@ -42,9 +48,11 @@ public class MirrorPeekTool : MonoBehaviour
                 GameObject originObject = new GameObject("Mirror View Origin");
                 existingOrigin = originObject.transform;
                 existingOrigin.SetParent(playerCamera.transform, false);
-                existingOrigin.localPosition = new Vector3(0.18f, -0.12f, 0.25f);
-                existingOrigin.localRotation = Quaternion.Euler(0f, 35f, 0f);
             }
+            // Move the view outside the player's camera position and point it
+            // sharply sideways so it can see around a corner.
+            existingOrigin.localPosition = fallbackViewOffset;
+            existingOrigin.localRotation = Quaternion.Euler(0f, fallbackYawAngle, 0f);
             mirrorViewOrigin = existingOrigin;
         }
         if (mirrorViewOrigin == null)
