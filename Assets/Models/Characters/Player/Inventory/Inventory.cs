@@ -66,6 +66,16 @@ public class Inventory : MonoBehaviour
              "equipped and F is pressed - no handItemPrefab involved.")]
     public Light torchLight;
 
+    [Tooltip("OFF (recommended): the torch only works while it's in the equipped " +
+             "hand slot, and F switches it on/off. ON: it switches itself on the " +
+             "moment it's equipped (F can still turn it off).")]
+    public bool autoTurnOnWhenEquipped = false;
+
+    // Used to detect the moment the torch enters / leaves the hand, so
+    // EquipHandItem() (called on pickups, drops, swaps...) doesn't keep
+    // re-forcing the light state.
+    private bool torchWasInHand = false;
+
     [Header("Adrenaline")]
     public int adrenalineHealthIncrease = 20;
     public float adrenalineSpeedMultiplier = 1.5f;
@@ -143,6 +153,10 @@ public class Inventory : MonoBehaviour
         if (container != null) container.SetActive(false);
 
 
+
+        // Torch always starts the level switched off
+        if (torchLight != null)
+            torchLight.gameObject.SetActive(false);
 
         // Explicitly enable rotation on startup
         SetPlayerRotationState(true);
@@ -382,7 +396,7 @@ public class Inventory : MonoBehaviour
         }
         else
         {
-             thrownItem = thrownObj.GetComponent<ThrownItem>();
+            thrownItem = thrownObj.GetComponent<ThrownItem>();
             if (thrownItem == null) thrownItem = thrownObj.AddComponent<ThrownItem>();
             thrownItem.Setup(thrownObj.tag);
         }
@@ -589,7 +603,7 @@ public class Inventory : MonoBehaviour
         {
             progressBarController.OnItemCollected(item, amountAdded);
         }
-        if(objectiveTracker != null)
+        if (objectiveTracker != null)
         {
             objectiveTracker.NotifyItemCollected(item);
         }
@@ -936,12 +950,54 @@ public class Inventory : MonoBehaviour
         CancelThrowAim();
     }
 
+    /// <summary>
+    /// True if the currently equipped hotbar slot holds an item tagged "Torch"
+    /// (checks the world prefab and the hand prefab, so either can carry the tag).
+    /// </summary>
+    private bool EquippedItemIsTorch()
+    {
+        Slot slot = GetEquippedSlot();
+        if (slot == null || !slot.HasItem()) return false;
+
+        ItemSO so = slot.GetItem();
+        if (so == null) return false;
+
+        return (so.itemPrefab != null && so.itemPrefab.CompareTag("Torch"))
+            || (so.handItemPrefab != null && so.handItemPrefab.CompareTag("Torch"));
+    }
+
+    /// <summary>
+    /// Keeps the torch light in sync with the hand. Torch leaves the hand
+    /// (swapped slot, dropped, thrown, moved in the inventory) -> light goes off.
+    /// Torch enters the hand -> light stays off, or turns on if autoTurnOnWhenEquipped.
+    /// </summary>
+    private void SyncTorchWithHand()
+    {
+        bool torchInHand = EquippedItemIsTorch();
+
+        if (torchLight != null)
+        {
+            if (!torchInHand)
+            {
+                torchLight.gameObject.SetActive(false);
+            }
+            else if (!torchWasInHand)
+            {
+                torchLight.gameObject.SetActive(autoTurnOnWhenEquipped);
+            }
+        }
+
+        torchWasInHand = torchInHand;
+    }
+
     public void EquipHandItem()
     {
         if (currentHandItem != null)
         {
             Destroy(currentHandItem);
         }
+
+        SyncTorchWithHand();
 
         Slot equippedSlot = GetEquippedSlot();
         if (equippedSlot == null || !equippedSlot.HasItem() || hand == null) return;

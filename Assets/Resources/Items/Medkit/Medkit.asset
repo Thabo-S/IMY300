@@ -17,8 +17,11 @@ MonoBehaviour:
   maxStackSize: 1
   itemPrefab: {fileID: 4185105213926453150, guid: a1caf27a3e1096a4eaa5000a00100e14, type: 3}
   handItemPrefab: {fileID: 0}
-  value: 50
+  isUniqueArtifact: 0
+  priceRangeMin: 0
+  priceRangeMax: 0
+  value: 0
   purchasable: 1
-  price: 670
+  price: 25000
   description: MedKit - Used for recovering health after being shot. Can't be used
     when health is still to high.
