@@ -21,8 +21,8 @@ MonoBehaviour:
   priceRangeMin: 0
   priceRangeMax: 0
   value: 0
-  purchasable: 0
-  price: 150
+  purchasable: 1
+  price: 20000
   description: 'This item allows a player to shine light in dark areas
 
 '

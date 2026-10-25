@@ -46,6 +46,9 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public AudioSource audioSource;
     public AudioClip buySuccessClip;
     public AudioClip buyFailClip;
+    [Range(0f, 1f)]
+    [Tooltip("Volume applied to the AudioSource for purchase sounds.")]
+    public float volume = 0.1f;
 
     private Material defaultMaterial;
     private Color buyButtonDefaultColor;
@@ -94,6 +97,8 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
                 audioSource.playOnAwake = false;
             }
         }
+
+        audioSource.volume = volume;
 
         if (feedbackText != null)
         {
@@ -245,7 +250,7 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             if (alreadyOwned)
             {
                 reason = "Already owned";
-               
+
             }
             else if (!canAfford)
             {
@@ -283,6 +288,7 @@ public class ShopSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         if (audioSource != null && clip != null)
         {
+            audioSource.volume = volume;
             audioSource.PlayOneShot(clip);
         }
     }

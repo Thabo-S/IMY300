@@ -722,7 +722,7 @@ public class Player : MonoBehaviour
 
                 if (hitObject.CompareTag("Cash"))
                 {
-                    interactionTextUI.text = "[E] Pick up Cash $100";
+                    interactionTextUI.text = "[E] Pick up Cash $1 000";
                 }
                 else
                 { 
