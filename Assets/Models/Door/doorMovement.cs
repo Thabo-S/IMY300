@@ -16,7 +16,7 @@ public class doorMovement : MonoBehaviour
     [Header("Door State")]
     public DoorState currentState = DoorState.Closed;
 
-        [Header("Animation Settings")]
+    [Header("Animation Settings")]
     [SerializeField] private float animationDuration = 0.5f;
     [SerializeField] private float garageDoorAnimationDuration = 2f;
     [SerializeField] private float garageDoorHeight = 1.8f;
@@ -35,6 +35,42 @@ public class doorMovement : MonoBehaviour
     private GameObject player;
 
     [SerializeField] private Outline outline;
+
+    // Absolute poses, cached once. Every toggle animates to one of these, so
+    // reversing mid-animation (spam clicking) can never drift out of bounds.
+    private Quaternion closedLocalRotation;
+    private Quaternion openLocalRotation;
+    private Vector3 closedLocalPosition;
+    private Vector3 openLocalPosition;
+
+    private void Awake()
+    {
+        CacheDoorPoses();
+    }
+
+    private void CacheDoorPoses()
+    {
+        Quaternion openOffset = Quaternion.Euler(0f, GetRotationDelta(), 0f);
+        Vector3 liftOffset = new Vector3(0f, garageDoorHeight, 0f);
+
+        if (currentState == DoorState.Closed)
+        {
+            closedLocalRotation = transform.localRotation;
+            openLocalRotation = closedLocalRotation * openOffset;
+
+            closedLocalPosition = transform.localPosition;
+            openLocalPosition = closedLocalPosition + liftOffset;
+        }
+        else
+        {
+            // Door was placed in the scene already open
+            openLocalRotation = transform.localRotation;
+            closedLocalRotation = openLocalRotation * Quaternion.Inverse(openOffset);
+
+            openLocalPosition = transform.localPosition;
+            closedLocalPosition = openLocalPosition - liftOffset;
+        }
+    }
 
     private void Start()
     {
@@ -92,44 +128,25 @@ public class doorMovement : MonoBehaviour
     public void ToggleDoor()
     {
         PlaySound(doorSound);
-
-        if (_animationCoroutine != null)
-            StopCoroutine(_animationCoroutine);
-
-        float yDelta = GetRotationDelta();
-
-        if (currentState == DoorState.Closed)
-        {
-            _animationCoroutine = StartCoroutine(RotateDoor(yDelta));
-            currentState = DoorState.Open;
-        }
-        else
-        {
-            _animationCoroutine = StartCoroutine(RotateDoor(-yDelta));
-            currentState = DoorState.Closed;
-        }
+        ToggleRotatingDoor();
     }
 
     public void ToggleKeycardDoor()
     {
-
         PlaySound(keycardDoorSound);
+        ToggleRotatingDoor();
+    }
 
+    private void ToggleRotatingDoor()
+    {
         if (_animationCoroutine != null)
             StopCoroutine(_animationCoroutine);
 
-        float yDelta = GetRotationDelta();
+        bool opening = currentState == DoorState.Closed;
+        currentState = opening ? DoorState.Open : DoorState.Closed;
 
-        if (currentState == DoorState.Closed)
-        {
-            _animationCoroutine = StartCoroutine(RotateDoor(yDelta));
-            currentState = DoorState.Open;
-        }
-        else
-        {
-            _animationCoroutine = StartCoroutine(RotateDoor(-yDelta));
-            currentState = DoorState.Closed;
-        }
+        Quaternion target = opening ? openLocalRotation : closedLocalRotation;
+        _animationCoroutine = StartCoroutine(RotateDoor(target));
     }
 
     public void ToggleGarageDoor()
@@ -139,17 +156,13 @@ public class doorMovement : MonoBehaviour
         if (_animationCoroutine != null)
             StopCoroutine(_animationCoroutine);
 
-        if (currentState == DoorState.Closed)
-        {
-            _animationCoroutine = StartCoroutine(MoveGarageDoor(garageDoorHeight));
-            currentState = DoorState.Open;
-        }
-        else
-        {
-            _animationCoroutine = StartCoroutine(MoveGarageDoor(-garageDoorHeight));
-            currentState = DoorState.Closed;
-        }
+        bool opening = currentState == DoorState.Closed;
+        currentState = opening ? DoorState.Open : DoorState.Closed;
+
+        Vector3 target = opening ? openLocalPosition : closedLocalPosition;
+        _animationCoroutine = StartCoroutine(MoveGarageDoor(target));
     }
+
     public void RemoveKeycardRequirement()
     {
         gameObject.tag = "Door";
@@ -189,42 +202,54 @@ public class doorMovement : MonoBehaviour
         }
     }
 
-        private float GetRotationDelta()
+    private float GetRotationDelta()
     {
         return openRotationY;
     }
 
-    private IEnumerator RotateDoor(float yDelta)
+    private IEnumerator RotateDoor(Quaternion targetRot)
     {
         Quaternion startRot = transform.localRotation;
-        Quaternion targetRot = startRot * Quaternion.Euler(0f, yDelta, 0f);
+
+        // Scale duration by how far there is left to go, so reversing a
+        // half-open door takes half the time instead of the full duration.
+        float fullAngle = Mathf.Max(Mathf.Abs(openRotationY), 0.01f);
+        float fraction = Mathf.Clamp01(Quaternion.Angle(startRot, targetRot) / fullAngle);
+        float duration = Mathf.Max(animationDuration * fraction, 0.01f);
+
         float elapsed = 0f;
 
-        while (elapsed < animationDuration)
+        while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / animationDuration;
+            float t = Mathf.Clamp01(elapsed / duration);
             transform.localRotation = Quaternion.Slerp(startRot, targetRot, t);
             yield return null;
         }
 
         transform.localRotation = targetRot;
+        _animationCoroutine = null;
     }
 
-    private IEnumerator MoveGarageDoor(float yDelta)
+    private IEnumerator MoveGarageDoor(Vector3 targetPos)
     {
         Vector3 startPos = transform.localPosition;
-        Vector3 targetPos = startPos + new Vector3(0f, yDelta, 0f);
+
+        float fullDistance = Mathf.Max(Mathf.Abs(garageDoorHeight), 0.01f);
+        float fraction = Mathf.Clamp01(Vector3.Distance(startPos, targetPos) / fullDistance);
+        float duration = Mathf.Max(garageDoorAnimationDuration * fraction, 0.01f);
+
         float elapsed = 0f;
 
-        while (elapsed < garageDoorAnimationDuration)
+        while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / animationDuration;
+            float t = Mathf.Clamp01(elapsed / duration);
             transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
             yield return null;
         }
 
         transform.localPosition = targetPos;
+        _animationCoroutine = null;
     }
 }

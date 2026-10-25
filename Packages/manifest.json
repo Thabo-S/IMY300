@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.adjoint.editor": "https://github.com/adjointdev/adjoint-beta-dist.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "2.0.12",
     "com.unity.behavior": "1.0.15",
