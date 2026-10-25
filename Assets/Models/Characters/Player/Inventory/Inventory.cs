@@ -409,16 +409,11 @@ public class Inventory : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.AddForce(spawnForward * throwForce, ForceMode.VelocityChange);
 
-        // Guarantee thrown items can always alert guards on landing, even if
-        // the prefab was never set up with ThrownItem attached in the Editor.
-        ThrownItem thrownItem = thrownObj.GetComponent<ThrownItem>();
-        if (thrownItem == null) thrownItem = thrownObj.AddComponent<ThrownItem>();
-        thrownItem.Setup(thrownObj.tag);
+        bool isNoiseMaker = itemSO.itemName == "NoiseMaker" ||
+                            thrownObj.GetComponent<NoiseMakerItem>() != null ||
+                            thrownObj.CompareTag("NoiseMaker");
 
-
-        // Guarantee thrown items can always alert guards on landing, even if
-        // the prefab was never set up with ThrownItem attached in the Editor.
-        if (thrownObj.CompareTag("NoiseMaker"))
+        if (isNoiseMaker)
         {
             NoiseMakerItem noiseMaker = thrownObj.GetComponent<NoiseMakerItem>();
             if (noiseMaker == null) noiseMaker = thrownObj.AddComponent<NoiseMakerItem>();
@@ -426,11 +421,11 @@ public class Inventory : MonoBehaviour
         }
         else
         {
-            thrownItem = thrownObj.GetComponent<ThrownItem>();
+            // Regular thrown items use one localized impact alert.
+            ThrownItem thrownItem = thrownObj.GetComponent<ThrownItem>();
             if (thrownItem == null) thrownItem = thrownObj.AddComponent<ThrownItem>();
             thrownItem.Setup(thrownObj.tag);
         }
-
         // Deduct 1 item from slot stack
         int remaining = equippedSlot.GetAmount() - 1;
         if (remaining > 0)

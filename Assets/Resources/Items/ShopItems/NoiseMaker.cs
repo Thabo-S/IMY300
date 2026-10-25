@@ -10,9 +10,8 @@ public class NoiseMakerItem : MonoBehaviour
     private AudioSource audioSource;
 
 
-    [Tooltip("Guards within this distance of the landing spot are sent to " +
-             "investigate it directly, the same as a thrown item's impact.")]
-    public float noiseVolume = 100f;
+    [Tooltip("Maximum guard-hearing radius in Unity world units; deliberately larger than a normal thrown item.")]
+    public float noiseRadius = 28f;
 
     [Tooltip("Seconds between landing and the sound actually going off.")]
     public float delayAfterLanding = 1.5f;
@@ -48,7 +47,7 @@ public class NoiseMakerItem : MonoBehaviour
 
     private void EmitNoise()
     {
-        SoundEmissionManager.EmitSound(transform.position, noiseVolume, true);
+        SoundEmissionManager.EmitSound(transform.position, noiseRadius, true);
 
         if (audioSource != null && noiseClip != null)
         { 
