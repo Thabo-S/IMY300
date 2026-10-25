@@ -161,10 +161,8 @@ public class ExitZone : MonoBehaviour
         }
 
         if (missionStarsController != null)
-
-            if (missionStarsController != null)
         {
-            missionStarsController.EvaluateAndAwardStars(sideLootCash, elapsedSeconds, itemsCollected, wasDetected);
+            missionStarsController.EvaluateAndAwardStars(sideLootCash, elapsedSeconds, itemsCollected, wasDetected, hasRequiredItems);
         }
 
         UpdateMissionCompleteText(hasRequiredItems, sideLootCash);
