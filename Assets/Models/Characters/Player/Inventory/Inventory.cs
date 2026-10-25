@@ -98,6 +98,10 @@ public class Inventory : MonoBehaviour
     public float trajectoryTimeStep = 0.1f;
     private bool isAiming = false;
 
+    [Header("Mirror Peek Tool")]
+    [SerializeField] private KeyCode mirrorPeekKey = KeyCode.V;
+    private MirrorPeekTool mirrorPeekTool;
+
     // Internal slot management lists
     private List<Slot> inventorySlots = new List<Slot>();
     public List<Slot> hotbarSlots = new List<Slot>();
@@ -158,6 +162,14 @@ public class Inventory : MonoBehaviour
 
         if (notificationText != null)
             notificationText.gameObject.SetActive(false);
+
+        // Attach the view tool to the player only when a camera is available.
+        if (playerCamera != null)
+        {
+            mirrorPeekTool = GetComponent<MirrorPeekTool>();
+            if (mirrorPeekTool == null)
+                mirrorPeekTool = gameObject.AddComponent<MirrorPeekTool>();
+        }
     }
 
     private void Update()
@@ -199,8 +211,26 @@ public class Inventory : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F) && !QteState.IsActive)
             useSelectedItem();
+
+        HandleMirrorPeekInput();
     }
 
+    private void HandleMirrorPeekInput()
+    {
+        if (mirrorPeekTool == null) return;
+
+        Slot equippedSlot = GetEquippedSlot();
+        ItemSO equippedItem = equippedSlot != null && equippedSlot.HasItem()
+            ? equippedSlot.GetItem()
+            : null;
+        bool hasMirrorEquipped = equippedItem != null && equippedItem.itemName == "MirrorPeekTool";
+        bool canPeek = hasMirrorEquipped && !IsOpen && !PauseMenu.isGamePause && !QteState.IsActive;
+
+        if (!canPeek || Input.GetKeyUp(mirrorPeekKey))
+            mirrorPeekTool.EndPeek();
+        else if (Input.GetKeyDown(mirrorPeekKey))
+            mirrorPeekTool.BeginPeek();
+    }
     #region Notifications
 
     public void ShowNotification(string message)
