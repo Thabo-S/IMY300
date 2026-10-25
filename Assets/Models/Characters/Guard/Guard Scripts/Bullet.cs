@@ -21,25 +21,24 @@ public class Bullet : MonoBehaviour
     {
         Transform hitObject = collision.transform;
 
-        // Ignore whoever fired this bullet - it can spawn overlapping the
-        // guard's own collider for the first physics step, which was
-        // destroying the bullet instantly instead of letting it travel.
+        // Ignore the shooter and its child colliders so the bullet can leave the gun.
         if (shooter != null &&
             (hitObject.gameObject == shooter || hitObject.root.gameObject == shooter))
         {
             return;
         }
 
-        if (hitObject.CompareTag("Player") && PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0)
+        // Player colliders may be on child objects, so search up the hierarchy.
+        Player player = hitObject.GetComponentInParent<Player>();
+        if (player != null)
         {
-            hitObject.GetComponent<Player>().TakeDamage(bulletDamageTutorial);
-
-        }
-        else
-        {
-            hitObject.GetComponent<Player>().TakeDamage(bulletDamage);
+            int damage = PlayerPrefs.GetInt("currentLevelPrefKey", 0) == 0
+                ? bulletDamageTutorial
+                : bulletDamage;
+            player.TakeDamage(damage);
         }
 
+        // Bullets are consumed by any non-shooter impact, including walls and props.
         Destroy(gameObject);
     }
 }
